@@ -4,7 +4,7 @@
 
 # Credits:
 # Jason Cox, @jasonacox
-# 
+# https://github.com/jasonacox/Build-OpenSSL-cURL 
 # Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
 # https://gist.github.com/c61c0f7d9ab60f53ebb0.git
 # Bochun Bai
@@ -83,7 +83,6 @@ buildIOS()
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
-		# -fembed-bitcode -arch ${ARCH}"
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} -fembed-bitcode"
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/iOS/lib"
    
@@ -124,7 +123,7 @@ buildTVOS()
    
 	echo "Building ${CURL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${ARCH}"
 
-	./configure -prefix="/tmp/${CURL_VERSION}-tvOS-${ARCH}" --host="arm-apple-darwin" -disable-shared -with-random=/dev/urandom --disable-ntlm-wb --with-ssl="${OPENSSL}" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
+	./configure -prefix="/tmp/${CURL_VERSION}-tvOS-${ARCH}" --host="arm-apple-darwin" -disable-shared -with-random=/dev/urandom --disable-ntlm-wb --with-ssl="${OPENSSL}/tvOS" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
 
 	# Patch to not use fork() since it's not available on tvOS
         LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "./lib/curl_config.h"
