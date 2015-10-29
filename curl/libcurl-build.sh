@@ -3,12 +3,13 @@
 # This script downlaods and builds the iOS and Mac libcurl libraries with Bitcode enabled
 
 # Credits:
-# Jason Cox, @jasonacox
-# https://github.com/jasonacox/Build-OpenSSL-cURL 
+#
 # Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
-# https://gist.github.com/c61c0f7d9ab60f53ebb0.git
+#   https://gist.github.com/c61c0f7d9ab60f53ebb0.git
 # Bochun Bai
-# https://github.com/sinofool/build-libcurl-ios
+#   https://github.com/sinofool/build-libcurl-ios
+# Jason Cox, @jasonacox
+#   https://github.com/jasonacox/Build-OpenSSL-cURL 
 
 set -e
 

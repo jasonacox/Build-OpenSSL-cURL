@@ -3,14 +3,17 @@
 # This script downlaods and builds the iOS and Mac openSSL libraries with Bitcode enabled
 
 # Credits:
-# Jason Cox, @jasonacox
-# https://github.com/jasonacox/Build-OpenSSL-cURL
-# https://github.com/st3fan/ios-openssl
-# https://github.com/x2on/OpenSSL-for-iPhone/blob/master/build-libssl.sh
-# https://gist.github.com/foozmeat/5154962
+#
+# Stefan Arentz
+#   https://github.com/st3fan/ios-openssl
+# Felix Schulze
+#   https://github.com/x2on/OpenSSL-for-iPhone/blob/master/build-libssl.sh
+# James Moore
+#   https://gist.github.com/foozmeat/5154962
 # Peter Steinberger, PSPDFKit GmbH, @steipete.
-# Felix Schwarz, IOSPIRIT GmbH, @felix_schwarz.
-# https://github.com/sinofool/build-openssl-ios
+#   https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
+# Jason Cox, @jasonacox
+#   https://github.com/jasonacox/Build-OpenSSL-cURL
 
 set -e
 
