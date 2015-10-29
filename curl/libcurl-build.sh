@@ -201,4 +201,3 @@ echo "Checking libraries"
 xcrun -sdk iphoneos lipo -info lib/*.a
 
 echo "Done"
-@
