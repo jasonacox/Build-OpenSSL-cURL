@@ -92,6 +92,9 @@ Usage
 
 ## Architectures in Libraries
 
+	xcrun -sdk iphoneos lipo -info openssl/*/lib/*.a
+	xcrun -sdk iphoneos lipo -info curl/lib/*.a
+
 * Mac
 * curl/lib/libcurl_Mac.a are: x86_64 
 * openssl/Mac/lib/libcrypto.a are: x86_64 
