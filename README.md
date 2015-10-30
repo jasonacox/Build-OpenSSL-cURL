@@ -90,6 +90,20 @@ Usage
 	      |____libssl.a
 
 
+## Architectures in Libraries
+
+* curl/lib/libcurl_Mac.a are: x86_64 
+* openssl/Mac/lib/libcrypto.a are: x86_64 
+* openssl/Mac/lib/libssl.a are: x86_64 
+
+* curl/lib/libcurl_iOS.a are: armv7 armv7s i386 x86_64 arm64 
+* openssl/iOS/lib/libcrypto.a are: armv7 i386 x86_64 arm64 
+* openssl/iOS/lib/libssl.a are: armv7 i386 x86_64 arm64 
+
+* curl/lib/libcurl_tvOS.a are: x86_64 arm64 
+* openssl/tvOS/lib/libcrypto.a are: x86_64 arm64 
+* openssl/tvOS/lib/libssl.a are: x86_64 arm64 
+
 ## Credits
 
  Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
@@ -106,4 +120,5 @@ Usage
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
  Jason Cox, @jasonacox
    https://github.com/jasonacox/Build-OpenSSL-cURL
+
 
