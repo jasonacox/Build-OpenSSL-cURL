@@ -92,14 +92,15 @@ Usage
 
 ## Architectures in Libraries
 
+* Mac
 * curl/lib/libcurl_Mac.a are: x86_64 
 * openssl/Mac/lib/libcrypto.a are: x86_64 
 * openssl/Mac/lib/libssl.a are: x86_64 
-
+* iOS
 * curl/lib/libcurl_iOS.a are: armv7 armv7s i386 x86_64 arm64 
 * openssl/iOS/lib/libcrypto.a are: armv7 i386 x86_64 arm64 
 * openssl/iOS/lib/libssl.a are: armv7 i386 x86_64 arm64 
-
+* tvOS
 * curl/lib/libcurl_tvOS.a are: x86_64 arm64 
 * openssl/tvOS/lib/libcrypto.a are: x86_64 arm64 
 * openssl/tvOS/lib/libssl.a are: x86_64 arm64 
