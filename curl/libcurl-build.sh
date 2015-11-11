@@ -42,7 +42,6 @@ IPHONEOS_DEPLOYMENT_TARGET="6.0"
 buildMac()
 {
 	ARCH=$1
-	SYSROOT="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk"
 	HOST="i386-apple-darwin"
 
 	echo "Building ${CURL_VERSION} for ${ARCH}"
@@ -54,8 +53,8 @@ buildMac()
 	fi
 
 	export CC="${BUILD_TOOLS}/usr/bin/clang"
-	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${SYSROOT} -miphoneos-version-min=${IPHONEOS_DEPLOYMENT_TARGET} -fembed-bitcode"
-	export LDFLAGS="-arch ${ARCH} -isysroot ${SYSROOT} -L${OPENSSL}/Mac/lib"
+	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
+	export LDFLAGS="-arch ${ARCH} -L${OPENSSL}/Mac/lib"
 
 	pushd . > /dev/null
 	cd "${CURL_VERSION}"
@@ -168,7 +167,6 @@ echo "Building Mac libraries"
 lipo \
 	"/tmp/${CURL_VERSION}-x86_64/lib/libcurl.a" \
 	-create -output lib/libcurl_Mac.a
-
 
 buildIOS "armv7"
 buildIOS "armv7s"
