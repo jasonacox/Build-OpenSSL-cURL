@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script downlaods and builds the iOS and Mac libcurl libraries with Bitcode enabled
+# This script downlaods and builds the Mac, iOS and tvOS libcurl libraries with Bitcode enabled
 
 # Credits:
 #
