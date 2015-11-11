@@ -125,4 +125,7 @@ Usage
  Jason Cox, @jasonacox
    https://github.com/jasonacox/Build-OpenSSL-cURL
 
+## Build Troubleshooting Tips
+
+The AppleTVOS curl build may fail due to a macports "ar" program being picked up (it was in the path - You will see a log message about /opt/local/bin/ar failing in the curl log). A quick cleanup of the path (so that the build uses /usr/bin/ar) fixed the problem.  - Thanks to Preston Jennings (prestonj) for this tip.
 
