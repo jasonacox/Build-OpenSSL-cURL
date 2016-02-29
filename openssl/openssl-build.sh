@@ -23,13 +23,13 @@ usage ()
 	exit 127
 }
 
-if [ $1 -e "-h" ]; then
+if [ "$1" == "-h" ]; then
 	usage
 fi
 
 if [ -z $1 ]; then
 	IOS_SDK_VERSION="" #"9.1"
-	IOS_MIN_SDK_VERSION="8.0"
+	IOS_MIN_SDK_VERSION="7.1"
 	
 	TVOS_SDK_VERSION="" #"9.0"
 	TVOS_MIN_SDK_VERSION="9.0"
@@ -38,7 +38,7 @@ else
 	TVOS_SDK_VERSION=$2
 fi
 
-OPENSSL_VERSION="openssl-1.0.1l"
+OPENSSL_VERSION="openssl-1.0.1r"
 DEVELOPER=`xcode-select -print-path`
 
 buildMac()
@@ -161,7 +161,7 @@ rm -rf "${OPENSSL_VERSION}"
 
 if [ ! -e ${OPENSSL_VERSION}.tar.gz ]; then
 	echo "Downloading ${OPENSSL_VERSION}.tar.gz"
-	curl -O https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
+	curl -LO https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
 else
 	echo "Using ${OPENSSL_VERSION}.tar.gz"
 fi
@@ -169,6 +169,7 @@ fi
 echo "Unpacking openssl"
 tar xfz "${OPENSSL_VERSION}.tar.gz"
 
+echo "Building Mac libraries"
 buildMac "x86_64"
 
 echo "Copying headers"
@@ -176,7 +177,6 @@ cp /tmp/${OPENSSL_VERSION}-x86_64/include/openssl/* Mac/include/openssl/
 cp /tmp/${OPENSSL_VERSION}-x86_64/include/openssl/* iOS/include/openssl/
 cp /tmp/${OPENSSL_VERSION}-x86_64/include/openssl/* tvOS/include/openssl/
 
-echo "Building Mac libraries"
 lipo \
 	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libcrypto.a" \
 	-create -output Mac/lib/libcrypto.a
@@ -185,13 +185,13 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libssl.a" \
 	-create -output Mac/lib/libssl.a
 
+echo "Building iOS libraries"
 buildIOS "armv7"
 buildIOS "armv7s"
 buildIOS "arm64"
 buildIOS "x86_64"
 buildIOS "i386"
 
-echo "Building iOS libraries"
 lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libcrypto.a" \
@@ -207,10 +207,10 @@ lipo \
 	-create -output iOS/lib/libssl.a
 
 
+echo "Building tvOS libraries"
 buildTVOS "arm64"
 buildTVOS "x86_64"
 
-echo "Building tvOS libraries"
 lipo \
 	"/tmp/${OPENSSL_VERSION}-tvOS-arm64/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-tvOS-x86_64/lib/libcrypto.a" \
