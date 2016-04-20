@@ -1,9 +1,37 @@
 #!/bin/bash
 
+# This script builds openssl+libcurl libraries for the Mac, iOS and tvOS 
+#
+# Jason Cox, @jasonacox
+#   https://github.com/jasonacox/Build-OpenSSL-cURL
+
+# HTTP2 Support?
+NOHTTP2="/tmp/no-http2"
+rm -f $NOHTTP2
+
+usage ()
+{
+        echo "usage: $0 [-disable-http2]"
+        exit 127
+}
+
+if [ "$1" == "-h" ]; then
+        usage
+fi
+
 echo "Building OpenSSL"
 cd openssl
 ./openssl-build.sh
 cd ..
+
+if [ "$1" == "-disable-http2" ]; then
+	touch "$NOHTTP2"
+else 
+	echo "Building nghttp2 for HTTP2 support"
+	cd nghttp2
+	./nghttp2-build.sh
+	cd ..
+fi
 
 echo
 echo "Building Curl"
@@ -15,3 +43,5 @@ echo
 echo "Libraries..."
 xcrun -sdk iphoneos lipo -info openssl/*/lib/*.a
 xcrun -sdk iphoneos lipo -info curl/lib/*.a
+
+rm -f $NOHTTP2

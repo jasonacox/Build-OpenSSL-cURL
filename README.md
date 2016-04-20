@@ -1,9 +1,9 @@
 # Build-OpenSSL-cURL
 
-Build OpenSSL and libcurl for OS X, iOS and tvOS with Bitcode enabled for iOS, tvOS.  Includes patching for tvOS to not use fork(). 
+Build OpenSSL, nghttp2 and libcurl for OS X, iOS and tvOS with Bitcode enabled for iOS, tvOS.  Includes patching for tvOS to not use fork() and HTTP2 Support. 
 
 ## Build
-The `build.sh` script calls two build scripts:
+The `build.sh` script calls three build scripts:
 
 ## OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
@@ -18,6 +18,19 @@ Edit `openssl-build.sh` to change the version of OpenSSL that will be downloaded
 	   |____libcrypto.a
 	   |____libssl.a
 
+## HTTP2 / nghttp2
+The `nghttp2-build.sh` script build the nghttp2 libraries used by libcurl for the HTTP2 protocol.
+* Mac - x86-64
+* iOS - armv7, armv7s, arm64 and iPhoneSimulator (i386, x86-64)
+* tvOS - arm64 and AppleTVSimulator (x86-64)
+
+	|____lib
+	   |____libnghttp2_iOS.a
+	   |____libnghttp2_Mac.a
+	   |____libnghttp2_tvOS.a
+
+DISABLE: The nghttp2 build can be disabled by using `build.sh --disable-http2`
+
 ## cURL / libcurl
 The `libcurl-build.sh` script create separate bitcode enabled targets libraries for:
 * Mac - x86-64
@@ -25,7 +38,7 @@ The `libcurl-build.sh` script create separate bitcode enabled targets libraries 
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
 The curl build uses `--with-ssl` pointing to the above OpenSSL builds.
-Edit `libcurl-build.sh` to change the verion of cURL that will be downloaded and built.
+Edit `libcurl-build.sh` to change the version of cURL that will be downloaded and built.
 
 	|____lib
 	   |____libcurl_iOS.a
