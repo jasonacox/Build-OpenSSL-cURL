@@ -41,7 +41,14 @@ cd ..
 
 echo 
 echo "Libraries..."
+echo
+echo "opensll"
 xcrun -sdk iphoneos lipo -info openssl/*/lib/*.a
+echo
+echo "nghttp2 (rename to libnghttp2.a)"
+xcrun -sdk iphoneos lipo -info nghttp2/lib/*.a
+echo
+echo "libcurl (rename to libcurl.a)"
 xcrun -sdk iphoneos lipo -info curl/lib/*.a
 
 rm -f $NOHTTP2

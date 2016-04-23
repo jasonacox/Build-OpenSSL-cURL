@@ -36,7 +36,7 @@ else
 	TVOS_SDK_VERSION=$2
 fi
 
-CURL_VERSION="curl-7.47.1"
+CURL_VERSION="curl-7.48.0"
 OPENSSL="${PWD}/../openssl"  
 DEVELOPER=`xcode-select -print-path`
 IPHONEOS_DEPLOYMENT_TARGET="6.0"
@@ -148,7 +148,7 @@ buildTVOS()
 	fi
 	
 	if [ ! -z "$NGHTTP2" ]; then 
-		#NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/tvOS/${ARCH}"
+		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/tvOS/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/tvOS/${ARCH}/lib"
 	fi
   
@@ -159,10 +159,11 @@ buildTVOS()
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} -fembed-bitcode"
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/tvOS/lib ${NGHTTP2LIB}"
+#	export PKG_CONFIG_PATH 
    
 	echo "Building ${CURL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${ARCH}"
 
-	./configure -prefix="/tmp/${CURL_VERSION}-tvOS-${ARCH}" --host="arm-apple-darwin" -disable-shared -with-random=/dev/urandom --disable-ntlm-wb --with-ssl="${OPENSSL}/tvOS ${NGHTTP2CFG}" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
+	./configure -prefix="/tmp/${CURL_VERSION}-tvOS-${ARCH}" --host="arm-apple-darwin" -disable-shared -with-random=/dev/urandom --disable-ntlm-wb --with-ssl="${OPENSSL}/tvOS" ${NGHTTP2CFG} &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
 
 	# Patch to not use fork() since it's not available on tvOS
         LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "./lib/curl_config.h"

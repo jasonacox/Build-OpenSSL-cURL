@@ -13,21 +13,21 @@ Usage
  1. Do "bash nghttp2-build.sh".
  2. Architecture Libraries are created in iOS/{ARCH}, Mac/{ARCH}, tvOS/{ARCH}
  3. Multiple Architecture fat libraries are created in lib.
- 3. To use libraries:
+ 4. To use libraries:
 	cURL - You would use `--with-nghttp2={PATH-for-ARCH}`
 	Xcode - Rename and add the appropriate FAT library to your project.
 		Ex. iOS: `cp lib/libnghttp2_iOS.a ~/myProj/lib/libnghttp2.a `
 
-## Manual Build
-```
-# Get build requirements
-# Some of these are used for the Python bindings
-# this package also installs
-sudo apt-get install g++ make binutils autoconf automake autotools-dev libtool pkg-config \
-  zlib1g-dev libcunit1-dev libssl-dev libxml2-dev libev-dev libevent-dev libjansson-dev \
-  libjemalloc-dev cython python3-dev python-setuptools
+The build script here is intended to be used with libcurl and openssl.
 
+## Manual Build
+
+Automake is required (see automake-build.sh to install on MacOS)
+
+```
+#!/bin/bash
 # Build nghttp2 from source
+
 git clone https://github.com/tatsuhiro-t/nghttp2.git
 cd nghttp2
 autoreconf -i
