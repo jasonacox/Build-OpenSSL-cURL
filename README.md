@@ -19,12 +19,12 @@ Edit `openssl-build.sh` to change the version of OpenSSL that will be downloaded
 	   |____libssl.a
 
 ## HTTP2 / nghttp2
-The `nghttp2-build.sh` script build the nghttp2 libraries used by libcurl for the HTTP2 protocol.
+The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
 * Mac - x86-64
 * iOS - armv7, armv7s, arm64 and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
-Include the relevant library into your project.  Rename the file to libnghttp2.a:
+Edit `nghttp2-build.sh` to change the version of OpenSSL that will be downloaded and built.  Include the relevant library into your project.  Rename the file to libnghttp2.a:
 
 	|____lib
 	   |____libnghttp2_iOS.a
@@ -39,7 +39,7 @@ The `libcurl-build.sh` script create separate bitcode enabled targets libraries 
 * iOS - armv7, armv7s, arm64 and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
-The curl build uses `--with-ssl` pointing to the above OpenSSL builds.
+The curl build uses `--with-ssl` pointing to the above OpenSSL builds and `--with-nghttp2` pointing to the above nghttp2 builds..
 Edit `libcurl-build.sh` to change the version of cURL that will be downloaded and built.
 
 	|____lib
@@ -60,7 +60,7 @@ To include the OpenSSL and libcurl libraries in your Xcode projects, import the 
 Usage
 =====
 
- 1. Do "sh build.sh"
+ 1. Run "sh build.sh"
  2. Libraries are created in curl/lib, openssl/*/lib, nghttp2/lib
  3. Copy libs and headers to your project.
  4. Import appropriate "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a".
