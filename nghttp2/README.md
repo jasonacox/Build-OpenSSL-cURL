@@ -40,6 +40,8 @@ sudo make install
 
 ## Credits
 
+ Tatsuhiro Tsujikawa, nghttp2.org
+   https://nghttp2.org https://github.com/nghttp2
  Jason Cox, @jasonacox
    https://github.com/jasonacox/Build-OpenSSL-cURL
  

@@ -143,6 +143,8 @@ Usage
    https://gist.github.com/foozmeat/5154962
  Peter Steinberger, PSPDFKit GmbH, @steipete.
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
+ Tatsuhiro Tsujikawa, nghttp2.org
+   https://nghttp2.org
  Jason Cox, @jasonacox
    https://github.com/jasonacox/Build-OpenSSL-cURL
 
