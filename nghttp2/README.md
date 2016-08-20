@@ -19,6 +19,7 @@ Usage
 		Ex. iOS: `cp lib/libnghttp2_iOS.a ~/myProj/lib/libnghttp2.a `
 
 The build script here is intended to be used with libcurl and openssl.
+NOTE: pkg-config is required to build libcurl with nghttp2.  This script will attempt to install pkg-config with brew if it is missing.
 
 ## Manual Build
 

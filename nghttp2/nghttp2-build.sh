@@ -10,6 +10,8 @@
 
 # > nghttp2 is an implementation of HTTP/2 and its header 
 # > compression algorithm HPACK in C
+# 
+# NOTE: pkg-config is required
  
 set -e
 
@@ -35,12 +37,36 @@ else
 fi
 
 # --- Edit this to update version ---
-NGHTTP2_VERNUM="1.9.2"
+NGHTTP2_VERNUM="1.13.0"
 
 NGHTTP2_VERSION="nghttp2-${NGHTTP2_VERNUM}"
 DEVELOPER=`xcode-select -print-path`
 
 NGHTTP2="${PWD}/../nghttp2"
+
+# Check to see if pkg-config is already installed
+if (type "pkg-config" > /dev/null) ; then
+	echo "pkg-config installed"
+else
+	echo "ERROR: pkg-config not installed... attempting to install."
+
+	# Check to see if Brew is installed
+	if ! type "brew" > /dev/null; then
+		echo "FATAL ERROR: brew not installed - unable to install pkg-config - exiting."
+		exit
+	else
+		echo "brew installed - using to install pkg-config"
+		brew install pkg-config
+	fi
+
+	# Check to see if installation worked
+	if (type "pkg-config" > /dev/null) ; then
+		echo "SUCCESS: pkg-config installed"
+	else
+		echo "FATAL ERROR: pkg-config failed to install - exiting."
+		exit
+	fi
+fi 
 
 buildMac()
 {

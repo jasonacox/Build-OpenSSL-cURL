@@ -36,7 +36,7 @@ else
 	TVOS_SDK_VERSION=$2
 fi
 
-CURL_VERSION="curl-7.48.0"
+CURL_VERSION="curl-7.50.1"
 OPENSSL="${PWD}/../openssl"  
 DEVELOPER=`xcode-select -print-path`
 IPHONEOS_DEPLOYMENT_TARGET="6.0"

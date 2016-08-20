@@ -38,7 +38,7 @@ else
 	TVOS_SDK_VERSION=$2
 fi
 
-OPENSSL_VERSION="openssl-1.0.1s"
+OPENSSL_VERSION="openssl-1.0.1t"
 DEVELOPER=`xcode-select -print-path`
 
 buildMac()

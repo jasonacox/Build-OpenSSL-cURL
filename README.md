@@ -24,7 +24,7 @@ The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for t
 * iOS - armv7, armv7s, arm64 and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
-Edit `nghttp2-build.sh` to change the version of OpenSSL that will be downloaded and built.  Include the relevant library into your project.  Rename the file to libnghttp2.a:
+Edit `nghttp2-build.sh` to change the version of OpenSSL that will be downloaded and built.  Include the relevant library into your project. The pkg-config tool is required.  The build script tests for this and will attempt to install if it is missing.   Rename the file to libnghttp2.a:
 
 	|____lib
 	   |____libnghttp2_iOS.a
