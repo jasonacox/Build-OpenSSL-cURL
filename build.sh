@@ -63,6 +63,7 @@ echo
 echo "libcurl (rename to libcurl.a) [$LIBCURL]"
 xcrun -sdk iphoneos lipo -info curl/lib/*.a
 
+echo
 ARCHIVE="archive/libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2"
 echo "Creating archive in $ARCHIVE..."
 mkdir -p "$ARCHIVE"

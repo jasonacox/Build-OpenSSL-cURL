@@ -32,8 +32,8 @@ if [ -z $2 ]; then
 	TVOS_SDK_VERSION="" #"9.0"
 	TVOS_MIN_SDK_VERSION="9.0"
 else
-	IOS_SDK_VERSION=$1
-	TVOS_SDK_VERSION=$2
+	IOS_SDK_VERSION=$2
+	TVOS_SDK_VERSION=$3
 fi
 
 if [ -z $1 ]; then
@@ -78,7 +78,7 @@ buildMac()
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/Mac/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/Mac/${ARCH}/lib"
 	fi
-
+	
 	export CC="${BUILD_TOOLS}/usr/bin/clang"
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
 	export LDFLAGS="-arch ${ARCH} -L${OPENSSL}/Mac/lib ${NGHTTP2LIB}"
