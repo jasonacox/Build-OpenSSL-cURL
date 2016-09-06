@@ -3,7 +3,17 @@
 Script to build OpenSSL, nghttp2 and libcurl for OS X, iOS and tvOS with Bitcode enabled for iOS, tvOS.  Includes patching for tvOS to not use fork() and adds HTTP2 support with nghttp2. 
 
 ## Build
-The `build.sh` script calls three build scripts:
+The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which pull down the specified release version.  Versions are specified in the `build.sh` script:
+
+	########################################
+	# EDIT this section to Select Versions #
+	########################################
+
+	OPENSSL="1.0.1t"
+	LIBCURL="7.50.1"
+	NGHTTP2="1.14.0"
+
+	######################################## 
 
 ## OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
@@ -60,7 +70,7 @@ To include the OpenSSL and libcurl libraries in your Xcode projects, import the 
 Usage
 =====
 
- 1. Run "sh build.sh"
+ 1. Edit and Run `build.sh` 
  2. Libraries are created in curl/lib, openssl/*/lib, nghttp2/lib
  3. Copy libs and headers to your project.
  4. Import appropriate "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a".
@@ -75,6 +85,24 @@ Usage
             ...  
         }
 
+NOTE: For iOS project with 64 bit targets, you will need to edit the `curlbuild.h` header if you get an error simliar to this: `'curl_rule_01' declared as an array with a negative size`
+
+curlbuild.h
+
+	/* The size of `long', as computed by sizeof. */
+	// ADD Condition for 64 Bit
+	#ifdef __LP64__
+	#define CURL_SIZEOF_LONG 8
+	#else
+	#define CURL_SIZEOF_LONG 4
+	#endif
+
+You may also need to edit this section:
+
+	/* Signed integral data type used for curl_off_t. */
+	//#define CURL_TYPEOF_CURL_OFF_T long
+	//ADD Condition for 64 Bit
+	#define CURL_TYPEOF_CURL_OFF_T int64_t
 
 ## Tree
 	|____curl
@@ -128,7 +156,24 @@ Usage
 * openssl/tvOS/lib/libssl.a are: x86_64 arm64 
 * nghttp2/lib/libnghttp2_tvOS.a are: x86_64 arm64 
 
+## Archive
 
+The `build.sh` script will create an ./archive folder and store all the *.a libraries built along with a MacOS binary for `curl` and `openssl`.
+
+	archive
+	   |___libcurl-7.50.1-openssl-1.0.1t-nghttp2-1.14.0
+	     |____curl
+	     |____libcrypto.a
+	     |____libcurl_iOS.a
+	     |____libcurl_iOS_nobitcode.a
+	     |____libcurl_Mac.a
+	     |____libcurl_tvOS.a
+	     |____libnghttp2_iOS.a
+	     |____libnghttp2_Mac.a
+	     |____libnghttp2_tvOS.a
+	     |____libssl.a
+	     |____openssl
+ 
 ## Credits
 
  Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.

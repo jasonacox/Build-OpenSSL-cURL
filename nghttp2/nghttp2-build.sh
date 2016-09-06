@@ -17,7 +17,7 @@ set -e
 
 usage ()
 {
-	echo "usage: $0 [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	echo "usage: $0 [nghttp2 version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
 	exit 127
 }
 
@@ -25,7 +25,7 @@ if [ "$1" == "-h" ]; then
 	usage
 fi
 
-if [ -z $1 ]; then
+if [ -z $2 ]; then
 	IOS_SDK_VERSION="" #"9.1"
 	IOS_MIN_SDK_VERSION="7.1"
 	
@@ -36,8 +36,13 @@ else
 	TVOS_SDK_VERSION=$2
 fi
 
+if [ -z $1 ]; then
+	NGHTTP2_VERNUM="1.14.0"
+else
+	NGHTTP2_VERNUM="$1"
+fi
+
 # --- Edit this to update version ---
-NGHTTP2_VERNUM="1.13.0"
 
 NGHTTP2_VERSION="nghttp2-${NGHTTP2_VERNUM}"
 DEVELOPER=`xcode-select -print-path`

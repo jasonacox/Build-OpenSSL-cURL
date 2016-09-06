@@ -17,7 +17,7 @@ set -e
 
 usage ()
 {
-	echo "usage: $0 [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	echo "usage: $0 [curl version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
 	exit 127
 }
 
@@ -25,7 +25,7 @@ if [ "$1" == "-h" ]; then
 	usage
 fi
 
-if [ -z $1 ]; then
+if [ -z $2 ]; then
 	IOS_SDK_VERSION="" #"9.1"
 	IOS_MIN_SDK_VERSION="7.1"
 	
@@ -36,7 +36,12 @@ else
 	TVOS_SDK_VERSION=$2
 fi
 
-CURL_VERSION="curl-7.50.1"
+if [ -z $1 ]; then
+	CURL_VERSION="curl-7.50.1"
+else
+	CURL_VERSION="curl-$1"
+fi
+
 OPENSSL="${PWD}/../openssl"  
 DEVELOPER=`xcode-select -print-path`
 IPHONEOS_DEPLOYMENT_TARGET="6.0"
@@ -83,6 +88,8 @@ buildMac()
 
 	make -j8 >> "/tmp/${CURL_VERSION}-${ARCH}.log" 2>&1
 	make install >> "/tmp/${CURL_VERSION}-${ARCH}.log" 2>&1
+	# Save curl binary for Mac Version
+	cp "/tmp/${CURL_VERSION}-${ARCH}/bin/curl" "/tmp/curl"
 	make clean >> "/tmp/${CURL_VERSION}-${ARCH}.log" 2>&1
 	popd > /dev/null
 }

@@ -19,7 +19,7 @@ set -e
 
 usage ()
 {
-	echo "usage: $0 [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	echo "usage: $0 [openssl version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
 	exit 127
 }
 
@@ -27,18 +27,23 @@ if [ "$1" == "-h" ]; then
 	usage
 fi
 
-if [ -z $1 ]; then
+if [ -z $2 ]; then
 	IOS_SDK_VERSION="" #"9.1"
 	IOS_MIN_SDK_VERSION="7.1"
 	
 	TVOS_SDK_VERSION="" #"9.0"
 	TVOS_MIN_SDK_VERSION="9.0"
 else
-	IOS_SDK_VERSION=$1
-	TVOS_SDK_VERSION=$2
+	IOS_SDK_VERSION=$2
+	TVOS_SDK_VERSION=$3
 fi
 
-OPENSSL_VERSION="openssl-1.0.1t"
+if [ -z $1 ]; then
+	OPENSSL_VERSION="openssl-1.0.1t"
+else
+	OPENSSL_VERSION="openssl-$1"
+fi
+
 DEVELOPER=`xcode-select -print-path`
 
 buildMac()
@@ -60,6 +65,8 @@ buildMac()
 	./Configure no-asm ${TARGET} --openssldir="/tmp/${OPENSSL_VERSION}-${ARCH}" &> "/tmp/${OPENSSL_VERSION}-${ARCH}.log"
 	make >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
+	# Keep openssl binary for Mac version
+	cp "/tmp/${OPENSSL_VERSION}-${ARCH}/bin/openssl" "/tmp/openssl"
 	make clean >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	popd > /dev/null
 }
