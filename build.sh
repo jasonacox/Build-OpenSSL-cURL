@@ -54,7 +54,7 @@ cd ..
 echo 
 echo "Libraries..."
 echo
-echo "opensll [$OPENSSL]"
+echo "openssl [$OPENSSL]"
 xcrun -sdk iphoneos lipo -info openssl/*/lib/*.a
 echo
 echo "nghttp2 (rename to libnghttp2.a) [$NGHTTP2]"

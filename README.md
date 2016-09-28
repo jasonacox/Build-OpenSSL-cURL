@@ -104,6 +104,8 @@ You may also need to edit this section:
 	//ADD Condition for 64 Bit
 	#define CURL_TYPEOF_CURL_OFF_T int64_t
 
+`curl/curlbuild-ios-universal.h` is a universal example, tested on iOS platforms, made out of libcurl-7.50.3. You'd better check the diff between this file and `curlbuild.h` before using it.
+
 ## Tree
 	|____curl
 	| |____include
