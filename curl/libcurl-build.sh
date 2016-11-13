@@ -15,9 +15,13 @@
 
 set -e
 
+# set trap to help debug any build errors
+trap 'echo "** ERROR with Build - Check /tmp/curl*.log"; tail /tmp/curl*.log' INT TERM EXIT
+
 usage ()
 {
 	echo "usage: $0 [curl version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	trap - INT TERM EXIT
 	exit 127
 }
 
@@ -259,5 +263,8 @@ rm -rf ${CURL_VERSION}
 
 echo "Checking libraries"
 xcrun -sdk iphoneos lipo -info lib/*.a
+
+#reset trap
+trap - INT TERM EXIT
 
 echo "Done"

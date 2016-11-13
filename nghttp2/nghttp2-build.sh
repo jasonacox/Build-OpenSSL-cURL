@@ -15,9 +15,13 @@
  
 set -e
 
+# set trap to help debug build errors
+trap 'echo "** ERROR with Build - Check /tmp/nghttp2*.log"; tail /tmp/nghttp2*.log' INT TERM EXIT
+
 usage ()
 {
 	echo "usage: $0 [nghttp2 version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	trap - INT TERM EXIT
 	exit 127
 }
 
@@ -242,4 +246,8 @@ echo "Cleaning up"
 rm -rf /tmp/${NGHTTP2_VERSION}-*
 rm -rf ${NGHTTP2_VERSION}
 
+#reset trap
+trap - INT TERM EXIT
+
 echo "Done"
+

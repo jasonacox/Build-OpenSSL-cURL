@@ -12,7 +12,7 @@
 
 OPENSSL="1.0.1u"
 LIBCURL="7.50.3"
-NGHTTP2="1.15.0"
+NGHTTP2="1.16.0"
 
 ########################################
 
@@ -30,6 +30,7 @@ if [ "$1" == "-h" ]; then
         usage
 fi
 
+echo
 echo "Building OpenSSL"
 cd openssl 
 ./openssl-build.sh "$OPENSSL"
@@ -39,6 +40,7 @@ if [ "$1" == "-disable-http2" ]; then
 	touch "$NOHTTP2"
 	NGHTTP2="NONE"	
 else 
+	echo
 	echo "Building nghttp2 for HTTP2 support"
 	cd nghttp2
 	./nghttp2-build.sh "$NGHTTP2"

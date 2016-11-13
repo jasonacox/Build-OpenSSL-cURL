@@ -17,9 +17,13 @@
 
 set -e
 
+# set trap to help debug build errors
+trap 'echo "** ERROR with Build - Check /tmp/openssl*.log"; tail /tmp/openssl*.log' INT TERM EXIT
+
 usage ()
 {
 	echo "usage: $0 [openssl version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	trap - INT TERM EXIT
 	exit 127
 }
 
@@ -232,5 +236,8 @@ lipo \
 echo "Cleaning up"
 rm -rf /tmp/${OPENSSL_VERSION}-*
 rm -rf ${OPENSSL_VERSION}
+
+#reset trap
+trap - INT TERM EXIT
 
 echo "Done"
