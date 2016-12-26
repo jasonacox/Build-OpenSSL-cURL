@@ -109,7 +109,7 @@ You may also need to edit this section:
 Example Apps
 ============
 
-Example Xcode project "iOS Test App" is located in the examples folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2. The app provides a simple single text field interfac and produces a curl respone.e
+Example Xcode project "iOS Test App" is located in the examples folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2 libraries. The app provides a simple single text field interface for URL input and produces a curl respone.
 
 ## Tree
 
