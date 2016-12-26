@@ -11,8 +11,8 @@
 ########################################
 
 OPENSSL="1.0.1u"
-LIBCURL="7.50.3"
-NGHTTP2="1.16.0"
+LIBCURL="7.52.1"
+NGHTTP2="1.17.0"
 
 ########################################
 
@@ -70,7 +70,12 @@ ARCHIVE="archive/libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2"
 echo "Creating archive in $ARCHIVE..."
 mkdir -p "$ARCHIVE"
 cp curl/lib/*.a $ARCHIVE
-cp openssl/*/lib/*.a $ARCHIVE
+cp openssl/iOS/lib/libcrypto.a $ARCHIVE/libcrypto_iOS.a
+cp openssl/tvOS/lib/libcrypto.a $ARCHIVE/libcrypto_tvOS.a
+cp openssl/Mac/lib/libcrypto.a $ARCHIVE/libcrypto_Mac.a
+cp openssl/iOS/lib/libssl.a $ARCHIVE/libssl_iOS.a
+cp openssl/tvOS/lib/libssl.a $ARCHIVE/libssl_tvOS.a
+cp openssl/Mac/lib/libssl.a $ARCHIVE/libssl_Mac.a
 cp nghttp2/lib/*.a $ARCHIVE
 echo "Archiving Mac binaries for curl and openssl..."
 mv /tmp/curl $ARCHIVE

@@ -1,0 +1,16 @@
+Two edits are needed for these header files to work for iOS.
+
+163,164d162
+< // ADD Condition for 64 Bit
+< #ifdef __LP64__
+< #define CURL_SIZEOF_LONG 8
+< #else
+< #define CURL_SIZEOF_LONG 4
+< #endif
+< 
+181,183c175
+< //#define CURL_TYPEOF_CURL_OFF_T long
+< //ADD Condition for 64 Bit
+< #define CURL_TYPEOF_CURL_OFF_T int64_t
+---
+> #define CURL_TYPEOF_CURL_OFF_T long

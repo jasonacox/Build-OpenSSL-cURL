@@ -106,34 +106,31 @@ You may also need to edit this section:
 
 `curl/curlbuild-ios-universal.h` is a universal example, tested on iOS platforms, made out of libcurl-7.50.3. You'd better check the diff between this file and `curlbuild.h` before using it.
 
+Example Apps
+============
+
+Example Xcode project "iOS Test App" is located in the examples folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2. The app provides a simple single text field interfac and produces a curl respone.e
+
 ## Tree
+
+	|
+	|____archive
+	|
 	|____curl
-	| |____include
-	| | |____curl
 	| |____lib
-	|   |____libcurl_iOS.a
-	|   |____libcurl_Mac.a
-	|   |____libcurl_tvOS.a
+	| |____libcurl-build.sh
+	|
+	|____examples
+	| |____iOS Test App
+	|
+	|____nghttp2
+	| |____nghttp2-build.sh
 	|
 	|____openssl
-	  |____iOS
-	  | |____include
-	  | | |____openssl
-	  | |____lib
-	  |   |____libcrypto.a
-	  |   |____libssl.a
-	  |____Mac
-	  | |____include
-	  | | |____openssl
-	  | |____lib
-	  |   |____libcrypto.a
-	  |   |____libssl.a
-	  |____tvOS
-	    |____include
-	    | |____openssl
-	    |____lib
-	      |____libcrypto.a
-	      |____libssl.a
+	| |____openssl-build.sh
+	|
+	|____build.sh
+	|____clean.sh
 
 
 ## Architectures in Libraries
@@ -176,7 +173,11 @@ The `build.sh` script will create an ./archive folder and store all the *.a libr
 	     |____libssl.a
 	     |____openssl
  
-## Credits
+## License
+
+The MIT License is used for this project.  See LICENSE file.
+
+## Credits & Thanks
 
  Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
    https://gist.github.com/c61c0f7d9ab60f53ebb0.git
