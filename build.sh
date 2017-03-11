@@ -10,9 +10,9 @@
 # EDIT this section to Select Versions #
 ########################################
 
-OPENSSL="1.0.1u"
-LIBCURL="7.52.1"
-NGHTTP2="1.17.0"
+OPENSSL="1.0.2k"
+LIBCURL="7.53.1"
+NGHTTP2="1.20.0"
 
 ########################################
 
@@ -80,6 +80,7 @@ cp nghttp2/lib/*.a $ARCHIVE
 echo "Archiving Mac binaries for curl and openssl..."
 mv /tmp/curl $ARCHIVE
 mv /tmp/openssl $ARCHIVE
+curl https://curl.haxx.se/ca/cacert.pem > $ARCHIVE/cacert.pem
 $ARCHIVE/curl -V
 
 rm -f $NOHTTP2
