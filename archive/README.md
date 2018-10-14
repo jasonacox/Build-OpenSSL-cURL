@@ -1,4 +1,4 @@
-# Build-OpenSSL-cURL Deployments
+# Build-OpenSSL-cURL Binaries 
 
 Archive of builds with various releases of OpenSSL, nghttp2 and libcurl for OS X, iOS and tvOS with Bitcode enabled for iOS, tvOS.  
 
