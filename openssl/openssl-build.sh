@@ -34,7 +34,7 @@ fi
 if [ -z $2 ]; then
 	IOS_SDK_VERSION="" #"9.1"
 	IOS_MIN_SDK_VERSION="7.1"
-	
+
 	TVOS_SDK_VERSION="" #"9.0"
 	TVOS_MIN_SDK_VERSION="9.0"
 else
@@ -81,20 +81,20 @@ buildIOS()
 
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
-  
+
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]]; then
 		PLATFORM="iPhoneSimulator"
 	else
 		PLATFORM="iPhoneOS"
 		sed -ie "s!static volatile sig_atomic_t intr_signal;!static volatile intr_signal;!" "crypto/ui/ui_openssl.c"
 	fi
-  
+
 	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
-   
+
 	echo "Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${ARCH}"
 
 	if [[ "${ARCH}" == "x86_64" ]]; then
@@ -117,21 +117,21 @@ buildTVOS()
 
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
-  
+
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]]; then
 		PLATFORM="AppleTVSimulator"
 	else
 		PLATFORM="AppleTVOS"
 		sed -ie "s!static volatile sig_atomic_t intr_signal;!static volatile intr_signal;!" "crypto/ui/ui_openssl.c"
 	fi
-  
+
 	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${TVOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
 	export LC_CTYPE=C
-   
+
 	echo "Building ${OPENSSL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${ARCH}"
 
 	# Patch apps/speed.c to not use fork() since it's not available on tvOS
@@ -206,6 +206,7 @@ buildIOS "i386"
 
 lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libcrypto.a" \
@@ -213,6 +214,7 @@ lipo \
 
 lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libssl.a" \
