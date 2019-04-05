@@ -4,19 +4,24 @@ create and improve the scripts in this project.
 If your name is not listed and you have contributed, please edit and 
 submit a pull request.
 
- Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
+* Daniel Stenberg, @bagder, author and maintainer of cURL and libcurl 
+   https://daniel.haxx.se/
+* OpenSSL Software Foundation, maintainer of OpenSSL
+   https://www.openssl.org/
+* Tatsuhiro Tsujikawa, @tatsuhiro_t, author and maintainer of nghttp2 library and tools
+   https://github.com/nghttp2/nghttp2 
+
+* Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
    https://gist.github.com/c61c0f7d9ab60f53ebb0.git
- Bochun Bai
+* Bochun Bai
    https://github.com/sinofool/build-libcurl-ios
- Stefan Arentz
+* Stefan Arentz
    https://github.com/st3fan/ios-openssl
- Felix Schulze
+* Felix Schulze
    https://github.com/x2on/OpenSSL-for-iPhone/blob/master/build-libssl.sh
- James Moore
+* James Moore
    https://gist.github.com/foozmeat/5154962
- Peter Steinberger, PSPDFKit GmbH, @steipete.
+* Peter Steinberger, PSPDFKit GmbH, @steipete.
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
- Tatsuhiro Tsujikawa, nghttp2.org
-   https://nghttp2.org
- Jason Cox, @jasonacox
+* Jason Cox, @jasonacox
    https://github.com/jasonacox/Build-OpenSSL-cURL
