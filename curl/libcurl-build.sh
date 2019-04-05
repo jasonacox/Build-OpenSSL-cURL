@@ -46,6 +46,9 @@ else
 	CURL_VERSION="curl-$1"
 fi
 
+# Uncomment to compile without bitcode
+#NOBITCODE="yes"
+
 OPENSSL="${PWD}/../openssl"  
 DEVELOPER=`xcode-select -print-path`
 IPHONEOS_DEPLOYMENT_TARGET="6.0"
@@ -232,20 +235,24 @@ lipo \
 	"/tmp/${CURL_VERSION}-iOS-x86_64-bitcode/lib/libcurl.a" \
 	-create -output lib/libcurl_iOS.a
 
-echo "Building iOS libraries (nobitcode)"
-buildIOS "armv7" "nobitcode"
-buildIOS "armv7s" "nobitcode"
-buildIOS "arm64" "nobitcode"
-buildIOS "x86_64" "nobitcode"
-buildIOS "i386" "nobitcode"
 
-lipo \
-	"/tmp/${CURL_VERSION}-iOS-armv7-nobitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-armv7s-nobitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-i386-nobitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64-nobitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-x86_64-nobitcode/lib/libcurl.a" \
-	-create -output lib/libcurl_iOS_nobitcode.a
+if [[ "${NOBITCODE}" == "yes" ]]; then
+	echo "Building iOS libraries (nobitcode)"
+	buildIOS "armv7" "nobitcode"
+	buildIOS "armv7s" "nobitcode"
+	buildIOS "arm64" "nobitcode"
+	buildIOS "x86_64" "nobitcode"
+	buildIOS "i386" "nobitcode"
+
+	lipo \
+		"/tmp/${CURL_VERSION}-iOS-armv7-nobitcode/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-armv7s-nobitcode/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-i386-nobitcode/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-arm64-nobitcode/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-x86_64-nobitcode/lib/libcurl.a" \
+		-create -output lib/libcurl_iOS_nobitcode.a
+
+fi
 
 echo "Building tvOS libraries (bitcode)"
 buildTVOS "arm64"

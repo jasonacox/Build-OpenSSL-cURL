@@ -32,6 +32,7 @@
 
 
 #import "AppDelegate.h"
+#import "opensslv.h"
 
 @interface AppDelegate ()
 
@@ -42,11 +43,12 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    
-    // OpenSSL
-    SSL_load_error_strings();                /* readable error messages */
-    SSL_library_init();                      /* initialize library */
-    
+
+    // OpenSSL - Dot no use with OpenSSL 1.1.1 series
+#if OPENSSL_VERSION_NUMBER < 0x1000100fL
+     SSL_load_error_strings();                /* readable error messages */
+     SSL_library_init();                      /* initialize library */
+#endif
     // libcurl - see http://curl.haxx.se/libcurl/
     curl_global_init(0L);
 
