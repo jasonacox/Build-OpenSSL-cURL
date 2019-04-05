@@ -10,9 +10,9 @@
 # EDIT this section to Select Versions #
 ########################################
 
-OPENSSL="1.0.2p"
-LIBCURL="7.62.0"
-NGHTTP2="1.34.0"
+OPENSSL="1.1.1b"
+LIBCURL="7.64.1"
+NGHTTP2="1.37.0"
 
 ########################################
 
@@ -65,8 +65,10 @@ echo
 echo "libcurl (rename to libcurl.a) [$LIBCURL]"
 xcrun -sdk iphoneos lipo -info curl/lib/*.a
 
-echo
+EXAMPLE="examples/iOS Test App"
 ARCHIVE="archive/libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2"
+
+echo
 echo "Creating archive in $ARCHIVE..."
 mkdir -p "$ARCHIVE"
 cp curl/lib/*.a $ARCHIVE
@@ -77,10 +79,23 @@ cp openssl/iOS/lib/libssl.a $ARCHIVE/libssl_iOS.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/libssl_tvOS.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/libssl_Mac.a
 cp nghttp2/lib/*.a $ARCHIVE
+curl -s https://curl.haxx.se/ca/cacert.pem > $ARCHIVE/cacert.pem
+echo
+echo "Copying libraries into $EXAMPLE..."
+cp openssl/iOS/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
+cp openssl/iOS/lib/libssl.a "$EXAMPLE/libs/libssl.a"
+cp openssl/iOS/include/openssl/* "$EXAMPLE/include/openssl/"
+cp curl/include/curl/* "$EXAMPLE/include/curl/"
+cp curl/lib/libcurl_iOS.a "$EXAMPLE/libs/libcurl.a"
+cp nghttp2/lib/libnghttp2_iOS.a "$EXAMPLE/libs/libnghttp2.a"
+cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
+cp -r "$EXAMPLE/include" "$ARCHIVE"
+echo
 echo "Archiving Mac binaries for curl and openssl..."
 mv /tmp/curl $ARCHIVE
 mv /tmp/openssl $ARCHIVE
-curl https://curl.haxx.se/ca/cacert.pem > $ARCHIVE/cacert.pem
+echo
+echo "Testing Mac curl binary..."
 $ARCHIVE/curl -V
 
 rm -f $NOHTTP2

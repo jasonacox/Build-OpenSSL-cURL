@@ -9,9 +9,9 @@ The `build.sh` script calls the three build scripts below (openssl, nghttp and c
 	# EDIT this section to Select Versions #
 	########################################
 
-	OPENSSL="1.0.1t"
-	LIBCURL="7.50.1"
-	NGHTTP2="1.14.0"
+	OPENSSL="1.1.1b"
+	LIBCURL="7.64.1"
+	NGHTTP2="1.37.0"
 
 	######################################## 
 
@@ -27,6 +27,8 @@ Edit `openssl-build.sh` to change the version of OpenSSL that will be downloaded
 	|____lib
 	   |____libcrypto.a
 	   |____libssl.a
+
+NOTE: This script allows building the OpenSSL 1.1.1 and 1.0.2 series libraries.  The 1.0.2 will be end of life end of 2019 so it is recommended that you use the new long term support (LTS) version, 1.1.1 series.
 
 ## HTTP2 / nghttp2
 The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
@@ -57,6 +59,9 @@ Edit `libcurl-build.sh` to change the version of cURL that will be downloaded an
 	   |____libcurl_Mac.a
 	   |____libcurl_tvOS.a
 
+NOTE: By default, this script only builds bitcode versions. To build non-bitcode versions uncommend this line:
+
+	NOBITCODE="yes"
 
 ## Xcode
 
