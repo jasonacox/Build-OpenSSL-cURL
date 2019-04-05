@@ -1,6 +1,6 @@
 # Build-OpenSSL-cURL
 
-Script to build OpenSSL, nghttp2 and libcurl for OS X, iOS and tvOS with Bitcode enabled for iOS, tvOS.  Includes patching for tvOS to not use fork() and adds HTTP2 support with nghttp2. 
+Script to build OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and tvOS devices (x86_64, armv7, armv7s, arm64).  Includes patching for tvOS to not use fork() and adds HTTP2 support with nghttp2. 
 
 ## Build
 The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which pull down the specified release version.  Versions are specified in the `build.sh` script:
