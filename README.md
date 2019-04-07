@@ -15,6 +15,12 @@ The `build.sh` script calls the three build scripts below (openssl, nghttp and c
 
 	######################################## 
 
+## Dependencies
+The build script requires:
+* Xcode 7.1 or higher (10+ recommended)
+* Xcode Command Line Tools
+* pkg-config tool for nghttp2 (or `brew` to auto-install)
+
 ## OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
 * Mac - x86-64
@@ -72,8 +78,9 @@ To include the OpenSSL and libcurl libraries in your Xcode projects, import the 
 * OpenSSL - openssl/Mac/lib, openssl/iOS/lib, openssl/tvOS/lib
 * nghttp2 (HTTP2) - nghttp2/lib [rename to libnghttp2.a]
 
-Usage
-=====
+See the example 'iOS Test App'.
+
+## Usage
 
  1. Edit and Run `build.sh` 
  2. Libraries are created in curl/lib, openssl/*/lib, nghttp2/lib
@@ -111,8 +118,7 @@ You may also need to edit this section:
 
 `curl/curlbuild-ios-universal.h` is a universal example, tested on iOS platforms, made out of libcurl-7.50.3. You'd better check the diff between this file and `curlbuild.h` before using it.
 
-Example Apps
-============
+## Example Apps
 
 Example Xcode project "iOS Test App" is located in the examples folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2 libraries. The app provides a simple single text field interface for URL input and produces a curl respone.
 
@@ -213,4 +219,8 @@ The MIT License is used for this project.  See LICENSE file.
 ## Build Troubleshooting Tips
 
 The AppleTVOS curl build may fail due to a macports "ar" program being picked up (it was in the path - You will see a log message about /opt/local/bin/ar failing in the curl log). A quick cleanup of the path (so that the build uses /usr/bin/ar) fixed the problem.  - Thanks to Preston Jennings (prestonj) for this tip.
+
+If the `build.sh` script fails during iOS build phase with an error "C Compiler cannot create executables" this is likely due to not having a clean installation of the Xcode command line tools.  Launch Xcode and re-install the command line tools. 
+
+If you see "FATAL ERROR" during the nghttp2 build phase, this is likely due to not having 'pkg-config' tools installed.  Install manually or install 'brew' to have the script install it for you.
 
