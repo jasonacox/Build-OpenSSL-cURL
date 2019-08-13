@@ -136,7 +136,7 @@ buildIOS()
    
 	echo "Building ${CURL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${ARCH} ${BITCODE}"
 
-	if [[ "${ARCH}" == "arm64" ]]; then
+	if [[ "${ARCH}" == *"arm64"* || "${ARCH}" == "arm64e" ]]; then
 		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" -disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/iOS ${NGHTTP2CFG} --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
 	else
 		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" -disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/iOS ${NGHTTP2CFG} --host="${ARCH}-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
@@ -224,6 +224,7 @@ echo "Building iOS libraries (bitcode)"
 buildIOS "armv7" "bitcode"
 buildIOS "armv7s" "bitcode"
 buildIOS "arm64" "bitcode"
+buildIOS "arm64e" "bitcode"
 buildIOS "x86_64" "bitcode"
 buildIOS "i386" "bitcode"
 
@@ -232,6 +233,7 @@ lipo \
 	"/tmp/${CURL_VERSION}-iOS-armv7s-bitcode/lib/libcurl.a" \
 	"/tmp/${CURL_VERSION}-iOS-i386-bitcode/lib/libcurl.a" \
 	"/tmp/${CURL_VERSION}-iOS-arm64-bitcode/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-arm64e-bitcode/lib/libcurl.a" \
 	"/tmp/${CURL_VERSION}-iOS-x86_64-bitcode/lib/libcurl.a" \
 	-create -output lib/libcurl_iOS.a
 
@@ -241,6 +243,7 @@ if [[ "${NOBITCODE}" == "yes" ]]; then
 	buildIOS "armv7" "nobitcode"
 	buildIOS "armv7s" "nobitcode"
 	buildIOS "arm64" "nobitcode"
+	buildIOS "arm64e" "nobitcode"
 	buildIOS "x86_64" "nobitcode"
 	buildIOS "i386" "nobitcode"
 
@@ -249,6 +252,7 @@ if [[ "${NOBITCODE}" == "yes" ]]; then
 		"/tmp/${CURL_VERSION}-iOS-armv7s-nobitcode/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-i386-nobitcode/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-arm64-nobitcode/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-arm64e-nobitcode/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-x86_64-nobitcode/lib/libcurl.a" \
 		-create -output lib/libcurl_iOS_nobitcode.a
 
