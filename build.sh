@@ -10,9 +10,9 @@
 # EDIT this section to Select Versions #
 ########################################
 
-OPENSSL="1.1.1b"
-LIBCURL="7.64.1"
-NGHTTP2="1.37.0"
+OPENSSL="1.1.1c"
+LIBCURL="7.65.3"
+NGHTTP2="1.39.1"
 
 ########################################
 

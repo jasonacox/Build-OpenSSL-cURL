@@ -132,7 +132,7 @@ buildIOS()
         export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK}"
    
 	echo "Building ${NGHTTP2_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${ARCH}"
-        if [[ "${ARCH}" == "arm64" ]]; then
+        if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
 		./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
         else
 		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
@@ -222,6 +222,7 @@ echo "Building iOS libraries (bitcode)"
 buildIOS "armv7" "bitcode"
 buildIOS "armv7s" "bitcode"
 buildIOS "arm64" "bitcode"
+buildIOS "arm64e" "bitcode"
 buildIOS "x86_64" "bitcode"
 buildIOS "i386" "bitcode"
 
@@ -230,6 +231,7 @@ lipo \
 	"${NGHTTP2}/iOS/armv7s/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/i386/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/arm64/lib/libnghttp2.a" \
+	"${NGHTTP2}/iOS/arm64e/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/x86_64/lib/libnghttp2.a" \
 	-create -output "${NGHTTP2}/lib/libnghttp2_iOS.a"
 

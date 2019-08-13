@@ -1,6 +1,6 @@
 # Build-OpenSSL-cURL
 
-Script to build OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and tvOS devices (x86_64, armv7, armv7s, arm64).  Includes patching for tvOS to not use fork() and adds HTTP2 support with nghttp2. 
+Script to build OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  Includes patching for tvOS to not use fork() and adds HTTP2 support with nghttp2. 
 
 ## Build
 The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which pull down the specified release version.  Versions are specified in the `build.sh` script:
@@ -24,7 +24,7 @@ The build script requires:
 ## OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
 * Mac - x86-64
-* iOS - iPhone (armv7, armv7s, arm64) and iPhoneSimulator (i386, x86-64)
+* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
 The tvOS build has fork() disable as the AppleTV tvOS does not support fork(). 
@@ -39,7 +39,7 @@ NOTE: This script allows building the OpenSSL 1.1.1 and 1.0.2 series libraries. 
 ## HTTP2 / nghttp2
 The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
 * Mac - x86-64
-* iOS - armv7, armv7s, arm64 and iPhoneSimulator (i386, x86-64)
+* iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
 Edit `build.sh` to change the version of nghttp2 that will be downloaded and built.  Include the relevant library into your project. The pkg-config tool is required.  The build script tests for this and will attempt to install if it is missing.   Rename the appropriate file to libnghttp2.a:
@@ -54,7 +54,7 @@ DISABLE HTTP2: The nghttp2 build can be disabled by using `build.sh --disable-ht
 ## cURL / libcurl
 The `libcurl-build.sh` script create separate bitcode enabled targets libraries for:
 * Mac - x86-64
-* iOS - armv7, armv7s, arm64 and iPhoneSimulator (i386, x86-64)
+* iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
 The curl build uses `--with-ssl` pointing to the above OpenSSL builds and `--with-nghttp2` pointing to the above nghttp2 builds..
@@ -156,10 +156,10 @@ Example Xcode project "iOS Test App" is located in the examples folder.  This pr
 	* openssl/Mac/lib/libssl.a are: x86_64 
 	* nghttp2/lib/libnghttp2_Mac.a are: x86_64 
 * iOS
-	* curl/lib/libcurl_iOS.a are: armv7 armv7s i386 x86_64 arm64 
-	* openssl/iOS/lib/libcrypto.a are: armv7 i386 x86_64 arm64 
-	* openssl/iOS/lib/libssl.a are: armv7 i386 x86_64 arm64 
-	* nghttp2/lib/libnghttp2_iOS.a are: armv7 armv7s i386 x86_64 arm64 
+	* curl/lib/libcurl_iOS.a are: armv7 armv7s i386 x86_64 arm64 arm64e
+	* openssl/iOS/lib/libcrypto.a are: armv7 i386 x86_64 arm64 arm64e
+	* openssl/iOS/lib/libssl.a are: armv7 i386 x86_64 arm64 arm64e
+	* nghttp2/lib/libnghttp2_iOS.a are: armv7 armv7s i386 x86_64 arm64 arm64e
 * tvOS
 	* curl/lib/libcurl_tvOS.a are: x86_64 arm64 
 	* openssl/tvOS/lib/libcrypto.a are: x86_64 arm64 
