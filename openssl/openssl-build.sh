@@ -160,6 +160,7 @@ buildTVOS()
 	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
 		LANG=C sed -i -- 's/!defined(OPENSSL_NO_POSIX_IO)/defined(HAVE_FORK)/' "./apps/ocsp.c"
 		LANG=C sed -i -- 's/fork()/-1/' "./apps/ocsp.c"
+                LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
 		LANG=C sed -i -- 's/!defined(OPENSSL_NO_ASYNC)/defined(HAVE_FORK)/' "./crypto/async/arch/async_posix.h"
 	fi
 	
