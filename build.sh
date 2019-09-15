@@ -10,9 +10,9 @@
 # EDIT this section to Select Versions #
 ########################################
 
-OPENSSL="1.1.1c"
-LIBCURL="7.65.3"
-NGHTTP2="1.39.1"
+OPENSSL="1.1.1d"	# https://www.openssl.org/source/
+LIBCURL="7.66.0"	# https://curl.haxx.se/download.html
+NGHTTP2="1.39.2"	# https://nghttp2.org/
 
 ########################################
 
@@ -71,6 +71,8 @@ ARCHIVE="archive/libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2"
 echo
 echo "Creating archive in $ARCHIVE..."
 mkdir -p "$ARCHIVE"
+mkdir -p "$ARCHIVE/include/openssl"
+mkdir -p "$ARCHIVE/include/curl"
 cp curl/lib/*.a $ARCHIVE
 cp openssl/iOS/lib/libcrypto.a $ARCHIVE/libcrypto_iOS.a
 cp openssl/tvOS/lib/libcrypto.a $ARCHIVE/libcrypto_tvOS.a
@@ -79,6 +81,8 @@ cp openssl/iOS/lib/libssl.a $ARCHIVE/libssl_iOS.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/libssl_tvOS.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/libssl_Mac.a
 cp nghttp2/lib/*.a $ARCHIVE
+cp openssl/iOS/include/openssl/* "$ARCHIVE/include/openssl"
+cp curl/include/curl/* "$ARCHIVE/include/curl"
 curl -s https://curl.haxx.se/ca/cacert.pem > $ARCHIVE/cacert.pem
 echo
 echo "Copying libraries into $EXAMPLE..."
@@ -89,7 +93,7 @@ cp curl/include/curl/* "$EXAMPLE/include/curl/"
 cp curl/lib/libcurl_iOS.a "$EXAMPLE/libs/libcurl.a"
 cp nghttp2/lib/libnghttp2_iOS.a "$EXAMPLE/libs/libnghttp2.a"
 cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
-cp -r "$EXAMPLE/include" "$ARCHIVE"
+#cp -r "$EXAMPLE/include" "$ARCHIVE"
 echo
 echo "Archiving Mac binaries for curl and openssl..."
 mv /tmp/curl $ARCHIVE
