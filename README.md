@@ -9,9 +9,9 @@ The `build.sh` script calls the three build scripts below (openssl, nghttp and c
 	# EDIT this section to Select Versions #
 	########################################
 
-	OPENSSL="1.1.1b"
-	LIBCURL="7.64.1"
-	NGHTTP2="1.37.0"
+	OPENSSL="1.1.1d"        # https://www.openssl.org/source/
+	LIBCURL="7.66.0"        # https://curl.haxx.se/download.html
+	NGHTTP2="1.39.2"        # https://nghttp2.org/
 
 	######################################## 
 
