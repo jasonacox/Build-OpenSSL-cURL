@@ -224,3 +224,6 @@ If the `build.sh` script fails during iOS build phase with an error "C Compiler 
 
 If you see "FATAL ERROR" during the nghttp2 build phase, this is likely due to not having 'pkg-config' tools installed.  Install manually or install 'brew' to have the script install it for you.
 
+If you are on a new macOS installation and wonder why the build is failing, you might need to set the correct path for the command line tools:
+
+	xcode-select --switch /Applications/Xcode.app
