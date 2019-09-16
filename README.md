@@ -170,23 +170,26 @@ Example Xcode project "iOS Test App" is located in the examples folder.  This pr
 
 The `build.sh` script will create an ./archive folder and store all the *.a libraries built along with the header files and a MacOS binaries for `curl` and `openssl`.
 
-	archive
-	   |___libcurl-7.64.1-openssl-1.1.1b-nghttp2-1.37.0
-	     |____libcrypto.a
-	     |____libcurl_iOS.a
-	     |____libcurl_Mac.a
-	     |____libcurl_tvOS.a
-	     |____libnghttp2_iOS.a
-	     |____libnghttp2_Mac.a
-	     |____libnghttp2_tvOS.a
-	     |____libssl.a
-	     |____curl*
-	     |____openssl*
-	     |____include
-	        |____curl
-	        |____openssl
+	   |___libcurl-7.66.0-openssl-1.1.1d-nghttp2-1.39.2
+             |
+             |____cacert.pem
+             |
+             |____bin/
+             |  |____openssl*
+             |  |____curl*
+             |
+             |____lib/
+             |  |____iOS/
+             |  |____MacOS/
+             |  |____tvOS/
+             |
+             |____include/
+                |____openssl/
+                |____curl/
 	
+## Download Compressed Archives
 
+Previous builds can be downloaded form the Github releases for this project: https://github.com/jasonacox/Build-OpenSSL-cURL/releases
  
 ## License
 
