@@ -1,27 +1,34 @@
 # Build-OpenSSL-cURL Binaries 
 
-Archive of builds with various releases of OpenSSL, nghttp2 and libcurl for OS X, iOS and tvOS with Bitcode enabled for iOS, tvOS.  
+The `build.sh` script stores the builds in this archive directory. The directory names are based on the version of the releases of OpenSSL, nghttp2 and libcurl and includes the libraries for OS X, iOS and tvOS.  
 
 ## Build Your Own or Use These
 See the `build.sh` script in parent directory.
 
+## Download Compressed Archives
+
+Previous builds can be downloaded form the Github releases for this project: https://github.com/jasonacox/Build-OpenSSL-cURL/releases
+
 ## Archive
 
-This directory contains the *.a libraries built along with a MacOS binary for `curl` and `openssl`.
+This directory contains the curl and openssl headers (in the `include` folder), the various *.a libraries built along with a MacOS binary for `curl` and `openssl`.
 
 	archive
+	   |
 	   |___libcurl-7.50.1-openssl-1.0.1t-nghttp2-1.14.0
-	     |____curl
-	     |____libcrypto.a
-	     |____libcurl_iOS.a
-	     |____libcurl_iOS_nobitcode.a
-	     |____libcurl_Mac.a
-	     |____libcurl_tvOS.a
-	     |____libnghttp2_iOS.a
-	     |____libnghttp2_Mac.a
-	     |____libnghttp2_tvOS.a
-	     |____libssl.a
-	     |____openssl
+	     |
+	     |____bin/
+	     |  |____openssl*
+	     |  |____curl*
+	     |
+	     |____lib/
+	     |  |____iOS/
+	     |  |____MacOS/
+	     |  |____tvOS/
+	     |
+	     |____include/
+	        |____openssl/
+	        |____curl/
  
 ## License
 
