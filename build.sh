@@ -11,8 +11,8 @@
 ########################################
 
 OPENSSL="1.1.1d"	# https://www.openssl.org/source/
-LIBCURL="7.66.0"	# https://curl.haxx.se/download.html
-NGHTTP2="1.39.2"	# https://nghttp2.org/
+LIBCURL="7.67.0"	# https://curl.haxx.se/download.html
+NGHTTP2="1.40.0"	# https://nghttp2.org/
 
 ########################################
 
