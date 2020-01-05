@@ -6,7 +6,7 @@
 //
 //  COPYRIGHT AND PERMISSION NOTICE
 //
-//  Copyright (c) 2014-2016 Jason A. Cox, jasonacox@me.com, and many contributors,
+//  Copyright (c) 2014-2020 Jason A. Cox, jasonacox@me.com, and many contributors,
 //  see the THANKS file.
 //
 //  All rights reserved.
@@ -43,7 +43,7 @@
 - (void)receivedData:(NSData *)data;
 @end
 
-// Curl methods to process response
+// Function called by libcurl to deliver info/debug and payload data
 int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t infoLen, void *contextInfo) {
     ViewController *vc = (__bridge ViewController *)contextInfo;
     NSData *infoData = [NSData dataWithBytes:info length:infoLen];
@@ -75,6 +75,7 @@ int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t 
     return 0;
 }
 
+// Function called by libcurl to get data for uploads to web server
 size_t iOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata) {
     const size_t sizeInBytes = size*nmemb;
     ViewController *vc = (__bridge ViewController *)userdata;
@@ -82,6 +83,7 @@ size_t iOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata)
     return [vc copyUpToThisManyBytes:sizeInBytes intoThisPointer:ptr];
 }
 
+// Function called by libcurl to deliver packets from web response
 size_t iOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
     const size_t sizeInBytes = size*nmemb;
     ViewController *vc = (__bridge ViewController *)userdata;
@@ -91,6 +93,7 @@ size_t iOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata
     return sizeInBytes;
 }
 
+// Function called by libcurl to update progress
 int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
     // Placeholder - add progress bar?
     // NSLog(@"iOSCurlProgressCallback %f of %f", dlnow, dltotal);
@@ -100,6 +103,7 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
 //
 // Private methods to display data
 //
+
 @implementation ViewController (Private)
 
 - (size_t)copyUpToThisManyBytes:(size_t)bytes intoThisPointer:(void *)pointer
@@ -115,6 +119,7 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
     return 0U;
 }
 
+// Transfer data from libcurl to view controller text box
 - (void)displayText:(NSString *)text
 {
     @autoreleasepool
@@ -171,7 +176,6 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
 - (IBAction)Get:(id)sender
 {
     _resultText.text = @""; // clear viewer
-    [_resultText setTextColor:[UIColor grayColor]]; // text to gray to indicate curl loading
 
     // Give some render time to show response before we hit the network
     [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
@@ -254,13 +258,11 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
             _resultText.text = [_resultText.text stringByAppendingFormat:@"\n** Timing Details **\n-- \tName Lookup:\t%0.2fs\n-- \tTCP Connect: \t%0.2fs\n-- \tSSL Handshake: \t%0.2fs\n-- \tFirst Byte: \t\t%0.2fs\n-- \tTotal Download: \t%0.2fs\n-- Size: %0.0f bytes\n-- Speed: %0.0f bytes/sec\n-- Using: %@\n** RESULT CODE: %ld**",
                                 timing_ns,timing_tcp,timing_ssl,timing_fb,
                                 total_time,total_size, total_speed, http_ver_s, http_code];
-            
-            [_resultText setTextColor:[UIColor blackColor]];
         
         }
         else {
             _resultText.text = [_resultText.text stringByAppendingFormat:@"\n** TRANSFER INTERRUPTED - ERROR [%d]\n", theResult];
-            [_resultText setTextColor:[UIColor redColor]];
+
             if (theResult == 6) {
                 _resultText.text = [_resultText.text stringByAppendingString:@"\n** Host Not Found - Check URL or Network\n"];
                 

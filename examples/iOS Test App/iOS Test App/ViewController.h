@@ -6,7 +6,7 @@
 //
 //  COPYRIGHT AND PERMISSION NOTICE
 //
-//  Copyright (c) 2014-2016 Jason A. Cox, jasonacox@me.com, and many contributors,
+//  Copyright (c) 2014-2020 Jason A. Cox, jasonacox@me.com, and many contributors,
 //  see the THANKS file.
 //
 //  All rights reserved.
