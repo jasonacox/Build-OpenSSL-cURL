@@ -5,17 +5,33 @@ Script to build OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and tvOS devi
 ## Build
 The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which pull down the specified release version.  Versions are specified in the `build.sh` script:
 
-	########################################
-	# EDIT this section to Select Versions #
-	########################################
+```bash
+################################################
+# EDIT this section to Select Default Versions #
+################################################
 
-	OPENSSL="1.1.1d"        # https://www.openssl.org/source/
-	LIBCURL="7.66.0"        # https://curl.haxx.se/download.html
-	NGHTTP2="1.39.2"        # https://nghttp2.org/
+OPENSSL="1.1.1d"	# https://www.openssl.org/source/
+LIBCURL="7.68.0"	# https://curl.haxx.se/download.html
+NGHTTP2="1.40.0"	# https://nghttp2.org/
 
-	######################################## 
+################################################
+```
 
-By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use `build.sh -with-engine` and static engine support will be included.
+By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use this and the static engine support will be included:
+
+	build.sh -e 
+
+The build script accept several arguments to adjust versions and toggle  features:
+
+	build.sh [-o <OpenSSL_version>] [-c <curl_version>] [-n <nghttp2_version] [-d] [-e] [-h]
+
+		-o <version>   Build OpenSSL version (default 1.1.1d)
+		-c <version>   Build curl version (default 7.68.0)
+		-n <version>   Build nghttp2 version (default 1.40.0)
+		-d             Compile without HTTP2 support
+		-e             Compile with OpenSSL engine support
+		-b             Compile without bitcode
+		-h             Show usage
 
 ## Dependencies
 The build script requires:
@@ -29,7 +45,7 @@ The `openssl-build.sh` script creates separate bitcode enabled target libraries 
 * iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
-By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use `openssl-build.sh -e` 
+By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use `build.sh -e`
 
 The tvOS build has fork() disable as the AppleTV tvOS does not support fork(). 
 
@@ -45,14 +61,20 @@ The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for t
 * iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
-Edit `build.sh` to change the version of nghttp2 that will be downloaded and built.  Include the relevant library into your project. The pkg-config tool is required.  The build script tests for this and will attempt to install if it is missing.   Rename the appropriate file to libnghttp2.a:
+Edit `build.sh` to change the default version of nghttp2 that will be downloaded and built or specify the version on the command line.
+
+	build.sh -n 1.40.0 
+
+Include the relevant library into your project. The pkg-config tool is required.  The build script tests for this and will attempt to install if it is missing. Rename the appropriate file to libnghttp2.a:
 
 	|____lib
 	   |____libnghttp2_iOS.a
 	   |____libnghttp2_Mac.a
 	   |____libnghttp2_tvOS.a
 
-DISABLE HTTP2: The nghttp2 build can be disabled by using `build.sh --disable-http2`
+DISABLE HTTP2: The nghttp2 build can be disabled by using:
+
+	build.sh -d
 
 ## cURL / libcurl
 The `libcurl-build.sh` script create separate bitcode enabled targets libraries for:
@@ -61,16 +83,20 @@ The `libcurl-build.sh` script create separate bitcode enabled targets libraries 
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
 The curl build uses `--with-ssl` pointing to the above OpenSSL builds and `--with-nghttp2` pointing to the above nghttp2 builds..
-Edit `build.sh` to change the version of cURL that will be downloaded and built.  Include the relevant library into your project.  Rename the appropriate file to libcurl.a:
+Edit `build.sh` to change the version of cURL that will be downloaded and built or specify the version on the command line.
+
+	build.sh -c 7.68.0 
+	
+Include the relevant library into your project.  Rename the appropriate file to libcurl.a:
 
 	|____lib
 	   |____libcurl_iOS.a
 	   |____libcurl_Mac.a
 	   |____libcurl_tvOS.a
 
-NOTE: By default, this script only builds bitcode versions. To build non-bitcode versions uncommend this line:
+NOTE: By default, this script only builds bitcode versions. To build non-bitcode versions:
 
-	NOBITCODE="yes"
+	build.sh -b
 
 ## Xcode
 
@@ -85,13 +111,15 @@ See the example 'iOS Test App'.
 
 ## Usage
 
- 1. Edit and Run `build.sh` 
- 2. Libraries are created in curl/lib, openssl/*/lib, nghttp2/lib
- 3. Copy libs and headers to your project.
- 4. Import appropriate "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a".
- 5. Reference Headers, "Headers/openssl", "Headers/curl".
- 6. Specifying the flag  "-lz" in "Other Linker Flags" (OTHER_LDFLAGS) setting in the "Linking" section in the Build settings of the target.
- 7. To use cURL, see below:
+ 1. Clone this Repo 
+ 	`git clone https://github.com/jasonacox/Build-OpenSSL-cURL.git`
+ 2. Run `build.sh` 
+ 3. Libraries are created in curl/lib, openssl/*/lib, and nghttp2/lib or you can find them in the archives folder.
+ 4. Copy libs and headers to your project.
+ 5. Import appropriate "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a".
+ 6. Reference Headers, "Headers/openssl", "Headers/curl".
+ 7. Specifying the flag  "-lz" in "Other Linker Flags" (OTHER_LDFLAGS) setting in the "Linking" section in the Build settings of the target.
+ 8. To use cURL, see below:
 
         #include <curl/curl.h>
 
@@ -100,7 +128,7 @@ See the example 'iOS Test App'.
             ...  
         }
 
-NOTE: For iOS project with 64 bit targets, you may need to edit the `curlbuild.h` header if you get an error simliar to this: `'curl_rule_01' declared as an array with a negative size`
+NOTE: You may need to edit the `curlbuild.h` header if you get an error simliar to this: `'curl_rule_01' declared as an array with a negative size`
 
 curlbuild.h
 
@@ -119,7 +147,7 @@ You may also need to edit this section:
 	//ADD Condition for 64 Bit
 	#define CURL_TYPEOF_CURL_OFF_T int64_t
 
-`curl/curlbuild-ios-universal.h` is a universal example, tested on iOS platforms, made out of libcurl-7.50.3. You'd better check the diff between this file and `curlbuild.h` before using it.
+`curl/curlbuild-ios-universal.h` is a universal example, tested on iOS platforms, made out of libcurl-7.50.3. Check the diff between this file and `curlbuild.h` before using it.
 
 ## Example Apps
 

@@ -18,33 +18,45 @@ set -e
 # set trap to help debug build errors
 trap 'echo "** ERROR with Build - Check /tmp/nghttp2*.log"; tail /tmp/nghttp2*.log' INT TERM EXIT
 
+NGHTTP2_VERNUM="x1.40.0"
+IOS_MIN_SDK_VERSION="7.1"
+IOS_SDK_VERSION=""
+TVOS_MIN_SDK_VERSION="9.0"
+TVOS_SDK_VERSION=""
+
 usage ()
 {
-	echo "usage: $0 [nghttp2 version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	echo
+	echo "Usage: "
+	echo
+	echo "  $0 [-v <nghttp2 version>] [-s <iOS SDK version>] [-t <tvOS SDK version>] [-h]"
+    echo
+	echo "         -v   version of nghttp2 (default $NGHTTP2_VERNUM)"
+	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
+	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -h   show usage"	
+	echo
 	trap - INT TERM EXIT
 	exit 127
 }
 
-if [ "$1" == "-h" ]; then
-	usage
-fi
-
-if [ -z $2 ]; then
-	IOS_SDK_VERSION="" #"9.1"
-	IOS_MIN_SDK_VERSION="7.1"
-	
-	TVOS_SDK_VERSION="" #"9.0"
-	TVOS_MIN_SDK_VERSION="9.0"
-else
-	IOS_SDK_VERSION=$2
-	TVOS_SDK_VERSION=$3
-fi
-
-if [ -z $1 ]; then
-	NGHTTP2_VERNUM="1.14.0"
-else
-	NGHTTP2_VERNUM="$1"
-fi
+while getopts "v:s:t:h\?" o; do
+    case "${o}" in
+        v)
+	    	NGHTTP2_VERNUM="${OPTARG}"
+            ;;
+        s)
+            IOS_SDK_VERSION="${OPTARG}"
+            ;;
+        t)
+	    	TVOS_SDK_VERSION="${OPTARG}"
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
 
 # --- Edit this to update version ---
 

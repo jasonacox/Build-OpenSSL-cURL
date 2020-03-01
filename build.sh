@@ -6,38 +6,74 @@
 #   https://github.com/jasonacox/Build-OpenSSL-cURL
 #
 
-########################################
-# EDIT this section to Select Versions #
-########################################
+################################################
+# EDIT this section to Select Default Versions #
+################################################
 
 OPENSSL="1.1.1d"	# https://www.openssl.org/source/
 LIBCURL="7.68.0"	# https://curl.haxx.se/download.html
 NGHTTP2="1.40.0"	# https://nghttp2.org/
 
-########################################
+################################################
 
 # HTTP2 Support?
 NOHTTP2="/tmp/no-http2"
 rm -f $NOHTTP2
 
+# Global flags
+engine=0
+disablehttp2=0
+disablebitcode=0
+
 usage ()
 {
-        echo "usage: $0 [-disable-http2] [-with-engine]"
-	echo "     Set to build versions -"
-	echo "         OpenSSL = $OPENSSL"
-	echo "         libcurl = $LIBCURL"
-	echo "         nghttp2 = $NGHTTP2"
+    echo
+	echo "Usage:"
+	echo
+	echo "  $0 [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version] [-d] [-e] [-h]"
 	echo 
-        exit 127
+	echo "         -o <version>   Build OpenSSL version (default $OPENSSL)"
+	echo "         -c <version>   Build curl version (default $LIBCURL)"
+	echo "         -n <version>   Build nghttp2 version (default $NGHTTP2)"
+	echo "         -d             Compile without HTTP2 support"
+	echo "         -e             Compile with OpenSSL engine support"
+	echo "         -b             Compile without bitcode"
+	echo "         -h             Show usage"
+	echo 
+    exit 127
 }
 
-if [ "$1" == "-h" ] || [ "$1" == "-v" ] || [ "$1" == "--version" ] || [ "$1" == "-?" ]; then
-        usage
-fi
+while getopts "o:c:n:deh\?" o; do
+    case "${o}" in
+		o)
+			OPENSSL="${OPTARG}"
+			;;
+		c)
+			LIBCURL="${OPTARG}"
+			;;
+		n)
+			NGHTTP2="${OPTARG}"
+			;;
+		d)
+			disablehttp2=1
+			;;
+		e)
+			engine=1
+			;;
+		b)
+			disablebitcode=1
+			;;
+		*)
+			usage
+			;;
+    esac
+done
+shift $((OPTIND-1))
 
+## OpenSSL Build
 echo
 cd openssl 
-if [ "$1" == "-with-engine" ] || [ "$2" == "-with-engine" ]; then
+if [ "$engine" == "1" ]; then
         echo "Building OpenSSL with engine support"
 	./openssl-build.sh -v "$OPENSSL" -e
 else
@@ -46,21 +82,27 @@ else
 fi
 cd ..
 
-if [ "$1" == "-disable-http2" ] || [ "$2" == "-disable-http2" ]; then
+## Nghttp2 Build
+if [ "$disablehttp2" == "1" ]; then
 	touch "$NOHTTP2"
 	NGHTTP2="NONE"	
 else 
 	echo
 	echo "Building nghttp2 for HTTP2 support"
 	cd nghttp2
-	./nghttp2-build.sh "$NGHTTP2"
+	./nghttp2-build.sh -v "$NGHTTP2"
 	cd ..
 fi
 
+## Curl Build
 echo
 echo "Building Curl"
 cd curl
-./libcurl-build.sh "$LIBCURL"
+if [ "$disablebitcode" == "1" ]; then
+	./libcurl-build.sh -v "$LIBCURL" -b
+else 
+	./libcurl-build.sh -v "$LIBCURL"
+fi
 cd ..
 
 echo 
