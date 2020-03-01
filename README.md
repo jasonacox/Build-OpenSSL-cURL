@@ -15,6 +15,8 @@ The `build.sh` script calls the three build scripts below (openssl, nghttp and c
 
 	######################################## 
 
+By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use `build.sh -with-engine` and static engine support will be included.
+
 ## Dependencies
 The build script requires:
 * Xcode 7.1 or higher (10+ recommended)
@@ -27,8 +29,9 @@ The `openssl-build.sh` script creates separate bitcode enabled target libraries 
 * iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
+By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use `openssl-build.sh -e` 
+
 The tvOS build has fork() disable as the AppleTV tvOS does not support fork(). 
-Edit `build.sh` to change the version of OpenSSL that will be downloaded and built.
 
 	|____lib
 	   |____libcrypto.a

@@ -20,33 +20,48 @@ set -e
 # set trap to help debug build errors
 trap 'echo "** ERROR with Build - Check /tmp/openssl*.log"; tail /tmp/openssl*.log' INT TERM EXIT
 
+OPENSSL_VERSION="openssl-1.1.1d"
+IOS_MIN_SDK_VERSION="7.1"
+IOS_SDK_VERSION=""
+TVOS_MIN_SDK_VERSION="9.0"
+TVOS_SDK_VERSION=""
+
 usage ()
 {
-	echo "usage: $0 [openssl version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	echo "usage: "
+	echo "    $0 [-v <openssl version>] [-s <iOS SDK version>] [-t <tvOS SDK version>] [-e]"
+        echo
+	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
+	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
+	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -e   compile with engine support"	
+	echo
 	trap - INT TERM EXIT
 	exit 127
 }
 
-if [ "$1" == "-h" ]; then
-	usage
-fi
+engine=0
 
-if [ -z $2 ]; then
-	IOS_SDK_VERSION="" 
-	IOS_MIN_SDK_VERSION="7.1"
-
-	TVOS_SDK_VERSION="" 
-	TVOS_MIN_SDK_VERSION="9.0"
-else
-	IOS_SDK_VERSION=$2
-	TVOS_SDK_VERSION=$3
-fi
-
-if [ -z $1 ]; then
-	OPENSSL_VERSION="openssl-1.0.1t"
-else
-	OPENSSL_VERSION="openssl-$1"
-fi
+while getopts "v:s:t:eh\?" o; do
+    case "${o}" in
+        v)
+	    OPENSSL_VERSION="openssl-${OPTARG}"
+            ;;
+        s)
+            IOS_SDK_VERSION="${OPTARG}"
+            ;;
+        t)
+	    TVOS_SDK_VERSION="${OPTARG}"
+            ;;
+	e)
+            engine=1
+	    ;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
 
 DEVELOPER=`xcode-select -print-path`
 
@@ -230,6 +245,11 @@ fi
 
 echo "Unpacking openssl"
 tar xfz "${OPENSSL_VERSION}.tar.gz"
+
+if [ "$engine" == "1" ]; then
+	echo "Activate Static Engine"
+	sed -ie 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
+fi
 
 echo "Building Mac libraries"
 buildMac "x86_64"

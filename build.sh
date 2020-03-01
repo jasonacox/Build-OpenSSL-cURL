@@ -22,21 +22,31 @@ rm -f $NOHTTP2
 
 usage ()
 {
-        echo "usage: $0 [-disable-http2]"
+        echo "usage: $0 [-disable-http2] [-with-engine]"
+	echo "     Set to build versions -"
+	echo "         OpenSSL = $OPENSSL"
+	echo "         libcurl = $LIBCURL"
+	echo "         nghttp2 = $NGHTTP2"
+	echo 
         exit 127
 }
 
-if [ "$1" == "-h" ]; then
+if [ "$1" == "-h" ] || [ "$1" == "-v" ] || [ "$1" == "--version" ] || [ "$1" == "-?" ]; then
         usage
 fi
 
 echo
-echo "Building OpenSSL"
 cd openssl 
-./openssl-build.sh "$OPENSSL"
+if [ "$1" == "-with-engine" ] || [ "$2" == "-with-engine" ]; then
+        echo "Building OpenSSL with engine support"
+	./openssl-build.sh -v "$OPENSSL" -e
+else
+	echo "Building OpenSSL"
+	./openssl-build.sh -v "$OPENSSL"
+fi
 cd ..
 
-if [ "$1" == "-disable-http2" ]; then
+if [ "$1" == "-disable-http2" ] || [ "$2" == "-disable-http2" ]; then
 	touch "$NOHTTP2"
 	NGHTTP2="NONE"	
 else 
