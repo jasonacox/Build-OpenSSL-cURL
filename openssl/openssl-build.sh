@@ -20,7 +20,7 @@ set -e
 # set trap to help debug build errors
 trap 'echo "** ERROR with Build - Check /tmp/openssl*.log"; tail /tmp/openssl*.log' INT TERM EXIT
 
-OPENSSL_VERSION="openssl-1.1.1d"
+OPENSSL_VERSION="openssl-x1.1.1d"
 IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
@@ -28,13 +28,16 @@ TVOS_SDK_VERSION=""
 
 usage ()
 {
-	echo "usage: "
-	echo "    $0 [-v <openssl version>] [-s <iOS SDK version>] [-t <tvOS SDK version>] [-e]"
+	echo
+	echo "Usage:"
+	echo
+	echo "  $0 [-v <openssl version>] [-s <iOS SDK version>] [-t <tvOS SDK version>] [-e] [-h]"
         echo
 	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
 	echo "         -e   compile with engine support"	
+	echo "         -h   show usage"	
 	echo
 	trap - INT TERM EXIT
 	exit 127
@@ -45,17 +48,17 @@ engine=0
 while getopts "v:s:t:eh\?" o; do
     case "${o}" in
         v)
-	    OPENSSL_VERSION="openssl-${OPTARG}"
+	    	OPENSSL_VERSION="openssl-${OPTARG}"
             ;;
         s)
             IOS_SDK_VERSION="${OPTARG}"
             ;;
         t)
-	    TVOS_SDK_VERSION="${OPTARG}"
+	    	TVOS_SDK_VERSION="${OPTARG}"
             ;;
-	e)
+		e)
             engine=1
-	    ;;
+	    	;;
         *)
             usage
             ;;

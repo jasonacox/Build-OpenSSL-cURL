@@ -18,40 +18,57 @@ set -e
 # set trap to help debug any build errors
 trap 'echo "** ERROR with Build - Check /tmp/curl*.log"; tail /tmp/curl*.log' INT TERM EXIT
 
+CURL_VERSION="curl-x7.50.1"
+IOS_SDK_VERSION="" 
+IOS_MIN_SDK_VERSION="7.1"
+TVOS_SDK_VERSION="" 
+TVOS_MIN_SDK_VERSION="9.0"
+IPHONEOS_DEPLOYMENT_TARGET="6.0"
+
 usage ()
 {
-	echo "usage: $0 [curl version] [iOS SDK version (defaults to latest)] [tvOS SDK version (defaults to latest)]"
+	echo
+	echo "Usage:"
+	echo
+	echo "  $0 [-v <curl version>] [-s <iOS SDK version>] [-t <tvOS SDK version>] [-i <iPhone target version>] [-b] [-h]"
+    echo
+	echo "         -v   version of curl (default $CURL_VERSION)"
+	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
+	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -i   iPhone target version (default $IPHONEOS_DEPLOYMENT_TARGET)"
+	echo "         -b   compile without bitcode"
+	echo "         -h   show usage"	
+	echo
 	trap - INT TERM EXIT
 	exit 127
 }
 
-if [ "$1" == "-h" ]; then
-	usage
-fi
-
-if [ -z $2 ]; then
-	IOS_SDK_VERSION="" #"9.1"
-	IOS_MIN_SDK_VERSION="7.1"
-	
-	TVOS_SDK_VERSION="" #"9.0"
-	TVOS_MIN_SDK_VERSION="9.0"
-else
-	IOS_SDK_VERSION=$2
-	TVOS_SDK_VERSION=$3
-fi
-
-if [ -z $1 ]; then
-	CURL_VERSION="curl-7.50.1"
-else
-	CURL_VERSION="curl-$1"
-fi
-
-# Uncomment to compile without bitcode
-#NOBITCODE="yes"
+while getopts "v:s:t:i:nh\?" o; do
+    case "${o}" in
+        v)
+			CURL_VERSION="curl-${OPTARG}"
+            ;;
+        s)
+            IOS_SDK_VERSION="${OPTARG}"
+            ;;
+        t)
+	    	TVOS_SDK_VERSION="${OPTARG}"
+            ;;
+        i)
+	    	IPHONEOS_DEPLOYMENT_TARGET="${OPTARG}"
+            ;;
+		b)
+			NOBITCODE="yes"
+			;;
+        *)
+            usage
+            ;;
+    esac
+done
+shift $((OPTIND-1))
 
 OPENSSL="${PWD}/../openssl"  
 DEVELOPER=`xcode-select -print-path`
-IPHONEOS_DEPLOYMENT_TARGET="6.0"
 
 # HTTP2 support
 NOHTTP2="/tmp/no-http2"
@@ -71,7 +88,7 @@ fi
 buildMac()
 {
 	ARCH=$1
-	HOST="i386-apple-darwin"
+	HOST="x86_64-apple-darwin"
 
 	echo "Building ${CURL_VERSION} for ${ARCH}"
 
