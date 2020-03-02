@@ -7,6 +7,7 @@ The `build.sh` script calls the three build scripts below (openssl, nghttp and c
 
 The build script accept several arguments to adjust versions and toggle features:
 
+```
   ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-x] [-h]
 
          -o <version>   Build OpenSSL version (default 1.1.1d)
@@ -17,16 +18,21 @@ The build script accept several arguments to adjust versions and toggle features
          -b             Compile without bitcode
          -x             No color output
          -h             Show usage
+```
 
 _OpenSSL Engine Note: By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use this and the static engine support will be included:_ `./build.sh -e`
 
 ## Quick Start
 
 1. Clone this Repo
-2. Run the build script: `./build.sh -o 1.1.1d -c 7.68.0 -n 1.40.0`
+2. Run the build script: `./build.sh`
 3. Libraries and Binaries will be in the ./archive folder
 
-Default versions are specified in the `build.sh` script but you can specify the version you want to build via the command line, e.g. `./build.sh -o 1.1.1d -c 7.68.0 -n 1.40.0`
+Default versions are specified in the `build.sh` script but you can specify the version you want to build via the command line, e.g.:
+
+	./build.sh -o 1.1.1d -c 7.68.0 -n 1.40.0
+
+You can update the default verison by editing this section in the build.sh script:
 
 ```bash
 ################################################
