@@ -3,7 +3,30 @@
 Script to build OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  Includes patching for tvOS to not use fork() and adds HTTP2 support with nghttp2. 
 
 ## Build
-The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which pull down the specified release version.  Versions are specified in the `build.sh` script:
+The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which download the specified release version, configures and builds the libraries and binaries.  
+
+The build script accept several arguments to adjust versions and toggle features:
+
+  ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-x] [-h]
+
+         -o <version>   Build OpenSSL version (default 1.1.1d)
+         -c <version>   Build curl version (default 7.68.0)
+         -n <version>   Build nghttp2 version (default 1.40.0)
+         -d             Compile without HTTP2 support
+         -e             Compile with OpenSSL engine support
+         -b             Compile without bitcode
+         -x             No color output
+         -h             Show usage
+
+_OpenSSL Engine Note: By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use this and the static engine support will be included:_ `./build.sh -e`
+
+## Quick Start
+
+1. Clone this Repo
+2. Run the build script: `./build.sh -o 1.1.1d -c 7.68.0 -n 1.40.0`
+3. Libraries and Binaries will be in the ./archive folder
+
+Default versions are specified in the `build.sh` script but you can specify the version you want to build via the command line, e.g. `./build.sh -o 1.1.1d -c 7.68.0 -n 1.40.0`
 
 ```bash
 ################################################
@@ -17,29 +40,15 @@ NGHTTP2="1.40.0"	# https://nghttp2.org/
 ################################################
 ```
 
-By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use this and the static engine support will be included:
+## Details
 
-	build.sh -e 
-
-The build script accept several arguments to adjust versions and toggle  features:
-
-	build.sh [-o <OpenSSL_version>] [-c <curl_version>] [-n <nghttp2_version] [-d] [-e] [-h]
-
-		-o <version>   Build OpenSSL version (default 1.1.1d)
-		-c <version>   Build curl version (default 7.68.0)
-		-n <version>   Build nghttp2 version (default 1.40.0)
-		-d             Compile without HTTP2 support
-		-e             Compile with OpenSSL engine support
-		-b             Compile without bitcode
-		-h             Show usage
-
-## Dependencies
+### Dependencies
 The build script requires:
 * Xcode 7.1 or higher (10+ recommended)
 * Xcode Command Line Tools
 * pkg-config tool for nghttp2 (or `brew` to auto-install)
 
-## OpenSSL
+### OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
 * Mac - x86-64
 * iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64)
@@ -55,7 +64,7 @@ The tvOS build has fork() disable as the AppleTV tvOS does not support fork().
 
 NOTE: This script allows building the OpenSSL 1.1.1 and 1.0.2 series libraries.  The 1.0.2 series will be end of life soon so it is recommended that you use the new long term support (LTS) 1.1.1 version.
 
-## HTTP2 / nghttp2
+### HTTP2 / nghttp2
 The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
 * Mac - x86-64
 * iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
@@ -76,7 +85,7 @@ DISABLE HTTP2: The nghttp2 build can be disabled by using:
 
 	build.sh -d
 
-## cURL / libcurl
+### cURL / libcurl
 The `libcurl-build.sh` script create separate bitcode enabled targets libraries for:
 * Mac - x86-64
 * iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
@@ -98,7 +107,7 @@ NOTE: By default, this script only builds bitcode versions. To build non-bitcode
 
 	build.sh -b
 
-## Xcode
+### Xcode
 
 Xcode7.1b or later is required for the tvOS SDK.
 
@@ -109,7 +118,7 @@ To include the OpenSSL and libcurl libraries in your Xcode projects, import the 
 
 See the example 'iOS Test App'.
 
-## Usage
+### Usage
 
  1. Clone this Repo 
  	`git clone https://github.com/jasonacox/Build-OpenSSL-cURL.git`
@@ -149,11 +158,11 @@ You may also need to edit this section:
 
 `curl/curlbuild-ios-universal.h` is a universal example, tested on iOS platforms, made out of libcurl-7.50.3. Check the diff between this file and `curlbuild.h` before using it.
 
-## Example Apps
+### Example Apps
 
 Example Xcode project "iOS Test App" is located in the examples folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2 libraries. The app provides a simple single text field interface for URL input and produces a curl respone.
 
-## Tree
+### Tree
 
 	|
 	|____archive
@@ -175,7 +184,7 @@ Example Xcode project "iOS Test App" is located in the examples folder.  This pr
 	|____clean.sh
 
 
-## Architectures in Libraries
+### Architectures in Libraries
 
 	xcrun -sdk iphoneos lipo -info openssl/*/lib/*.a
 	xcrun -sdk iphoneos lipo -info nghttp2/lib/*.a
@@ -197,7 +206,7 @@ Example Xcode project "iOS Test App" is located in the examples folder.  This pr
 	* openssl/tvOS/lib/libssl.a are: x86_64 arm64 
 	* nghttp2/lib/libnghttp2_tvOS.a are: x86_64 arm64 
 
-## Archive
+### Archive
 
 The `build.sh` script will create an ./archive folder and store all the *.a libraries built along with the header files and a MacOS binaries for `curl` and `openssl`.
 

@@ -15,8 +15,23 @@
 
 set -e
 
+# Formatting
+default="\033[39m"
+wihte="\033[97m"
+green="\033[32m"
+red="\033[91m"
+yellow="\033[33m"
+
+bold="\033[0m${green}\033[1m"
+subbold="\033[0m${green}"
+archbold="\033[0m${yellow}\033[1m"
+normal="${white}\033[0m"
+dim="\033[0m${white}\033[2m"
+alert="\033[0m${red}\033[1m"
+alertdim="\033[0m${red}\033[2m"
+
 # set trap to help debug any build errors
-trap 'echo "** ERROR with Build - Check /tmp/curl*.log"; tail /tmp/curl*.log' INT TERM EXIT
+trap 'echo -e "${alert}** ERROR with Build - Check /tmp/curl*.log${alertdim}"; tail -3 /tmp/curl*.log' INT TERM EXIT
 
 CURL_VERSION="curl-x7.50.1"
 IOS_SDK_VERSION="" 
@@ -28,22 +43,23 @@ IPHONEOS_DEPLOYMENT_TARGET="6.0"
 usage ()
 {
 	echo
-	echo "Usage:"
+	echo -e "${bold}Usage:${normal}"
 	echo
-	echo "  $0 [-v <curl version>] [-s <iOS SDK version>] [-t <tvOS SDK version>] [-i <iPhone target version>] [-b] [-h]"
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<curl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-i ${dim}<iPhone target version>${normal}] [-b] [-x] [-h]"
     echo
 	echo "         -v   version of curl (default $CURL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
 	echo "         -i   iPhone target version (default $IPHONEOS_DEPLOYMENT_TARGET)"
 	echo "         -b   compile without bitcode"
+	echo "         -x   disable color output"
 	echo "         -h   show usage"	
 	echo
 	trap - INT TERM EXIT
 	exit 127
 }
 
-while getopts "v:s:t:i:nh\?" o; do
+while getopts "v:s:t:i:nxh\?" o; do
     case "${o}" in
         v)
 			CURL_VERSION="curl-${OPTARG}"
@@ -59,6 +75,15 @@ while getopts "v:s:t:i:nh\?" o; do
             ;;
 		b)
 			NOBITCODE="yes"
+			;;
+		x)
+			bold=""
+			subbold=""
+			normal=""
+			dim=""
+			alert=""
+			alertdim=""
+			archbold=""
 			;;
         *)
             usage
@@ -90,7 +115,7 @@ buildMac()
 	ARCH=$1
 	HOST="x86_64-apple-darwin"
 
-	echo "Building ${CURL_VERSION} for ${ARCH}"
+	echo -e "${subbold}Building ${CURL_VERSION} for ${archbold}$${ARCH}${dim}"
 
 	TARGET="darwin-i386-cc"
 
@@ -151,7 +176,7 @@ buildIOS()
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} ${CC_BITCODE_FLAG}"
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/iOS/lib ${NGHTTP2LIB}"
    
-	echo "Building ${CURL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${ARCH} ${BITCODE}"
+	echo -e "${subbold}Building ${CURL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim} ${BITCODE}"
 
 	if [[ "${ARCH}" == *"arm64"* || "${ARCH}" == "arm64e" ]]; then
 		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/iOS ${NGHTTP2CFG} --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
@@ -192,7 +217,7 @@ buildTVOS()
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/tvOS/lib ${NGHTTP2LIB}"
 #	export PKG_CONFIG_PATH 
    
-	echo "Building ${CURL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${ARCH}"
+	echo -e "${subbold}Building ${CURL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
 
 	./configure -prefix="/tmp/${CURL_VERSION}-tvOS-${ARCH}" --host="arm-apple-darwin" --disable-shared -with-random=/dev/urandom --disable-ntlm-wb --with-ssl="${OPENSSL}/tvOS" ${NGHTTP2CFG} &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
 
@@ -206,7 +231,7 @@ buildTVOS()
 	popd > /dev/null
 }
 
-echo "Cleaning up"
+echo -e "${bold}Cleaning up${dim}"
 rm -rf include/curl/* lib/*
 
 mkdir -p lib
@@ -227,17 +252,17 @@ fi
 echo "Unpacking curl"
 tar xfz "${CURL_VERSION}.tar.gz"
 
-echo "Building Mac libraries"
+echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
 
-echo "Copying headers"
+echo "  Copying headers"
 cp /tmp/${CURL_VERSION}-x86_64/include/curl/* include/curl/
 
 lipo \
 	"/tmp/${CURL_VERSION}-x86_64/lib/libcurl.a" \
 	-create -output lib/libcurl_Mac.a
 
-echo "Building iOS libraries (bitcode)"
+echo -e "${bold}Building iOS libraries (bitcode)${dim}"
 buildIOS "armv7" "bitcode"
 buildIOS "armv7s" "bitcode"
 buildIOS "arm64" "bitcode"
@@ -256,7 +281,7 @@ lipo \
 
 
 if [[ "${NOBITCODE}" == "yes" ]]; then
-	echo "Building iOS libraries (nobitcode)"
+	echo -e "${bold}Building iOS libraries (nobitcode)${dim}"
 	buildIOS "armv7" "nobitcode"
 	buildIOS "armv7s" "nobitcode"
 	buildIOS "arm64" "nobitcode"
@@ -275,7 +300,7 @@ if [[ "${NOBITCODE}" == "yes" ]]; then
 
 fi
 
-echo "Building tvOS libraries (bitcode)"
+echo -e "${bold}Building tvOS libraries${dim}"
 buildTVOS "arm64"
 buildTVOS "x86_64"
 
@@ -285,7 +310,7 @@ lipo \
 	-create -output lib/libcurl_tvOS.a
 
 
-echo "Cleaning up"
+echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${CURL_VERSION}-*
 rm -rf ${CURL_VERSION}
 
@@ -295,4 +320,4 @@ xcrun -sdk iphoneos lipo -info lib/*.a
 #reset trap
 trap - INT TERM EXIT
 
-echo "Done"
+echo -e "${normal}Done"
