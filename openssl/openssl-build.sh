@@ -17,10 +17,25 @@
 
 set -e
 
-# set trap to help debug build errors
-trap 'echo "** ERROR with Build - Check /tmp/openssl*.log"; tail /tmp/openssl*.log' INT TERM EXIT
+# Formatting
+default="\033[39m"
+wihte="\033[97m"
+green="\033[32m"
+red="\033[91m"
+yellow="\033[33m"
 
-OPENSSL_VERSION="openssl-x1.1.1d"
+bold="\033[0m${green}\033[1m"
+subbold="\033[0m${green}"
+archbold="\033[0m${yellow}\033[1m"
+normal="${white}\033[0m"
+dim="\033[0m${white}\033[2m"
+alert="\033[0m${red}\033[1m"
+alertdim="\033[0m${red}\033[2m"
+
+# set trap to help debug build errors
+trap 'echo -e "${alert}** ERROR with Build - Check /tmp/openssl*.log${alertdim}"; tail -3 /tmp/openssl*.log' INT TERM EXIT
+
+OPENSSL_VERSION="openssl-1.1.1d"
 IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
@@ -29,14 +44,15 @@ TVOS_SDK_VERSION=""
 usage ()
 {
 	echo
-	echo "Usage:"
+	echo -e "${bold}Usage:${normal}"
 	echo
-	echo "  $0 [-v <openssl version>] [-s <iOS SDK version>] [-t <tvOS SDK version>] [-e] [-h]"
-        echo
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<openssl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-e] [-x] [-h]"
+	echo
 	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
 	echo "         -e   compile with engine support"	
+	echo "         -x   disable color output"
 	echo "         -h   show usage"	
 	echo
 	trap - INT TERM EXIT
@@ -45,7 +61,7 @@ usage ()
 
 engine=0
 
-while getopts "v:s:t:eh\?" o; do
+while getopts "v:s:t:exh\?" o; do
     case "${o}" in
         v)
 	    	OPENSSL_VERSION="openssl-${OPTARG}"
@@ -59,6 +75,15 @@ while getopts "v:s:t:eh\?" o; do
 		e)
             engine=1
 	    	;;
+		x)
+			bold=""
+			subbold=""
+			normal=""
+			dim=""
+			alert=""
+			alertdim=""
+			archbold=""
+			;;
         *)
             usage
             ;;
@@ -72,7 +97,7 @@ buildMac()
 {
 	ARCH=$1
 
-	echo "Building ${OPENSSL_VERSION} for ${ARCH}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim}"
 
 	TARGET="darwin-i386-cc"
 
@@ -117,7 +142,7 @@ buildIOS()
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
 
-	echo "Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${ARCH}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
 
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]]; then
 		TARGET="darwin-i386-cc"
@@ -171,7 +196,7 @@ buildTVOS()
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
 	export LC_CTYPE=C
 
-	echo "Building ${OPENSSL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${ARCH}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
 
 	# Patch apps/speed.c to not use fork() since it's not available on tvOS
 	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "./apps/speed.c"
@@ -214,7 +239,7 @@ buildTVOS()
 }
 
 
-echo "Cleaning up"
+echo -e "${bold}Cleaning up${dim}"
 rm -rf include/openssl/* lib/*
 
 mkdir -p Mac/lib
@@ -240,9 +265,10 @@ if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
 	echo "** Building OpenSSL 1.1.1 **"
 else
 	if [[ "$OPENSSL_VERSION" = "openssl-1.0."* ]]; then
-		echo "** Building OpenSSL 1.0.x - WARNING: End of Life Version - Upgrade to 1.1.1 **"
+		echo "** Building OpenSSL 1.0.x ** "
+		echo -e "${alert}** WARNING: End of Life Version - Upgrade to 1.1.1 **${dim}"
 	else
-		echo "** WARNING: This build script has not been tested with $OPENSSL_VERSION **"
+		echo -e "${alert}** WARNING: This build script has not been tested with $OPENSSL_VERSION **${dim}"
 	fi
 fi
 
@@ -250,11 +276,11 @@ echo "Unpacking openssl"
 tar xfz "${OPENSSL_VERSION}.tar.gz"
 
 if [ "$engine" == "1" ]; then
-	echo "Activate Static Engine"
+	echo "+ Activate Static Engine"
 	sed -ie 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
 fi
 
-echo "Building Mac libraries"
+echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
 
 echo "  Copying headers and libraries"
@@ -268,7 +294,7 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libssl.a" \
 	-create -output Mac/lib/libssl.a
 
-echo "Building iOS libraries"
+echo -e "${bold}Building iOS libraries${dim}"
 buildIOS "armv7"
 buildIOS "armv7s"
 buildIOS "arm64"
@@ -298,7 +324,7 @@ lipo \
 	-create -output iOS/lib/libssl.a
 
 
-echo "Building tvOS libraries"
+echo -e "${bold}Building tvOS libraries${dim}"
 buildTVOS "arm64"
 buildTVOS "x86_64"
 echo "  Copying headers and libraries"
@@ -314,11 +340,11 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-tvOS-x86_64/lib/libssl.a" \
 	-create -output tvOS/lib/libssl.a
 
-echo "Cleaning up"
+echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${OPENSSL_VERSION}-*
 rm -rf ${OPENSSL_VERSION}
 
 #reset trap
 trap - INT TERM EXIT
 
-echo "Done"
+echo -e "${normal}Done"
