@@ -33,7 +33,7 @@ alertdim="\033[0m${red}\033[2m"
 # set trap to help debug build errors
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; tail -3 /tmp/nghttp2*.log' INT TERM EXIT
 
-NGHTTP2_VERNUM="x1.40.0"
+NGHTTP2_VERNUM="1.40.0"
 IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"

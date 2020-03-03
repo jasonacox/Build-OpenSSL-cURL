@@ -33,25 +33,27 @@ alertdim="\033[0m${red}\033[2m"
 # set trap to help debug any build errors
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/curl*.log${alertdim}"; tail -3 /tmp/curl*.log' INT TERM EXIT
 
-CURL_VERSION="curl-x7.50.1"
+CURL_VERSION="curl-7.50.1"
 IOS_SDK_VERSION="" 
 IOS_MIN_SDK_VERSION="7.1"
 TVOS_SDK_VERSION="" 
 TVOS_MIN_SDK_VERSION="9.0"
 IPHONEOS_DEPLOYMENT_TARGET="6.0"
+nohttp2="0"
 
 usage ()
 {
 	echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-v ${dim}<curl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-i ${dim}<iPhone target version>${normal}] [-b] [-x] [-h]"
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<curl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-i ${dim}<iPhone target version>${normal}] [-b] [-x] [-n] [-h]"
     echo
 	echo "         -v   version of curl (default $CURL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
 	echo "         -i   iPhone target version (default $IPHONEOS_DEPLOYMENT_TARGET)"
 	echo "         -b   compile without bitcode"
+	echo "         -n   compile with nghttp2"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"	
 	echo
@@ -59,7 +61,7 @@ usage ()
 	exit 127
 }
 
-while getopts "v:s:t:i:bxh\?" o; do
+while getopts "v:s:t:i:nbxh\?" o; do
     case "${o}" in
         v)
 			CURL_VERSION="curl-${OPTARG}"
@@ -73,6 +75,9 @@ while getopts "v:s:t:i:bxh\?" o; do
         i)
 	    	IPHONEOS_DEPLOYMENT_TARGET="${OPTARG}"
             ;;
+		n)
+			nohttp2="1"
+			;;
 		b)
 			NOBITCODE="yes"
 			;;
@@ -96,13 +101,12 @@ OPENSSL="${PWD}/../openssl"
 DEVELOPER=`xcode-select -print-path`
 
 # HTTP2 support
-NOHTTP2="/tmp/no-http2"
-if [ ! -f "$NOHTTP2" ]; then
+if [ $nohttp2 == "1" ]; then
 	# nghttp2 will be in ../nghttp2/{Platform}/{arch}
 	NGHTTP2="${PWD}/../nghttp2"  
 fi
 
-if [ ! -z "$NGHTTP2" ]; then 
+if [ $nohttp2 == "1" ]; then
 	echo "Building with HTTP2 Support (nghttp2)"
 else
 	echo "Building without HTTP2 Support (nghttp2)"
@@ -115,7 +119,7 @@ buildMac()
 	ARCH=$1
 	HOST="x86_64-apple-darwin"
 
-	echo -e "${subbold}Building ${CURL_VERSION} for ${archbold}$${ARCH}${dim}"
+	echo -e "${subbold}Building ${CURL_VERSION} for ${archbold}${ARCH}${dim}"
 
 	TARGET="darwin-i386-cc"
 
@@ -123,7 +127,7 @@ buildMac()
 		TARGET="darwin64-x86_64-cc"
 	fi
 
-	if [ ! -z "$NGHTTP2" ]; then 
+	if [ $nohttp2 == "1" ]; then 
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/Mac/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/Mac/${ARCH}/lib"
 	fi
@@ -163,7 +167,7 @@ buildIOS()
 		CC_BITCODE_FLAG="-fembed-bitcode"	
 	fi
 
-	if [ ! -z "$NGHTTP2" ]; then 
+	if [ $nohttp2 == "1" ]; then 
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/iOS/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/iOS/${ARCH}/lib"
 	fi
@@ -203,7 +207,7 @@ buildTVOS()
 		PLATFORM="AppleTVOS"
 	fi
 	
-	if [ ! -z "$NGHTTP2" ]; then 
+	if [ $nohttp2 == "1" ]; then 
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/tvOS/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/tvOS/${ARCH}/lib"
 	fi
