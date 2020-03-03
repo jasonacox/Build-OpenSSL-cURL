@@ -16,13 +16,9 @@ NGHTTP2="1.40.0"	# https://nghttp2.org/
 
 ################################################
 
-# HTTP2 Support?
-NOHTTP2="/tmp/no-http2"
-rm -f $NOHTTP2
-
 # Global flags
 engine=""
-disablehttp2=0
+buildnghttp2="-n"
 disablebitcode=""
 colorflag=""
 
@@ -71,7 +67,7 @@ while getopts "o:c:n:dexh\?" o; do
 			NGHTTP2="${OPTARG}"
 			;;
 		d)
-			disablehttp2=1
+			buildnghttp2=""
 			;;
 		e)
 			engine="-e"
@@ -109,8 +105,7 @@ echo -e "${bold}Building OpenSSL${normal}"
 cd ..
 
 ## Nghttp2 Build
-if [ "$disablehttp2" == "1" ]; then
-	touch "$NOHTTP2"
+if [ "$buildnghttp2" == "" ]; then
 	NGHTTP2="NONE"	
 else 
 	echo
@@ -124,7 +119,7 @@ fi
 echo
 echo -e "${bold}Building Curl${normal}"
 cd curl
-./libcurl-build.sh -v "$LIBCURL" $disablebitcode $colorflag
+./libcurl-build.sh -v "$LIBCURL" $disablebitcode $colorflag $buildnghttp2
 cd ..
 
 echo 
