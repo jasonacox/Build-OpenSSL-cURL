@@ -59,7 +59,7 @@ usage ()
 	exit 127
 }
 
-while getopts "v:s:t:i:nxh\?" o; do
+while getopts "v:s:t:i:bxh\?" o; do
     case "${o}" in
         v)
 			CURL_VERSION="curl-${OPTARG}"
