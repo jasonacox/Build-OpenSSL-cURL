@@ -55,7 +55,7 @@ usage ()
     exit 127
 }
 
-while getopts "o:c:n:dexh\?" o; do
+while getopts "o:c:n:debxh\?" o; do
     case "${o}" in
 		o)
 			OPENSSL="${OPTARG}"
