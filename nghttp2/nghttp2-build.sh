@@ -133,7 +133,7 @@ buildMac()
 
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
-	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Mac/${ARCH}" --host=${HOST} &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
+	./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Mac/${ARCH}" --host=${HOST} &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
 	make >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make install >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
@@ -170,9 +170,9 @@ buildIOS()
    
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
         if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
-		./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
         else
-		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
         fi
 
         make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
@@ -212,7 +212,7 @@ buildTVOS()
 	# LANG=C sed -i -- 's/D\_REENTRANT\:iOS/D\_REENTRANT\:tvOS/' "./Configure"
 	# chmod u+x ./Configure
 	
-	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
+	./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
 	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "config.h"
 
 	# add -isysroot to CC=
@@ -249,13 +249,18 @@ echo "Unpacking nghttp2"
 tar xfz "${NGHTTP2_VERSION}.tar.gz"
 
 echo -e "${bold}Building Mac libraries${dim}"
+export BOOST_ROOT="${BOOST_ROOT_MACOS}"
 buildMac "x86_64"
 
 lipo \
         "${NGHTTP2}/Mac/x86_64/lib/libnghttp2.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_Mac.a"
+lipo \
+        "${NGHTTP2}/Mac/x86_64/lib/libnghttp2_asio.a" \
+        -create -output "${NGHTTP2}/lib/libnghttp2_asio_Mac.a"
 
 echo -e "${bold}Building iOS libraries (bitcode)${dim}"
+export BOOST_ROOT="${BOOST_ROOT_IOS}"
 buildIOS "armv7" "bitcode"
 buildIOS "armv7s" "bitcode"
 buildIOS "arm64" "bitcode"
@@ -271,8 +276,17 @@ lipo \
 	"${NGHTTP2}/iOS/arm64e/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/x86_64/lib/libnghttp2.a" \
 	-create -output "${NGHTTP2}/lib/libnghttp2_iOS.a"
+lipo \
+        "${NGHTTP2}/iOS/armv7/lib/libnghttp2_asio.a" \
+        "${NGHTTP2}/iOS/armv7s/lib/libnghttp2_asio.a" \
+        "${NGHTTP2}/iOS/i386/lib/libnghttp2_asio.a" \
+        "${NGHTTP2}/iOS/arm64/lib/libnghttp2_asio.a" \
+        "${NGHTTP2}/iOS/arm64e/lib/libnghttp2_asio.a" \
+        "${NGHTTP2}/iOS/x86_64/lib/libnghttp2_asio.a" \
+        -create -output "${NGHTTP2}/lib/libnghttp2_asio_iOS.a"
 
 echo -e "${bold}Building tvOS libraries${dim}"
+export BOOST_ROOT="${BOOST_ROOT_TVOS}"
 buildTVOS "arm64"
 buildTVOS "x86_64"
 
@@ -280,6 +294,10 @@ lipo \
         "${NGHTTP2}/tvOS/arm64/lib/libnghttp2.a" \
         "${NGHTTP2}/tvOS/x86_64/lib/libnghttp2.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_tvOS.a"
+lipo \
+        "${NGHTTP2}/tvOS/arm64/lib/libnghttp2_asio.a" \
+        "${NGHTTP2}/tvOS/x86_64/lib/libnghttp2_asio.a" \
+        -create -output "${NGHTTP2}/lib/libnghttp2_asio_tvOS.a"
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${NGHTTP2_VERSION}-*

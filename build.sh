@@ -160,6 +160,9 @@ cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
 cp nghttp2/lib/libnghttp2_iOS.a $ARCHIVE/lib/iOS/libnghttp2.a
 cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2.a
 cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2.a
+cp nghttp2/lib/libnghttp2_iOS.a $ARCHIVE/lib/iOS/libnghttp2_asio.a
+cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2_asio.a
+cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2_asio.a
 # archive header files
 cp openssl/iOS/include/openssl/* "$ARCHIVE/include/openssl"
 #cp curl/include/curl/* "$ARCHIVE/include/curl"
