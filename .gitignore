@@ -1,0 +1,17 @@
+examples/*
+archive/libcurl-7.68.0-openssl-1.1.1d-nghttp2-1.40.0/
+curl/curl-7.68.0.tar.gz
+curl/curl-7.68.0/
+nghttp2/Mac/
+nghttp2/iOS/
+nghttp2/lib/
+nghttp2/nghttp2-1.40.0.tar.gz
+nghttp2/tvOS/
+openssl-1.1.1d.tar.gz
+openssl-1.1.1d/
+openssl/openssl-1.1.1d.tar.gz
+openssl/openssl-1.1.1d/
+archive/openssl-1.1.1d-nghttp2-1.40.0/
+openssl/Mac/
+openssl/iOS/
+openssl/tvOS/
