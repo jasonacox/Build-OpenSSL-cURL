@@ -102,6 +102,12 @@ echo
 cd openssl 
 echo -e "${bold}Building OpenSSL${normal}"
 ./openssl-build.sh -v "$OPENSSL" $engine $colorflag
+export OPENSSL_CFLAGS_MACOS=`pwd`/Mac/include
+export OPENSSL_LIBS_MACOS=`pwd`/Mac/lib
+export OPENSSL_CFLAGS_IOS=`pwd`/iOS/include
+export OPENSSL_LIBS_IOS=`pwd`/iOS/lib
+export OPENSSL_CFLAGS_TVOS=`pwd`/tvOS/include
+export OPENSSL_LIBS_TVOS=`pwd`/tvOS/lib
 cd ..
 
 ## Nghttp2 Build

@@ -130,10 +130,10 @@ buildMac()
 	export CC="${BUILD_TOOLS}/usr/bin/clang -fembed-bitcode"
         export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
         export LDFLAGS="-arch ${ARCH}"
-
-	pushd . > /dev/null
+	
+        pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
-	./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Mac/${ARCH}" --host=${HOST} &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
+	env OPENSSL_CFLAGS="-I${OPENSSL_CFLAGS_MACOS}" OPENSSL_LIBS="-L${OPENSSL_LIBS_MACOS} -lssl -lcrypto" ./configure --with-boost="${BOOST_ROOT_MACOS}" --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Mac/${ARCH}" --host=${HOST} &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
 	make >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make install >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
@@ -170,9 +170,9 @@ buildIOS()
    
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
         if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
-		./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		env OPENSSL_CFLAGS="-I${OPENSSL_CFLAGS_IOS}" OPENSSL_LIBS="-L${OPENSSL_LIBS_IOS} -lssl -lcrypto" ./configure --with-boost="${BOOST_ROOT_IOS}" --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
         else
-		./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		env OPENSSL_CFLAGS="-I${OPENSSL_CFLAGS_IOS}" OPENSSL_LIBS="-L${OPENSSL_LIBS_IOS} -lssl -lcrypto" ./configure --with-boost="${BOOST_ROOT_IOS}" --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
         fi
 
         make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
@@ -212,7 +212,7 @@ buildTVOS()
 	# LANG=C sed -i -- 's/D\_REENTRANT\:iOS/D\_REENTRANT\:tvOS/' "./Configure"
 	# chmod u+x ./Configure
 	
-	./configure --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
+	env OPENSSL_CFLAGS="-I${OPENSSL_CFLAGS_TVOS}" OPENSSL_LIBS="-L${OPENSSL_LIBS_TVOS} -lssl -lcrypto" ./configure --with-boost="${BOOST_ROOT_TVOS}" --enable-asio-lib --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
 	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "config.h"
 
 	# add -isysroot to CC=
@@ -249,7 +249,6 @@ echo "Unpacking nghttp2"
 tar xfz "${NGHTTP2_VERSION}.tar.gz"
 
 echo -e "${bold}Building Mac libraries${dim}"
-export BOOST_ROOT="${BOOST_ROOT_MACOS}"
 buildMac "x86_64"
 
 lipo \
@@ -260,33 +259,24 @@ lipo \
         -create -output "${NGHTTP2}/lib/libnghttp2_asio_Mac.a"
 
 echo -e "${bold}Building iOS libraries (bitcode)${dim}"
-export BOOST_ROOT="${BOOST_ROOT_IOS}"
-buildIOS "armv7" "bitcode"
-buildIOS "armv7s" "bitcode"
+
 buildIOS "arm64" "bitcode"
 buildIOS "arm64e" "bitcode"
 buildIOS "x86_64" "bitcode"
-buildIOS "i386" "bitcode"
 
 lipo \
-	"${NGHTTP2}/iOS/armv7/lib/libnghttp2.a" \
-	"${NGHTTP2}/iOS/armv7s/lib/libnghttp2.a" \
-	"${NGHTTP2}/iOS/i386/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/arm64/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/arm64e/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/x86_64/lib/libnghttp2.a" \
 	-create -output "${NGHTTP2}/lib/libnghttp2_iOS.a"
 lipo \
-        "${NGHTTP2}/iOS/armv7/lib/libnghttp2_asio.a" \
-        "${NGHTTP2}/iOS/armv7s/lib/libnghttp2_asio.a" \
-        "${NGHTTP2}/iOS/i386/lib/libnghttp2_asio.a" \
         "${NGHTTP2}/iOS/arm64/lib/libnghttp2_asio.a" \
         "${NGHTTP2}/iOS/arm64e/lib/libnghttp2_asio.a" \
         "${NGHTTP2}/iOS/x86_64/lib/libnghttp2_asio.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_asio_iOS.a"
 
 echo -e "${bold}Building tvOS libraries${dim}"
-export BOOST_ROOT="${BOOST_ROOT_TVOS}"
+
 buildTVOS "arm64"
 buildTVOS "x86_64"
 
