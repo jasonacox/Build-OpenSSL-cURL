@@ -30,7 +30,7 @@ _OpenSSL Engine Note: By default, the OpenSSL source disables ENGINE support for
 
 Default versions are specified in the `build.sh` script but you can specify the version you want to build via the command line, e.g.:
 
-	./build.sh -o 1.1.1d -c 7.68.0 -n 1.40.0
+	./build.sh -o 1.1.1g -c 7.71.1 -n 1.41.0
 
 You can update the default verison by editing this section in the build.sh script:
 
@@ -39,9 +39,9 @@ You can update the default verison by editing this section in the build.sh scrip
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="1.1.1d"	# https://www.openssl.org/source/
-LIBCURL="7.68.0"	# https://curl.haxx.se/download.html
-NGHTTP2="1.40.0"	# https://nghttp2.org/
+OPENSSL="1.1.1g"	# https://www.openssl.org/source/
+LIBCURL="7.71.1"	# https://curl.haxx.se/download.html
+NGHTTP2="1.41.0"	# https://nghttp2.org/
 
 ################################################
 ```
