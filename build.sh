@@ -134,7 +134,7 @@ echo
 echo -e "${subbold}libcurl (rename to libcurl.a)${normal} [${dim}$LIBCURL${normal}]${dim}"
 xcrun -sdk iphoneos lipo -info curl/lib/*.a
 
-EXAMPLE="examples/iOS Test App"
+EXAMPLE="example/iOS Test App"
 ARCHIVE="archive/libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2"
 
 echo
