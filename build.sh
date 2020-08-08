@@ -156,6 +156,7 @@ cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
 cp openssl/iOS/lib/libcrypto.a $ARCHIVE/lib/iOS/libcrypto.a
 cp openssl/tvOS/lib/libcrypto.a $ARCHIVE/lib/tvOS/libcrypto.a
 cp openssl/Mac/lib/libcrypto.a $ARCHIVE/lib/MacOS/libcrypto.a
+cp openssl/Catalyst/lib/libcrypto.a $ARCHIVE/lib/Catalyst/libcrypto.a
 cp openssl/iOS/lib/libssl.a $ARCHIVE/lib/iOS/libssl.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
