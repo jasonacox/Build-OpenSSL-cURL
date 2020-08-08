@@ -1,6 +1,8 @@
 Thanks to the following for their direct and/or indirect contributions to 
 create and improve the scripts in this project.
 
+Author: Jason Cox, @jasonacox, https://github.com/jasonacox/Build-OpenSSL-cURL
+
 If your name is not listed and you have contributed, please edit and 
 submit a pull request.
 
@@ -23,5 +25,5 @@ submit a pull request.
    https://gist.github.com/foozmeat/5154962
 * Peter Steinberger, PSPDFKit GmbH, @steipete.
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
-* Jason Cox, @jasonacox
-   https://github.com/jasonacox/Build-OpenSSL-cURL
+* Tommy2d, Brightfish
+   https://github.com/tommy2d

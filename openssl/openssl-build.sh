@@ -129,6 +129,8 @@ buildCatalyst()
 {
 	ARCH=$1
 
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim}"
+
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
 
