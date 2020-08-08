@@ -165,6 +165,11 @@ buildCatalyst()
 		CC_BITCODE_FLAG="-fembed-bitcode"
 	fi
 
+	if [ $nohttp2 == "1" ]; then
+		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/Catalyst/${ARCH}"
+		NGHTTP2LIB="-L${NGHTTP2}/Catalyst/${ARCH}/lib"
+	fi
+
 	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}.sdk"
