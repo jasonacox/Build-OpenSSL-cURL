@@ -54,9 +54,9 @@ usage ()
 	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
-	echo "         -e   compile with engine support"	
+	echo "         -e   compile with engine support"
 	echo "         -x   disable color output"
-	echo "         -h   show usage"	
+	echo "         -h   show usage"
 	echo
 	trap - INT TERM EXIT
 	exit 127
@@ -108,7 +108,7 @@ buildMac()
 		TARGET="darwin64-x86_64-cc"
 	fi
 
-	export CC="${BUILD_TOOLS}/usr/bin/clang"
+	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
@@ -122,6 +122,40 @@ buildMac()
 	# Keep openssl binary for Mac version
 	cp "/tmp/${OPENSSL_VERSION}-${ARCH}/bin/openssl" "/tmp/openssl"
 	make clean >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
+	popd > /dev/null
+}
+
+buildCatalyst()
+{
+	ARCH=$1
+
+	pushd . > /dev/null
+	cd "${OPENSSL_VERSION}"
+
+	TARGET="darwin64-${ARCH}-cc"
+
+	export PLATFORM="MacOSX"
+	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
+	export CROSS_SDK="${PLATFORM}.sdk"
+	export BUILD_TOOLS="${DEVELOPER}"
+
+    export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target x86_64-apple-ios13.0-macabi"
+
+    if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
+        ./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
+    else
+        ./Configure no-asm ${TARGET} -no-shared  --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
+    fi
+
+	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
+		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} !" "Makefile"
+	else
+		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} !" "Makefile"
+	fi
+
+	make >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
+	make install_sw >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
+	make clean >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
 	popd > /dev/null
 }
 
@@ -209,7 +243,7 @@ buildTVOS()
                 LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
 		LANG=C sed -i -- 's/!defined(OPENSSL_NO_ASYNC)/defined(HAVE_FORK)/' "./crypto/async/arch/async_posix.h"
 	fi
-	
+
 	# Patch Configure to build for tvOS, not iOS
 	LANG=C sed -i -- 's/D\_REENTRANT\:iOS/D\_REENTRANT\:tvOS/' "./Configure"
 	chmod u+x ./Configure
@@ -246,9 +280,11 @@ echo -e "${bold}Cleaning up${dim}"
 rm -rf include/openssl/* lib/*
 
 mkdir -p Mac/lib
+mkdir -p Catalyst/lib
 mkdir -p iOS/lib
 mkdir -p tvOS/lib
 mkdir -p Mac/include/openssl/
+mkdir -p Catalyst/include/openssl/
 mkdir -p iOS/include/openssl/
 mkdir -p tvOS/include/openssl/
 
@@ -296,6 +332,23 @@ lipo \
 lipo \
 	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libssl.a" \
 	-create -output Mac/lib/libssl.a
+
+
+echo -e "${bold}Building Catalyst libraries${dim}"
+buildCatalyst "x86_64"
+
+echo "  Copying headers and libraries"
+cp /tmp/${OPENSSL_VERSION}-catalyst-x86_64/include/openssl/* Catalyst/include/openssl/
+
+lipo \
+	"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libcrypto.a" \
+	-create -output Catalyst/lib/libcrypto.a
+
+lipo \
+	"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libssl.a" \
+	-create -output Catalyst/lib/libssl.a
+
+
 
 echo -e "${bold}Building iOS libraries${dim}"
 buildIOS "armv7"
