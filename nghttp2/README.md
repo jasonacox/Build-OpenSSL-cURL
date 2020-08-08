@@ -1,6 +1,6 @@
 # Build nghttp2  
 
-Build nghttp2 for OS X, iOS and tvOS with Bitcode enabled for iOS, tvOS. 
+Build nghttp2 for MacOS, Mac Catalyst, iOS and tvOS with Bitcode enabled for iOS, tvOS. 
 
 ## Build
 The `nghttp2-build.sh` script attempts to pull down and build nghttp2.
@@ -11,7 +11,7 @@ Usage
 =====
 
  1. Do "bash nghttp2-build.sh".
- 2. Architecture Libraries are created in iOS/{ARCH}, Mac/{ARCH}, tvOS/{ARCH}
+ 2. Architecture Libraries are created in iOS/{ARCH}, Mac/{ARCH}, tvOS/{ARCH}, Catalyst/{ARCH}
  3. Multiple Architecture fat libraries are created in lib.
  4. To use libraries:
 	cURL - You would use `--with-nghttp2={PATH-for-ARCH}`

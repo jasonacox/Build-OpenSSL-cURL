@@ -1,11 +1,13 @@
 # Build-OpenSSL-cURL
 
-Script to build OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  Includes patching for tvOS to not use fork() and adds HTTP2 support with nghttp2. 
+This Script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), Mac Catalyst, iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
+
+NEW: This now builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/) [beta]
 
 ## Build
-The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which download the specified release version, configures and builds the libraries and binaries.  
+The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which download the specified release version, configure and build the libraries and binaries.  
 
-The build script accept several arguments to adjust versions and toggle features:
+The build script accepts several arguments to adjust versions and toggle features:
 
 ```
   ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-x] [-h]
@@ -25,14 +27,22 @@ _OpenSSL Engine Note: By default, the OpenSSL source disables ENGINE support for
 ## Quick Start
 
 1. Clone this Repo
-2. Run the build script: `./build.sh`
+2. Run the build script
 3. Libraries and Binaries will be in the ./archive folder
+
+```bash
+git clone https://github.com/jasonacox/Build-OpenSSL-cURL.git
+cd Build-OpenSSL-cURL
+./build.sh
+```
 
 Default versions are specified in the `build.sh` script but you can specify the version you want to build via the command line, e.g.:
 
-	./build.sh -o 1.1.1g -c 7.71.1 -n 1.41.0
+```bash
+./build.sh -o 1.1.1g -c 7.71.1 -n 1.41.0
+```
 
-You can update the default verison by editing this section in the build.sh script:
+You can update the default version by editing this section in the `build.sh` script:
 
 ```bash
 ################################################
@@ -86,6 +96,7 @@ Include the relevant library into your project. The pkg-config tool is required.
 	   |____libnghttp2_iOS.a
 	   |____libnghttp2_Mac.a
 	   |____libnghttp2_tvOS.a
+	   |____libnghttp2_Catalyst.a
 
 DISABLE HTTP2: The nghttp2 build can be disabled by using:
 
@@ -108,6 +119,7 @@ Include the relevant library into your project.  Rename the appropriate file to 
 	   |____libcurl_iOS.a
 	   |____libcurl_Mac.a
 	   |____libcurl_tvOS.a
+	   |____libcurl_Catalyst.a
 
 NOTE: By default, this script only builds bitcode versions. To build non-bitcode versions:
 
@@ -127,7 +139,6 @@ See the example 'iOS Test App'.
 ### Usage
 
  1. Clone this Repo 
- 	`git clone https://github.com/jasonacox/Build-OpenSSL-cURL.git`
  2. Run `build.sh` 
  3. Libraries are created in curl/lib, openssl/*/lib, and nghttp2/lib or you can find them in the archives folder.
  4. Copy libs and headers to your project.
@@ -143,7 +154,7 @@ See the example 'iOS Test App'.
             ...  
         }
 
-NOTE: You may need to edit the `curlbuild.h` header if you get an error simliar to this: `'curl_rule_01' declared as an array with a negative size`
+NOTE: You may need to edit the `curlbuild.h` header if you get an error similar to this: `'curl_rule_01' declared as an array with a negative size`
 
 curlbuild.h
 
@@ -166,7 +177,7 @@ You may also need to edit this section:
 
 ### Example Apps
 
-Example Xcode project "iOS Test App" is located in the example folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2 libraries. The app provides a simple single text field interface for URL input and produces a curl respone.
+Example Xcode project "iOS Test App" is located in the example folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2 libraries. The app provides a simple single text field interface for URL input and produces a curl response.
 
 ### Tree
 
@@ -225,6 +236,7 @@ The `build.sh` script will create an ./archive folder and store all the *.a libr
              |  |____curl*
              |
              |____lib/
+			 |  |____Catalyst/
              |  |____iOS/
              |  |____MacOS/
              |  |____tvOS/
@@ -262,6 +274,9 @@ The MIT License is used for this project.  See LICENSE file.
    https://gist.github.com/foozmeat/5154962
 * Peter Steinberger, PSPDFKit GmbH, @steipete.
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
+* Tommy2d, Brightfish, Mac Catalyst build support
+   https://github.com/tommy2d
+
 * Jason Cox, @jasonacox
    https://github.com/jasonacox/Build-OpenSSL-cURL
 

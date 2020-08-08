@@ -146,20 +146,24 @@ mkdir -p "$ARCHIVE/include/curl"
 mkdir -p "$ARCHIVE/lib/iOS"
 mkdir -p "$ARCHIVE/lib/MacOS"
 mkdir -p "$ARCHIVE/lib/tvOS"
+mkdir -p "$ARCHIVE/lib/Catalyst"
 mkdir -p "$ARCHIVE/bin"
 # archive libraries
 cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
 cp curl/lib/libcurl_tvOS.a $ARCHIVE/lib/tvOS/libcurl.a
 cp curl/lib/libcurl_Mac.a $ARCHIVE/lib/MacOS/libcurl.a
+cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
 cp openssl/iOS/lib/libcrypto.a $ARCHIVE/lib/iOS/libcrypto.a
 cp openssl/tvOS/lib/libcrypto.a $ARCHIVE/lib/tvOS/libcrypto.a
 cp openssl/Mac/lib/libcrypto.a $ARCHIVE/lib/MacOS/libcrypto.a
 cp openssl/iOS/lib/libssl.a $ARCHIVE/lib/iOS/libssl.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
+cp openssl/Catalyst/lib/libssl.a $ARCHIVE/lib/Catalyst/libssl.a
 cp nghttp2/lib/libnghttp2_iOS.a $ARCHIVE/lib/iOS/libnghttp2.a
 cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2.a
 cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2.a
+cp nghttp2/lib/libnghttp2_Catalyst.a $ARCHIVE/lib/Catalyst/libnghttp2.a
 # archive header files
 cp openssl/iOS/include/openssl/* "$ARCHIVE/include/openssl"
 cp curl/include/curl/* "$ARCHIVE/include/curl"
@@ -182,8 +186,10 @@ echo "  See $ARCHIVE/bin"
 mv /tmp/curl $ARCHIVE/bin
 mv /tmp/openssl $ARCHIVE/bin
 echo
-echo -e "${bold}Testing Mac curl binary...${dim}"
+echo -e "${bold}Testing Mac binaries...${dim}"
 $ARCHIVE/bin/curl -V
+$ARCHIVE/bin/openssl version
+date "+%c - Build Complete" 
 echo
 echo -e "${normal}Done"
 

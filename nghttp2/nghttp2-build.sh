@@ -33,7 +33,7 @@ alertdim="\033[0m${red}\033[2m"
 # set trap to help debug build errors
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; tail -3 /tmp/nghttp2*.log' INT TERM EXIT
 
-NGHTTP2_VERNUM="1.40.0"
+NGHTTP2_VERNUM="1.41.0"
 IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
@@ -117,7 +117,6 @@ fi
 buildMac()
 {
 	ARCH=$1
-        HOST="i386-apple-darwin"
 
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${archbold}${ARCH}${dim}"
 
@@ -127,16 +126,38 @@ buildMac()
 		TARGET="darwin64-x86_64-cc"
 	fi
 
-	export CC="${BUILD_TOOLS}/usr/bin/clang -fembed-bitcode"
+	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode"
         export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
         export LDFLAGS="-arch ${ARCH}"
 
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
-	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Mac/${ARCH}" --host=${HOST} &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
+	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Mac/${ARCH}" &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
 	make >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make install >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
+	popd > /dev/null
+}
+
+buildCatalyst()
+{
+	ARCH=$1
+
+	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${archbold}${ARCH}${dim}"
+
+	TARGET="darwin64-${ARCH}-cc"
+
+	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target x86_64-apple-ios13.0-macabi"
+
+    export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
+    export LDFLAGS="-arch ${ARCH}"
+
+	pushd . > /dev/null
+	cd "${NGHTTP2_VERSION}"
+	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
+	make >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
+	make install >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
+	make clean >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	popd > /dev/null
 }
 
@@ -230,6 +251,7 @@ rm -rf include/nghttp2/* lib/*
 rm -fr Mac
 rm -fr iOS
 rm -fr tvOS
+rm -fr Catalyst
 
 mkdir -p lib
 
@@ -254,6 +276,13 @@ buildMac "x86_64"
 lipo \
         "${NGHTTP2}/Mac/x86_64/lib/libnghttp2.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_Mac.a"
+
+echo -e "${bold}Building Catalyst libraries${dim}"
+buildCatalyst "x86_64"
+
+lipo \
+        "${NGHTTP2}/Catalyst/x86_64/lib/libnghttp2.a" \
+        -create -output "${NGHTTP2}/lib/libnghttp2_Catalyst.a"
 
 echo -e "${bold}Building iOS libraries (bitcode)${dim}"
 buildIOS "armv7" "bitcode"
