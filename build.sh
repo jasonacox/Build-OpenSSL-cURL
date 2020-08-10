@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script builds openssl+libcurl libraries for MacOS, iOS and tvOS 
+# This script builds openssl+libcurl libraries for MacOS, iOS and tvOS
 #
 # Jason Cox, @jasonacox
 #   https://github.com/jasonacox/Build-OpenSSL-cURL
@@ -42,7 +42,7 @@ usage ()
 	echo -e "${bold}Usage:${normal}"
 	echo
 	echo -e "  ${subbold}$0${normal} [-o ${dim}<OpenSSL version>${normal}] [-c ${dim}<curl version>${normal}] [-n ${dim}<nghttp2 version>${normal}] [-d] [-e] [-x] [-h]"
-	echo 
+	echo
 	echo "         -o <version>   Build OpenSSL version (default $OPENSSL)"
 	echo "         -c <version>   Build curl version (default $LIBCURL)"
 	echo "         -n <version>   Build nghttp2 version (default $NGHTTP2)"
@@ -51,7 +51,7 @@ usage ()
 	echo "         -b             Compile without bitcode"
 	echo "         -x             No color output"
 	echo "         -h             Show usage"
-	echo 
+	echo
     exit 127
 }
 
@@ -99,15 +99,15 @@ echo
 
 ## OpenSSL Build
 echo
-cd openssl 
+cd openssl
 echo -e "${bold}Building OpenSSL${normal}"
 ./openssl-build.sh -v "$OPENSSL" $engine $colorflag
 cd ..
 
 ## Nghttp2 Build
 if [ "$buildnghttp2" == "" ]; then
-	NGHTTP2="NONE"	
-else 
+	NGHTTP2="NONE"
+else
 	echo
 	echo -e "${bold}Building nghttp2 for HTTP2 support${normal}"
 	cd nghttp2
@@ -122,14 +122,16 @@ cd curl
 ./libcurl-build.sh -v "$LIBCURL" $disablebitcode $colorflag $buildnghttp2
 cd ..
 
-echo 
+echo
 echo -e "${bold}Libraries...${normal}"
 echo
 echo -e "${subbold}openssl${normal} [${dim}$OPENSSL${normal}]${dim}"
 xcrun -sdk iphoneos lipo -info openssl/*/lib/*.a
-echo
-echo -e "${subbold}nghttp2 (rename to libnghttp2.a)${normal} [${dim}$NGHTTP2${normal}]${dim}"
-xcrun -sdk iphoneos lipo -info nghttp2/lib/*.a
+if [ "$buildnghttp2" != "" ]; then
+	echo
+	echo -e "${subbold}nghttp2 (rename to libnghttp2.a)${normal} [${dim}$NGHTTP2${normal}]${dim}"
+	xcrun -sdk iphoneos lipo -info nghttp2/lib/*.a
+fi
 echo
 echo -e "${subbold}libcurl (rename to libcurl.a)${normal} [${dim}$LIBCURL${normal}]${dim}"
 xcrun -sdk iphoneos lipo -info curl/lib/*.a
@@ -144,14 +146,17 @@ mkdir -p "$ARCHIVE"
 mkdir -p "$ARCHIVE/include/openssl"
 mkdir -p "$ARCHIVE/include/curl"
 mkdir -p "$ARCHIVE/lib/iOS"
+mkdir -p "$ARCHIVE/lib/iOS-simulator"
 mkdir -p "$ARCHIVE/lib/MacOS"
 mkdir -p "$ARCHIVE/lib/tvOS"
 mkdir -p "$ARCHIVE/lib/Catalyst"
 mkdir -p "$ARCHIVE/bin"
 # archive libraries
 cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
+cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
 cp curl/lib/libcurl_tvOS.a $ARCHIVE/lib/tvOS/libcurl.a
 cp curl/lib/libcurl_Mac.a $ARCHIVE/lib/MacOS/libcurl.a
+
 cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
 cp openssl/iOS/lib/libcrypto.a $ARCHIVE/lib/iOS/libcrypto.a
 cp openssl/tvOS/lib/libcrypto.a $ARCHIVE/lib/tvOS/libcrypto.a
@@ -161,10 +166,13 @@ cp openssl/iOS/lib/libssl.a $ARCHIVE/lib/iOS/libssl.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
 cp openssl/Catalyst/lib/libssl.a $ARCHIVE/lib/Catalyst/libssl.a
-cp nghttp2/lib/libnghttp2_iOS.a $ARCHIVE/lib/iOS/libnghttp2.a
-cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2.a
-cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2.a
-cp nghttp2/lib/libnghttp2_Catalyst.a $ARCHIVE/lib/Catalyst/libnghttp2.a
+
+if [ "$buildnghttp2" != "" ]; then
+	cp nghttp2/lib/libnghttp2_iOS.a $ARCHIVE/lib/iOS/libnghttp2.a
+	cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2.a
+	cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2.a
+	cp nghttp2/lib/libnghttp2_Catalyst.a $ARCHIVE/lib/Catalyst/libnghttp2.a
+fi
 # archive header files
 cp openssl/iOS/include/openssl/* "$ARCHIVE/include/openssl"
 cp curl/include/curl/* "$ARCHIVE/include/curl"
@@ -179,7 +187,9 @@ cp openssl/iOS/lib/libssl.a "$EXAMPLE/libs/libssl.a"
 cp openssl/iOS/include/openssl/* "$EXAMPLE/include/openssl/"
 cp curl/include/curl/* "$EXAMPLE/include/curl/"
 cp curl/lib/libcurl_iOS.a "$EXAMPLE/libs/libcurl.a"
-cp nghttp2/lib/libnghttp2_iOS.a "$EXAMPLE/libs/libnghttp2.a"
+if [ "$buildnghttp2" != "" ]; then
+	cp nghttp2/lib/libnghttp2_iOS.a "$EXAMPLE/libs/libnghttp2.a"
+fi
 cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
 echo
 echo -e "${bold}Archiving Mac binaries for curl and openssl...${dim}"
@@ -190,7 +200,7 @@ echo
 echo -e "${bold}Testing Mac binaries...${dim}"
 $ARCHIVE/bin/curl -V
 $ARCHIVE/bin/openssl version
-date "+%c - Build Complete" 
+date "+%c - Build Complete"
 echo
 echo -e "${normal}Done"
 
