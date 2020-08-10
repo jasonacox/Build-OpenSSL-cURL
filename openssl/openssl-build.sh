@@ -38,7 +38,7 @@ alertdim="\033[0m${red}\033[2m"
 # set trap to help debug build errors
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/openssl*.log${alertdim}"; tail -3 /tmp/openssl*.log' INT TERM EXIT
 
-OPENSSL_VERSION="openssl-1.1.1d"
+OPENSSL_VERSION="openssl-1.1.1g"
 IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
@@ -284,10 +284,12 @@ rm -rf include/openssl/* lib/*
 mkdir -p Mac/lib
 mkdir -p Catalyst/lib
 mkdir -p iOS/lib
+mkdir -p iOS-simulator/lib
 mkdir -p tvOS/lib
 mkdir -p Mac/include/openssl/
 mkdir -p Catalyst/include/openssl/
 mkdir -p iOS/include/openssl/
+mkdir -p iOS-simulator/include/openssl/
 mkdir -p tvOS/include/openssl/
 
 rm -rf "/tmp/${OPENSSL_VERSION}-*"
@@ -357,6 +359,7 @@ buildIOS "armv7"
 buildIOS "armv7s"
 buildIOS "arm64"
 buildIOS "arm64e"
+
 buildIOS "i386"
 buildIOS "x86_64"
 
@@ -366,20 +369,29 @@ cp /tmp/${OPENSSL_VERSION}-iOS-arm64/include/openssl/* iOS/include/openssl/
 lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libcrypto.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64e/lib/libcrypto.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libcrypto.a" \
 	-create -output iOS/lib/libcrypto.a
 
 lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libssl.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64e/lib/libssl.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libssl.a" \
 	-create -output iOS/lib/libssl.a
+
+
+cp /tmp/${OPENSSL_VERSION}-iOS-x86_64/include/openssl/* iOS-simulator/include/openssl/
+
+lipo \
+	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libcrypto.a" \
+	-create -output iOS-simulator/lib/libcrypto.a
+
+lipo \
+	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libssl.a" \
+	-create -output iOS-simulator/lib/libssl.a
 
 
 echo -e "${bold}Building tvOS libraries${dim}"
@@ -397,6 +409,11 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-tvOS-arm64/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-tvOS-x86_64/lib/libssl.a" \
 	-create -output tvOS/lib/libssl.a
+
+echo "  Linking framework binaries for iOS, iOS-simulator and Mac Catalyst"
+libtool -no_warning_for_no_symbols -static -o openssl-ios-armv7_armv7s_arm64_arm64e iOS/lib/libcrypto.a iOS/lib/libssl.a
+libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-simulator iOS-simulator/lib/libcrypto.a iOS-simulator/lib/libssl.a
+libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-maccatalyst Catalyst/lib/libcrypto.a Catalyst/lib/libssl.a
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${OPENSSL_VERSION}-*

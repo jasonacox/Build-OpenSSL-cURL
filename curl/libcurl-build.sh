@@ -199,8 +199,10 @@ buildIOS()
 
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]]; then
 		PLATFORM="iPhoneSimulator"
+		SSLVARIANT="iOS-simulator"
 	else
 		PLATFORM="iPhoneOS"
+		SSLVARIANT="iOS"
 	fi
 
 	if [[ "${BITCODE}" == "nobitcode" ]]; then
@@ -220,14 +222,16 @@ buildIOS()
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} ${CC_BITCODE_FLAG}"
-	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/iOS/lib ${NGHTTP2LIB}"
 
 	echo -e "${subbold}Building ${CURL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim} ${BITCODE}"
 
+	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/${SSLVARIANT}/lib ${NGHTTP2LIB}"
+
 	if [[ "${ARCH}" == *"arm64"* || "${ARCH}" == "arm64e" ]]; then
-		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/iOS ${NGHTTP2CFG} --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/${SSLVARIANT} ${NGHTTP2CFG} --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
 	else
-		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/iOS ${NGHTTP2CFG} --host="${ARCH}-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+
+		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/${SSLVARIANT} ${NGHTTP2CFG} --host="${ARCH}-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
 	fi
 
 	make -j8 >> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
@@ -311,9 +315,6 @@ lipo \
 echo -e "${bold}Building Catalyst libraries${dim}"
 buildCatalyst "x86_64" "bitcode"
 
-echo "  Copying headers"
-cp /tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/include/curl/* include/curl/
-
 lipo \
 	"/tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/lib/libcurl.a" \
 	-create -output lib/libcurl_Catalyst.a
@@ -323,18 +324,21 @@ buildIOS "armv7" "bitcode"
 buildIOS "armv7s" "bitcode"
 buildIOS "arm64" "bitcode"
 buildIOS "arm64e" "bitcode"
-buildIOS "x86_64" "bitcode"
-buildIOS "i386" "bitcode"
 
 lipo \
 	"/tmp/${CURL_VERSION}-iOS-armv7-bitcode/lib/libcurl.a" \
 	"/tmp/${CURL_VERSION}-iOS-armv7s-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-i386-bitcode/lib/libcurl.a" \
 	"/tmp/${CURL_VERSION}-iOS-arm64-bitcode/lib/libcurl.a" \
 	"/tmp/${CURL_VERSION}-iOS-arm64e-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-x86_64-bitcode/lib/libcurl.a" \
 	-create -output lib/libcurl_iOS.a
 
+buildIOS "x86_64" "bitcode"
+buildIOS "i386" "bitcode"
+
+lipo \
+	"/tmp/${CURL_VERSION}-iOS-i386-bitcode/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-x86_64-bitcode/lib/libcurl.a" \
+	-create -output lib/libcurl_iOS-simulator.a
 
 if [[ "${NOBITCODE}" == "yes" ]]; then
 	echo -e "${bold}Building iOS libraries (nobitcode)${dim}"
