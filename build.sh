@@ -147,28 +147,37 @@ mkdir -p "$ARCHIVE/include/openssl"
 mkdir -p "$ARCHIVE/include/curl"
 mkdir -p "$ARCHIVE/lib/iOS"
 mkdir -p "$ARCHIVE/lib/iOS-simulator"
+mkdir -p "$ARCHIVE/lib/iOS-fat"
 mkdir -p "$ARCHIVE/lib/MacOS"
 mkdir -p "$ARCHIVE/lib/tvOS"
 mkdir -p "$ARCHIVE/lib/Catalyst"
 mkdir -p "$ARCHIVE/bin"
 # archive libraries
 cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
-cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
+cp curl/lib/libcurl_iOS-simulator.a $ARCHIVE/lib/iOS-simulator/libcurl.a
+cp curl/lib/libcurl_iOS-fat.a $ARCHIVE/lib/iOS-fat/libcurl.a
 cp curl/lib/libcurl_tvOS.a $ARCHIVE/lib/tvOS/libcurl.a
 cp curl/lib/libcurl_Mac.a $ARCHIVE/lib/MacOS/libcurl.a
-
 cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
+
 cp openssl/iOS/lib/libcrypto.a $ARCHIVE/lib/iOS/libcrypto.a
+cp openssl/iOS-simulator/lib/libcrypto.a $ARCHIVE/lib/iOS-simulator/libcrypto.a
+cp openssl/iOS-fat/lib/libcrypto.a $ARCHIVE/lib/iOS-fat/libcrypto.a
 cp openssl/tvOS/lib/libcrypto.a $ARCHIVE/lib/tvOS/libcrypto.a
 cp openssl/Mac/lib/libcrypto.a $ARCHIVE/lib/MacOS/libcrypto.a
 cp openssl/Catalyst/lib/libcrypto.a $ARCHIVE/lib/Catalyst/libcrypto.a
+
 cp openssl/iOS/lib/libssl.a $ARCHIVE/lib/iOS/libssl.a
+cp openssl/iOS-simulator/lib/libssl.a $ARCHIVE/lib/iOS-simulator/libssl.a
+cp openssl/iOS-fat/lib/libssl.a $ARCHIVE/lib/iOS-fat/libssl.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
 cp openssl/Catalyst/lib/libssl.a $ARCHIVE/lib/Catalyst/libssl.a
 
 if [ "$buildnghttp2" != "" ]; then
 	cp nghttp2/lib/libnghttp2_iOS.a $ARCHIVE/lib/iOS/libnghttp2.a
+	cp nghttp2/lib/libnghttp2_iOS-simulator.a $ARCHIVE/lib/iOS-simulator/libnghttp2.a
+	cp nghttp2/lib/libnghttp2_iOS-fat.a $ARCHIVE/lib/iOS-fat/libnghttp2.a
 	cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2.a
 	cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2.a
 	cp nghttp2/lib/libnghttp2_Catalyst.a $ARCHIVE/lib/Catalyst/libnghttp2.a
@@ -182,13 +191,13 @@ sed -e "s/ZZZLIBCURL/$LIBCURL/g" -e "s/ZZZOPENSSL/$OPENSSL/g" -e "s/ZZZNGHTTP2/$
 echo
 echo -e "${bold}Copying libraries to Test App ...${dim}"
 echo "  See $EXAMPLE"
-cp openssl/iOS/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
-cp openssl/iOS/lib/libssl.a "$EXAMPLE/libs/libssl.a"
-cp openssl/iOS/include/openssl/* "$EXAMPLE/include/openssl/"
+cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
+cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
+cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
 cp curl/include/curl/* "$EXAMPLE/include/curl/"
-cp curl/lib/libcurl_iOS.a "$EXAMPLE/libs/libcurl.a"
+cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
 if [ "$buildnghttp2" != "" ]; then
-	cp nghttp2/lib/libnghttp2_iOS.a "$EXAMPLE/libs/libnghttp2.a"
+	cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
 fi
 cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
 echo

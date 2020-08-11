@@ -94,6 +94,8 @@ Include the relevant library into your project. The pkg-config tool is required.
 
 	|____lib
 	   |____libnghttp2_iOS.a
+	   |____libnghttp2_iOS-simulator.a
+	   |____libnghttp2_iOS-fat.a    <-- Contains both iOS and iOS-simulator binaries
 	   |____libnghttp2_Mac.a
 	   |____libnghttp2_tvOS.a
 	   |____libnghttp2_Catalyst.a
@@ -117,6 +119,8 @@ Include the relevant library into your project.  Rename the appropriate file to 
 
 	|____lib
 	   |____libcurl_iOS.a
+	   |____libcurl_iOS-simulator.a
+	   |____libcurl_iOS-fat.a        <-- Contains both iOS and iOS-simulator binaries
 	   |____libcurl_Mac.a
 	   |____libcurl_tvOS.a
 	   |____libcurl_Catalyst.a
@@ -223,6 +227,7 @@ Example Xcode project "iOS Test App" is located in the example folder.  This pro
 	* openssl/tvOS/lib/libssl.a are: x86_64 arm64 
 	* nghttp2/lib/libnghttp2_tvOS.a are: x86_64 arm64 
 
+
 ### Archive
 
 The `build.sh` script will create an ./archive folder and store all the *.a libraries built along with the header files and a MacOS binaries for `curl` and `openssl`.
@@ -238,6 +243,8 @@ The `build.sh` script will create an ./archive folder and store all the *.a libr
              |____lib/
 			 |  |____Catalyst/
              |  |____iOS/
+			 |  |____iOS-simulator/
+             |  |____iOS-fat/        <-- Contains both iOS and iOS-simulator binaries
              |  |____MacOS/
              |  |____tvOS/
              |
