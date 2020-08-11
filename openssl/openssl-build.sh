@@ -285,11 +285,13 @@ mkdir -p Mac/lib
 mkdir -p Catalyst/lib
 mkdir -p iOS/lib
 mkdir -p iOS-simulator/lib
+mkdir -p iOS-fat/lib
 mkdir -p tvOS/lib
 mkdir -p Mac/include/openssl/
 mkdir -p Catalyst/include/openssl/
 mkdir -p iOS/include/openssl/
 mkdir -p iOS-simulator/include/openssl/
+mkdir -p iOS-fat/include/openssl/
 mkdir -p tvOS/include/openssl/
 
 rm -rf "/tmp/${OPENSSL_VERSION}-*"
@@ -393,6 +395,25 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libssl.a" \
 	-create -output iOS-simulator/lib/libssl.a
 
+cp /tmp/${OPENSSL_VERSION}-iOS-arm64/include/openssl/* iOS-fat/include/openssl/
+
+lipo \
+	"/tmp/${OPENSSL_VERSION}-iOS-armv7/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-arm64e/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libcrypto.a" \
+	-create -output iOS-fat/lib/libcrypto.a
+
+lipo \
+	"/tmp/${OPENSSL_VERSION}-iOS-armv7/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-arm64e/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libssl.a" \
+	-create -output iOS-fat/lib/libssl.a
 
 echo -e "${bold}Building tvOS libraries${dim}"
 buildTVOS "arm64"
