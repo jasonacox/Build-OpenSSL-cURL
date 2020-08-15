@@ -431,10 +431,10 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-tvOS-x86_64/lib/libssl.a" \
 	-create -output tvOS/lib/libssl.a
 
-echo "  Linking framework binaries for iOS, iOS-simulator and Mac Catalyst"
-libtool -no_warning_for_no_symbols -static -o openssl-ios-armv7_armv7s_arm64_arm64e iOS/lib/libcrypto.a iOS/lib/libssl.a
-libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-simulator iOS-simulator/lib/libcrypto.a iOS-simulator/lib/libssl.a
-libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-maccatalyst Catalyst/lib/libcrypto.a Catalyst/lib/libssl.a
+echo "  Creating combined OpenSSL libraries for iOS, iOS-simulator and Mac Catalyst"
+libtool -no_warning_for_no_symbols -static -o openssl-ios-armv7_armv7s_arm64_arm64e.a iOS/lib/libcrypto.a iOS/lib/libssl.a
+libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-simulator.a iOS-simulator/lib/libcrypto.a iOS-simulator/lib/libssl.a
+libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-maccatalyst.a Catalyst/lib/libcrypto.a Catalyst/lib/libssl.a
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${OPENSSL_VERSION}-*
