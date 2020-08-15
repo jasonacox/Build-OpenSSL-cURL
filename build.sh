@@ -152,6 +152,8 @@ mkdir -p "$ARCHIVE/lib/MacOS"
 mkdir -p "$ARCHIVE/lib/tvOS"
 mkdir -p "$ARCHIVE/lib/Catalyst"
 mkdir -p "$ARCHIVE/bin"
+mkdir -p "$ARCHIVE/framework"
+
 # archive libraries
 cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
 cp curl/lib/libcurl_iOS-simulator.a $ARCHIVE/lib/iOS-simulator/libcurl.a
@@ -173,6 +175,8 @@ cp openssl/iOS-fat/lib/libssl.a $ARCHIVE/lib/iOS-fat/libssl.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
 cp openssl/Catalyst/lib/libssl.a $ARCHIVE/lib/Catalyst/libssl.a
+
+cp openssl/*.a $ARCHIVE/framework
 
 if [ "$buildnghttp2" != "" ]; then
 	cp nghttp2/lib/libnghttp2_iOS.a $ARCHIVE/lib/iOS/libnghttp2.a
