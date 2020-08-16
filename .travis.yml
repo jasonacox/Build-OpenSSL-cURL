@@ -10,21 +10,21 @@ env:
     - EXAMPLE="example/iOS Test App"
 
 stages:
-  - openssl
   - nghttp2
+  - openssl
   - libcurl
   - deploy
   - test
 
 jobs:
   include:
+    - stage: nghttp2
+    script:
+      - cd nghttp2;./nghttp2-build.sh -v "$NGHTTP2"
+      
     - stage: openssl
       script: 
         - cd openssl;./openssl-build.sh -v "$OPENSSL"
-
-    - stage: nghttp2
-      script:
-        - cd nghttp2;./nghttp2-build.sh -v "$NGHTTP2"
     
     - stage: libcurl
       script: 
