@@ -24,7 +24,7 @@ colorflag=""
 
 # Formatting
 default="\033[39m"
-wihte="\033[97m"
+white="\033[97m"
 green="\033[32m"
 red="\033[91m"
 yellow="\033[33m"
@@ -97,6 +97,9 @@ echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and 
 echo "Targets: x86_64, armv7, armv7s, arm64 and arm64e"
 echo
 
+## Start Counter
+START=$(date +%s)
+
 ## OpenSSL Build
 echo
 cd openssl
@@ -122,6 +125,7 @@ cd curl
 ./libcurl-build.sh -v "$LIBCURL" $disablebitcode $colorflag $buildnghttp2
 cd ..
 
+## Archive Libraries and Clean Up
 echo
 echo -e "${bold}Libraries...${normal}"
 echo
@@ -154,7 +158,7 @@ mkdir -p "$ARCHIVE/lib/Catalyst"
 mkdir -p "$ARCHIVE/bin"
 mkdir -p "$ARCHIVE/framework"
 
-# archive libraries
+# libraries
 cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
 cp curl/lib/libcurl_iOS-simulator.a $ARCHIVE/lib/iOS-simulator/libcurl.a
 cp curl/lib/libcurl_iOS-fat.a $ARCHIVE/lib/iOS-fat/libcurl.a
@@ -189,10 +193,12 @@ fi
 # archive header files
 cp openssl/iOS/include/openssl/* "$ARCHIVE/include/openssl"
 cp curl/include/curl/* "$ARCHIVE/include/curl"
-# archive root certs
+# grab root certs
 curl -s https://curl.haxx.se/ca/cacert.pem > $ARCHIVE/cacert.pem
+# create README for archive
 sed -e "s/ZZZLIBCURL/$LIBCURL/g" -e "s/ZZZOPENSSL/$OPENSSL/g" -e "s/ZZZNGHTTP2/$NGHTTP2/g" archive/release-template.md > $ARCHIVE/README.md
 echo
+# update test app
 echo -e "${bold}Copying libraries to Test App ...${dim}"
 echo "  See $EXAMPLE"
 cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
@@ -205,6 +211,7 @@ if [ "$buildnghttp2" != "" ]; then
 fi
 cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
 echo
+# archive and run Mac binaries test
 echo -e "${bold}Archiving Mac binaries for curl and openssl...${dim}"
 echo "  See $ARCHIVE/bin"
 mv /tmp/curl $ARCHIVE/bin
@@ -213,8 +220,14 @@ echo
 echo -e "${bold}Testing Mac binaries...${dim}"
 $ARCHIVE/bin/curl -V
 $ARCHIVE/bin/openssl version
-date "+%c - Build Complete"
+date "+%c - End"
+
+## Done - Display Build Duration
 echo
-echo -e "${normal}Done"
+echo -e "${bold}Build Complete${dim}"
+END=$(date +%s)
+secs=$(echo "$END - $START" | bc)
+printf '  Duration %02dh:%02dm:%02ds\n' $(($secs/3600)) $(($secs%3600/60)) $(($secs%60))
+echo -e "${normal}"
 
 rm -f $NOHTTP2
