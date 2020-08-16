@@ -1,0 +1,6 @@
+os: osx
+# command to install dependencies
+
+# command to run build
+script:
+  - bash build.sh
