@@ -20,15 +20,15 @@ jobs:
   include:
     - stage: openssl
       script: 
-        - bash "cd openssl; ./openssl-build.sh -v $OPENSSL"
+        - cd openssl;./openssl-build.sh -v "$OPENSSL"
 
     - stage: nghttp2
       script:
-        - bash "cd nghttp2; ./nghttp2-build.sh -v $NGHTTP2"
+        - cd nghttp2;./nghttp2-build.sh -v "$NGHTTP2"
     
     - stage: libcurl
       script: 
-        - bash "cd curl; ./libcurl-build.sh -v $LIBCURL"
+        - cd curl;./libcurl-build.sh -v "$LIBCURL"
 
     - stage: deploy
       script:
@@ -47,4 +47,3 @@ jobs:
       script:
         - xcodebuild clean -project iOS\ Test\ App.xcodeproj 
         - xcodebuild build -project iOS\ Test\ App.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
-        
