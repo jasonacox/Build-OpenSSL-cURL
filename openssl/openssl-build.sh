@@ -43,18 +43,20 @@ IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
+catalyst="0"
 
 usage ()
 {
 	echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-v ${dim}<openssl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-e] [-x] [-h]"
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<openssl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-e] [-m] [-x] [-h]"
 	echo
 	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
 	echo "         -e   compile with engine support"
+	echo "         -m   compile Mac Catalyst library [beta]"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"
 	echo
@@ -64,7 +66,7 @@ usage ()
 
 engine=0
 
-while getopts "v:s:t:exh\?" o; do
+while getopts "v:s:t:emxh\?" o; do
     case "${o}" in
         v)
 	    	OPENSSL_VERSION="openssl-${OPTARG}"
@@ -77,6 +79,9 @@ while getopts "v:s:t:exh\?" o; do
             ;;
 		e)
             engine=1
+	    	;;
+		m)
+            catalyst="1"
 	    	;;
 		x)
 			bold=""
@@ -339,7 +344,7 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libssl.a" \
 	-create -output Mac/lib/libssl.a
 
-
+if [ $catalyst == "1" ]; then
 echo -e "${bold}Building Catalyst libraries${dim}"
 buildCatalyst "x86_64"
 
@@ -353,7 +358,7 @@ lipo \
 lipo \
 	"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libssl.a" \
 	-create -output Catalyst/lib/libssl.a
-
+fi
 
 
 echo -e "${bold}Building iOS libraries${dim}"
@@ -431,10 +436,12 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-tvOS-x86_64/lib/libssl.a" \
 	-create -output tvOS/lib/libssl.a
 
-echo "  Creating combined OpenSSL libraries for iOS, iOS-simulator and Mac Catalyst"
+echo "  Creating combined OpenSSL libraries for iOS"
 libtool -no_warning_for_no_symbols -static -o openssl-ios-armv7_armv7s_arm64_arm64e.a iOS/lib/libcrypto.a iOS/lib/libssl.a
 libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-simulator.a iOS-simulator/lib/libcrypto.a iOS-simulator/lib/libssl.a
+if [ $catalyst == "1" ]; then
 libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-maccatalyst.a Catalyst/lib/libcrypto.a Catalyst/lib/libssl.a
+fi
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${OPENSSL_VERSION}-*

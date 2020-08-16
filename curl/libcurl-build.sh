@@ -40,13 +40,14 @@ TVOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
 IPHONEOS_DEPLOYMENT_TARGET="6.0"
 nohttp2="0"
+catalyst="0"
 
 usage ()
 {
 	echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-v ${dim}<curl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-i ${dim}<iPhone target version>${normal}] [-b] [-x] [-n] [-h]"
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<curl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-i ${dim}<iPhone target version>${normal}] [-b] [-m] [-x] [-n] [-h]"
     echo
 	echo "         -v   version of curl (default $CURL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
@@ -54,6 +55,7 @@ usage ()
 	echo "         -i   iPhone target version (default $IPHONEOS_DEPLOYMENT_TARGET)"
 	echo "         -b   compile without bitcode"
 	echo "         -n   compile with nghttp2"
+	echo "         -m   compile Mac Catalyst library [beta]"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"
 	echo
@@ -61,7 +63,7 @@ usage ()
 	exit 127
 }
 
-while getopts "v:s:t:i:nbxh\?" o; do
+while getopts "v:s:t:i:nmbxh\?" o; do
     case "${o}" in
         v)
 			CURL_VERSION="curl-${OPTARG}"
@@ -77,6 +79,9 @@ while getopts "v:s:t:i:nbxh\?" o; do
             ;;
 		n)
 			nohttp2="1"
+			;;
+		m)
+			catalyst="1"
 			;;
 		b)
 			NOBITCODE="yes"
@@ -312,12 +317,14 @@ lipo \
 	"/tmp/${CURL_VERSION}-x86_64/lib/libcurl.a" \
 	-create -output lib/libcurl_Mac.a
 
+if [ $catalyst == "1" ]; then
 echo -e "${bold}Building Catalyst libraries${dim}"
 buildCatalyst "x86_64" "bitcode"
 
 lipo \
 	"/tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/lib/libcurl.a" \
 	-create -output lib/libcurl_Catalyst.a
+fi
 
 echo -e "${bold}Building iOS libraries (bitcode)${dim}"
 buildIOS "armv7" "bitcode"

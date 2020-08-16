@@ -38,17 +38,19 @@ IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
+catalyst="0"
 
 usage ()
 {
 	echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-    echo -e "  ${subbold}$0${normal} [-v ${dim}<nghttp2 version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-x] [-h]"
+    echo -e "  ${subbold}$0${normal} [-v ${dim}<nghttp2 version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-m] [-x] [-h]"
     echo
 	echo "         -v   version of nghttp2 (default $NGHTTP2_VERNUM)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -m   compile Mac Catalyst library [beta]"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"	
 	echo
@@ -56,7 +58,7 @@ usage ()
 	exit 127
 }
 
-while getopts "v:s:t:xh\?" o; do
+while getopts "v:s:t:mxh\?" o; do
     case "${o}" in
         v)
 	    	NGHTTP2_VERNUM="${OPTARG}"
@@ -67,6 +69,9 @@ while getopts "v:s:t:xh\?" o; do
         t)
 	    	TVOS_SDK_VERSION="${OPTARG}"
             ;;
+		m)
+            catalyst="1"
+	    	;;
 		x)
 			bold=""
 			subbold=""
@@ -277,12 +282,14 @@ lipo \
         "${NGHTTP2}/Mac/x86_64/lib/libnghttp2.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_Mac.a"
 
+if [ $catalyst == "1" ]; then
 echo -e "${bold}Building Catalyst libraries${dim}"
 buildCatalyst "x86_64"
 
 lipo \
         "${NGHTTP2}/Catalyst/x86_64/lib/libnghttp2.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_Catalyst.a"
+fi
 
 echo -e "${bold}Building iOS libraries (bitcode)${dim}"
 buildIOS "armv7" "bitcode"
