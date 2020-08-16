@@ -1,7 +1,50 @@
 os: osx
 osx_image: xcode11.6
-# command to install dependencies
+language: objective-c
 
-# command to run build
-script:
-  - bash build.sh
+env:
+  global:
+    - OPENSSL="1.1.1g"	# https://www.openssl.org/source/
+    - LIBCURL="7.71.1"	# https://curl.haxx.se/download.html
+    - NGHTTP2="1.41.0"	# https://nghttp2.org/
+    - EXAMPLE="example/iOS Test App"
+
+stages:
+  - openssl
+  - nghttp2
+  - libcurl
+  - deploy
+  - test
+
+jobs:
+  include:
+    - stage: openssl
+      script: 
+        - bash "cd openssl; ./openssl-build.sh -v $OPENSSL"
+
+    - stage: nghttp2
+      script:
+        - bash "cd nghttp2; ./nghttp2-build.sh -v $NGHTTP2"
+    
+    - stage: libcurl
+      script: 
+        - bash "cd curl; ./libcurl-build.sh -v $LIBCURL"
+
+    - stage: deploy
+      script:
+        - echo "Fetching root certs..."
+        - curl -s https://curl.haxx.se/ca/cacert.pem > "$EXAMPLE/cacert.pem"
+        - echo "Copying libraries to Test App ..."
+        - cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
+        - cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
+        - cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
+        - cp curl/include/curl/* "$EXAMPLE/include/curl/"
+        - cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
+        - cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
+        - cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
+
+    - stage: test
+      script:
+        - xcodebuild clean -project iOS\ Test\ App.xcodeproj 
+        - xcodebuild build -project iOS\ Test\ App.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+        
