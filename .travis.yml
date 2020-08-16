@@ -20,7 +20,7 @@ jobs:
   include:
     - stage: nghttp2
       script:
-        - cd nghttp2;./nghttp2-build.sh -v "$NGHTTP2"
+        - cd nghttp2;./nghttp2-build2.sh -v "$NGHTTP2"
 
     - stage: openssl
       script: 
