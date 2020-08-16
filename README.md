@@ -205,28 +205,48 @@ Example Xcode project "iOS Test App" is located in the example folder.  This pro
 	|____clean.sh
 
 
-### Architectures in Libraries
+### Architectures in Mach-O Universal (Fat) Libraries
 
 	xcrun -sdk iphoneos lipo -info openssl/*/lib/*.a
 	xcrun -sdk iphoneos lipo -info nghttp2/lib/*.a
 	xcrun -sdk iphoneos lipo -info curl/lib/*.a
 
+* Catalyst
+	* openssl/Catalyst/lib/libcrypto.a are: x86_64 
+	* openssl/Catalyst/lib/libssl.a are: x86_64 
+    * nghttp2/lib/libnghttp2_Catalyst.a are: x86_64 
+	* curl/lib/libcurl_Catalyst.a are: x86_64 
+
 * Mac
-	* curl/lib/libcurl_Mac.a are: x86_64 
 	* openssl/Mac/lib/libcrypto.a are: x86_64 
 	* openssl/Mac/lib/libssl.a are: x86_64 
 	* nghttp2/lib/libnghttp2_Mac.a are: x86_64 
+	* curl/lib/libcurl_Mac.a are: x86_64 
+
 * iOS
-	* curl/lib/libcurl_iOS.a are: armv7 armv7s i386 x86_64 arm64 arm64e
-	* openssl/iOS/lib/libcrypto.a are: armv7 i386 x86_64 arm64 arm64e
-	* openssl/iOS/lib/libssl.a are: armv7 i386 x86_64 arm64 arm64e
-	* nghttp2/lib/libnghttp2_iOS.a are: armv7 armv7s i386 x86_64 arm64 arm64e
+	* openssl/iOS-fat/lib/libcrypto.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* openssl/iOS-fat/lib/libssl.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* openssl/iOS-simulator/lib/libcrypto.a are: i386 x86_64 
+	* openssl/iOS-simulator/lib/libssl.a are: i386 x86_64 
+	* openssl/iOS/lib/libcrypto.a are: armv7 armv7s arm64 arm64e 
+	* openssl/iOS/lib/libssl.a are: armv7 armv7s arm64 arm64e 
+	* nghttp2/lib/libnghttp2_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* nghttp2/lib/libnghttp2_iOS-simulator.a are: i386 x86_64 
+	* nghttp2/lib/libnghttp2_iOS.a are: armv7 armv7s arm64 arm64e 
+	* curl/lib/libcurl_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* curl/lib/libcurl_iOS-simulator.a are: i386 x86_64 
+	* curl/lib/libcurl_iOS.a are: armv7 armv7s arm64 arm64e 
+
 * tvOS
-	* curl/lib/libcurl_tvOS.a are: x86_64 arm64 
 	* openssl/tvOS/lib/libcrypto.a are: x86_64 arm64 
 	* openssl/tvOS/lib/libssl.a are: x86_64 arm64 
 	* nghttp2/lib/libnghttp2_tvOS.a are: x86_64 arm64 
+	* curl/lib/libcurl_tvOS.a are: x86_64 arm64 
 
+* Consolidated OpenSSL Libraries for iOS
+	* openssl/openssl-ios-armv7_armv7s_arm64_arm64e.a are: armv7 armv7s arm64 arm64e 
+	* openssl/openssl-ios-x86_64-simulator.a are: i386 x86_64 
+	* openssl/openssl-ios-x86_64-maccatalyst.a is architecture: x86_64
 
 ### Archive
 
@@ -240,18 +260,20 @@ The `build.sh` script will create an ./archive folder and store all the *.a libr
              |  |____openssl*
              |  |____curl*
              |
+             |____framework/
+             |
              |____lib/
-			 |  |____Catalyst/
+             |  |____Catalyst/
              |  |____iOS/
-			 |  |____iOS-simulator/
-             |  |____iOS-fat/        <-- Contains both iOS and iOS-simulator binaries
+             |  |____iOS-simulator/
+             |  |____iOS-fat/        <-- Contains universal iOS and iOS-simulator binaries
              |  |____MacOS/
              |  |____tvOS/
              |
              |____include/
                 |____openssl/
                 |____curl/
-	
+
 ## Download Compressed Archives
 
 Previous builds can be downloaded form the Github releases for this project: https://github.com/jasonacox/Build-OpenSSL-cURL/releases
