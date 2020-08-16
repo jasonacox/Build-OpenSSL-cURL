@@ -31,8 +31,9 @@ alert="\033[0m${red}\033[1m"
 alertdim="\033[0m${red}\033[2m"
 
 # set trap to help debug build errors
-trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; tail -3 /tmp/nghttp2*.log' INT TERM EXIT
+trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; tail -30 /tmp/nghttp2*.log' INT TERM EXIT
 
+# --- Edit this to update default version ---
 NGHTTP2_VERNUM="1.41.0"
 IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
@@ -88,8 +89,6 @@ while getopts "v:s:t:mxh\?" o; do
 done
 shift $((OPTIND-1))
 
-# --- Edit this to update version ---
-
 NGHTTP2_VERSION="nghttp2-${NGHTTP2_VERNUM}"
 DEVELOPER=`xcode-select -print-path`
 
@@ -104,7 +103,7 @@ else
 	# Check to see if Brew is installed
 	if ! type "brew" > /dev/null; then
 		echo -e "${alert}** FATAL ERROR: brew not installed - unable to install pkg-config - exiting.${normal}"
-		exit
+		exit 1
 	else
 		echo "  brew installed - using to install pkg-config"
 		brew install pkg-config
@@ -115,7 +114,7 @@ else
 		echo "  SUCCESS: pkg-config installed"
 	else
 		echo -e "${alert}** FATAL ERROR: pkg-config failed to install - exiting.${normal}"
-		exit
+		exit 1
 	fi
 fi 
 
@@ -244,12 +243,11 @@ buildTVOS()
 	# add -isysroot to CC=
 	#sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
 
-	make  >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
+	make -j8 >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make install  >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
 	popd > /dev/null
 }
-
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf include/nghttp2/* lib/*

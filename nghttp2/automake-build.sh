@@ -47,13 +47,13 @@ else
 	brew install automake
 fi
 
-# Check to see if installation workedjj
+# Check to see if installation worked
 if (type "automake" > /dev/null) && (type "autoreconf" > /dev/null); then
 	echo "SUCCESS: Automake tools installed"
-	exit
+	exit 0
 else
 	echo "ERROR: Automake tools failed to install"
-	exit
+	exit 1
 fi
  
 #curl -OL http://ftpmirror.gnu.org/libtool/libtool-2.4.2.tar.gz
