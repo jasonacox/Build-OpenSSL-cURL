@@ -13,7 +13,7 @@
 # 
 # NOTE: pkg-config is required
  
-set -e
+# set -e
 
 # Formatting
 default="\033[39m"
@@ -31,7 +31,7 @@ alert="\033[0m${red}\033[1m"
 alertdim="\033[0m${red}\033[2m"
 
 # set trap to help debug build errors
-trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; cat /tmp/nghttp2-1.41.0-tvOS-arm64.log' INT TERM EXIT
+# trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; cat /tmp/nghttp2-1.41.0-tvOS-arm64.log' INT TERM EXIT
 
 # --- Edit this to update default version ---
 NGHTTP2_VERNUM="1.41.0"
@@ -237,16 +237,16 @@ buildTVOS()
 	# LANG=C sed -i -- 's/D\_REENTRANT\:iOS/D\_REENTRANT\:tvOS/' "./Configure"
 	# chmod u+x ./Configure
 	
-	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
-	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "config.h" &> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log"
+	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS/${ARCH}" --host="arm-apple-darwin"
+	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "config.h" 
 
 	# add -isysroot to CC=
 	#sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
 
-	make -j8 >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
-	make install  >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
-	make clean >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
-	popd > /dev/null
+	make -j8 >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 
+	make install  >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 
+	make clean >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 
+	popd 
 }
 
 echo -e "${bold}Cleaning up${dim}"
