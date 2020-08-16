@@ -1,8 +1,10 @@
 # Build-OpenSSL-cURL
 
+[![Build Status](https://travis-ci.org/jasonacox/Build-OpenSSL-cURL.svg?branch=master)](https://travis-ci.org/jasonacox/Build-OpenSSL-cURL)
+
 This Script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), Mac Catalyst, iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
 
-NEW: This now builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/) [beta]
+NEW: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/) [beta]
 
 ## Build
 The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which download the specified release version, configure and build the libraries and binaries.  
@@ -18,11 +20,14 @@ The build script accepts several arguments to adjust versions and toggle feature
          -d             Compile without HTTP2 support
          -e             Compile with OpenSSL engine support
          -b             Compile without bitcode
+         -m             Compile Mac Catalyst binaries [beta]"
          -x             No color output
          -h             Show usage
 ```
 
 _OpenSSL Engine Note: By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use this and the static engine support will be included:_ `./build.sh -e`
+
+_Mac Catalyst Note: Static libraries can be built for Mac Catalyst. This requires a current version of Xcode (11.6+). To build Catalyst binaries use the switch:_ `./build.sh -m`
 
 ## Quick Start
 
