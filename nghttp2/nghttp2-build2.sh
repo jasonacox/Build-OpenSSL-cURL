@@ -212,6 +212,8 @@ buildTVOS()
 
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
+
+	mkdir -p "${NGHTTP2}/tvOS/${ARCH}"
   
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]]; then
 		PLATFORM="AppleTVSimulator"
@@ -238,6 +240,7 @@ buildTVOS()
 	# chmod u+x ./Configure
 	
 	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS/${ARCH}" --host="arm-apple-darwin"
+	
 	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "config.h" 
 
 	# add -isysroot to CC=
