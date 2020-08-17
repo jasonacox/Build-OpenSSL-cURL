@@ -225,7 +225,7 @@ buildTVOS()
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} -fembed-bitcode"
-	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/tvOS/lib ${NGHTTP2LIB}"
+	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} ${NGHTTP2LIB}"
 	export LC_CTYPE=C
   
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
@@ -257,6 +257,10 @@ rm -fr tvOS
 rm -fr Catalyst
 
 mkdir -p lib
+mkdir -p Mac
+mkdir -p iOS
+mkdir -p tvOS
+mkdir -p Catalyst
 
 rm -rf "/tmp/${NGHTTP2_VERSION}-*"
 rm -rf "/tmp/${NGHTTP2_VERSION}-*.log"
