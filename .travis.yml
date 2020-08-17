@@ -8,6 +8,12 @@ env:
     - LIBCURL="7.71.1"	# https://curl.haxx.se/download.html
     - NGHTTP2="1.41.0"	# https://nghttp2.org/
     - EXAMPLE="example/iOS Test App"
+    - PATH=$HOME/.local/bin:$PATH   # for AWS
+
+before_install:
+  - pyenv global 3.7.1
+  - pip install -U pip
+  - pip install awscli
 
 stages:
   - nghttp2
@@ -21,6 +27,7 @@ jobs:
     - stage: nghttp2
       script:
         - cd nghttp2;./nghttp2-build.sh -v "$NGHTTP2"
+        - cd ..
         - tar -zcf "nghttp2.tgz" nghttp2/Catalyst nghttp2/iOS* nghttp2/tvOS nghttp2/lib 
         - aws s3 cp "nghttp2.tgz" s3://jasonacox.com.travis-build-stage-storage/
         - aws s3 ls jasonacox.com.travis-build-stage-storage
@@ -28,6 +35,7 @@ jobs:
     - stage: opensslphase1
       script: 
         - cd openssl;./openssl-build-phase1.sh -v "$OPENSSL"
+        - cd ..
         - cp /tmp/openssl openssl/Mac
         - /tmp/openssl version
         - tar -zcf "openssl-1.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
@@ -37,6 +45,7 @@ jobs:
     - stage: opensslphase2
       script: 
         - cd openssl;./openssl-build-phase2.sh -v "$OPENSSL"
+        - cd ..
         - tar -zcf "openssl-2.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
         - aws s3 cp "openssl-2.tgz" s3://jasonacox.com.travis-build-stage-storage/
         - aws s3 ls jasonacox.com.travis-build-stage-storage
@@ -49,6 +58,7 @@ jobs:
         - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/nghttp2.tgz .
         - tar -zxf *.tgz
         - cd curl;./libcurl-build.sh -v "$LIBCURL"
+        - cd ..
         - cp /tmp/curl curl/lib
         - /tmp/curl -V
         - echo "Uploading libcurl libraries..."
