@@ -11,8 +11,8 @@ env:
 
 stages:
   - nghttp2
-  - openssl-phase1
-  - openssl-phase2
+  - opensslphase1
+  - opensslphase2
   - libcurl
   - test
 
@@ -25,21 +25,21 @@ jobs:
         - aws s3 cp "nghttp2.tgz" s3://jasonacox.com.travis-build-stage-storage/
         - aws s3 ls jasonacox.com.travis-build-stage-storage
 
-    - stage: openssl-phase1
+    - stage: opensslphase1
       script: 
         - cd openssl;./openssl-build-phase1.sh -v "$OPENSSL"
         - cp /tmp/openssl openssl/Mac
         - /tmp/openssl version
         - tar -zcf "openssl-1.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
-			  - aws s3 cp "openssl-1.tgz" s3://jasonacox.com.travis-build-stage-storage/
-			  - aws s3 ls jasonacox.com.travis-build-stage-storage
+        - aws s3 cp "openssl-1.tgz" s3://jasonacox.com.travis-build-stage-storage/
+        - aws s3 ls jasonacox.com.travis-build-stage-storage
 
-    - stage: openssl-phase2
+    - stage: opensslphase2
       script: 
         - cd openssl;./openssl-build-phase2.sh -v "$OPENSSL"
         - tar -zcf "openssl-2.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
-			  - aws s3 cp "openssl-2.tgz" s3://jasonacox.com.travis-build-stage-storage/
-			  - aws s3 ls jasonacox.com.travis-build-stage-storage
+        - aws s3 cp "openssl-2.tgz" s3://jasonacox.com.travis-build-stage-storage/
+        - aws s3 ls jasonacox.com.travis-build-stage-storage
 
     - stage: libcurl
       script: 
