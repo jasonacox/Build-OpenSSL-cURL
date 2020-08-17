@@ -97,6 +97,7 @@ while getopts "o:ncduth\?" o; do
 			echo "Fetching root certs..."
 			curl -s https://curl.haxx.se/ca/cacert.pem > "$EXAMPLE/cacert.pem"
 			echo "Copying libraries to Test App ..."
+			mkdir -p "$EXAMPLE/libs"
 			cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
 			cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
 			cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
