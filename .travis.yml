@@ -58,7 +58,9 @@ jobs:
         - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-1.tgz .
         - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-2.tgz .
         - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/nghttp2.tgz .
-        - tar -zxf *.tgz
+        - tar -zxf openssl-1.tgz
+        - tar -zxf openssl-2.tgz
+        - tar -zxf nghttp2.tgz
         - cd curl;./libcurl-build.sh -v "$LIBCURL"
         - cd ..
         - cp /tmp/curl curl/lib
@@ -71,24 +73,23 @@ jobs:
     - stage: test
       script:
         - echo "Fetching libcurl, openssl and nghttp2 libraries..."
-        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/libcurl.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/curl.tgz .
         - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-1.tgz .
         - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-2.tgz .
         - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/nghttp2.tgz .
-        - tar -zxf *.tgz
+        - tar -zxf openssl-1.tgz
+        - tar -zxf openssl-2.tgz
+        - tar -zxf nghttp2.tgz
+        - tar -zxf curl.tgz
         - echo "Fetching root certs..."
         - curl -s https://curl.haxx.se/ca/cacert.pem > "$EXAMPLE/cacert.pem"
         - echo "Copying libraries to Test App ..."
-        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-1.tgz .
-        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-2.tgz .
-        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/nghttp2.tgz .
         - cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
         - cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
         - cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
         - cp curl/include/curl/* "$EXAMPLE/include/curl/"
         - cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
         - cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
-        - cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
         - echo "Building iOS Test App..."
-        - xcodebuild clean -project iOS\ Test\ App.xcodeproj 
-        - xcodebuild build -project iOS\ Test\ App.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+        - xcodebuild clean -project "$EXAMPLE/iOS Test App.xcodeproj"
+        - xcodebuild build -project "$EXAMPLE/iOS Test App.xcodeproj" -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
