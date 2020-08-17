@@ -11,30 +11,65 @@ env:
 
 stages:
   - nghttp2
-  - openssl
+  - openssl-phase1
+  - openssl-phase2
   - libcurl
-  - deploy
   - test
 
 jobs:
   include:
     - stage: nghttp2
       script:
-        - cd nghttp2;./nghttp2-build2.sh -v "$NGHTTP2"
+        - cd nghttp2;./nghttp2-build.sh -v "$NGHTTP2"
+        - tar -zcf "nghttp2.tgz" nghttp2/Catalyst nghttp2/iOS* nghttp2/tvOS nghttp2/lib 
+        - aws s3 cp "nghttp2.tgz" s3://jasonacox.com.travis-build-stage-storage/
+        - aws s3 ls jasonacox.com.travis-build-stage-storage
 
-    - stage: openssl
+    - stage: openssl-phase1
       script: 
-        - cd openssl;./openssl-build.sh -v "$OPENSSL"
-    
+        - cd openssl;./openssl-build-phase1.sh -v "$OPENSSL"
+        - cp /tmp/openssl openssl/Mac
+        - /tmp/openssl version
+        - tar -zcf "openssl-1.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
+			  - aws s3 cp "openssl-1.tgz" s3://jasonacox.com.travis-build-stage-storage/
+			  - aws s3 ls jasonacox.com.travis-build-stage-storage
+
+    - stage: openssl-phase2
+      script: 
+        - cd openssl;./openssl-build-phase2.sh -v "$OPENSSL"
+        - tar -zcf "openssl-2.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
+			  - aws s3 cp "openssl-2.tgz" s3://jasonacox.com.travis-build-stage-storage/
+			  - aws s3 ls jasonacox.com.travis-build-stage-storage
+
     - stage: libcurl
       script: 
+        - echo "Fetching openssl and nghttp2 libraries..."
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-1.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-2.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/nghttp2.tgz .
+        - tar -zxf *.tgz
         - cd curl;./libcurl-build.sh -v "$LIBCURL"
+        - cp /tmp/curl curl/lib
+        - /tmp/curl -V
+        - echo "Uploading libcurl libraries..."
+        - tar -zcf "curl.tgz" curl/lib curl/include
+        - aws s3 cp "curl.tgz" s3://jasonacox.com.travis-build-stage-storage/
+        - aws s3 ls jasonacox.com.travis-build-stage-storage
 
-    - stage: deploy
+    - stage: test
       script:
+        - echo "Fetching libcurl, openssl and nghttp2 libraries..."
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/libcurl.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-1.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-2.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/nghttp2.tgz .
+        - tar -zxf *.tgz
         - echo "Fetching root certs..."
         - curl -s https://curl.haxx.se/ca/cacert.pem > "$EXAMPLE/cacert.pem"
         - echo "Copying libraries to Test App ..."
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-1.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/openssl-2.tgz .
+        - aws s3 cp s3://jasonacox.com.travis-build-stage-storage/nghttp2.tgz .
         - cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
         - cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
         - cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
@@ -42,8 +77,6 @@ jobs:
         - cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
         - cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
         - cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
-
-    - stage: test
-      script:
+        echo "Building iOS Test App..."
         - xcodebuild clean -project iOS\ Test\ App.xcodeproj 
         - xcodebuild build -project iOS\ Test\ App.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
