@@ -11,9 +11,8 @@ env:
     - PATH=$HOME/.local/bin:$PATH   # for AWS
 
 before_install:
-  - pyenv global 3.7.1
-  - pip install -U pip
-  - pip install awscli
+  # set up awscli packages
+  - pip install --user awscli
 
 stages:
   - nghttp2
