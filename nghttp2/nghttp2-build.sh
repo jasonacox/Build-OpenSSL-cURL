@@ -31,7 +31,7 @@ alert="\033[0m${red}\033[1m"
 alertdim="\033[0m${red}\033[2m"
 
 # set trap to help debug build errors
-trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; tail -30 /tmp/nghttp2*.log' INT TERM EXIT
+trap 'echo -e "${alert}** ERROR with Build - Check /tmp/nghttp2*.log${alertdim}"; tail -5 /tmp/nghttp2*.log' INT TERM EXIT
 
 # --- Edit this to update default version ---
 NGHTTP2_VERNUM="1.41.0"
@@ -62,26 +62,26 @@ usage ()
 while getopts "v:s:t:mxh\?" o; do
     case "${o}" in
         v)
-	    	NGHTTP2_VERNUM="${OPTARG}"
+            NGHTTP2_VERNUM="${OPTARG}"
             ;;
         s)
             IOS_SDK_VERSION="${OPTARG}"
             ;;
         t)
-	    	TVOS_SDK_VERSION="${OPTARG}"
+            TVOS_SDK_VERSION="${OPTARG}"
             ;;
-		m)
+        m)
             catalyst="1"
-	    	;;
-		x)
-			bold=""
-			subbold=""
-			normal=""
-			dim=""
-			alert=""
-			alertdim=""
-			archbold=""
-			;;
+            ;;
+        x)
+            bold=""
+            subbold=""
+            normal=""
+            dim=""
+            alert=""
+            alertdim=""
+            archbold=""
+            ;;
         *)
             usage
             ;;
