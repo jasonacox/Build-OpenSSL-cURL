@@ -77,6 +77,6 @@ jobs:
         - cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
         - cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
         - cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
-        echo "Building iOS Test App..."
+        - echo "Building iOS Test App..."
         - xcodebuild clean -project iOS\ Test\ App.xcodeproj 
         - xcodebuild build -project iOS\ Test\ App.xcodeproj -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
