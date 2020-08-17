@@ -12,9 +12,8 @@ env:
 
 before_install:
   # set up awscli packages
-  - pip install pyopenssl
-  - pip install --user awscli
-  - python3 -m pip install –user awscli
+  - python3 -m pip install pyopenssl
+  - python3 -m pip install --user awscli
   - ls $HOME/.local/bin
   - aws s3 ls jasonacox.com.travis-build-stage-storage
 
