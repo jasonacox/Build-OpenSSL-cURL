@@ -12,7 +12,9 @@ env:
 
 before_install:
   # set up awscli packages
+  - pip install pyopenssl
   - pip install --user awscli
+  - aws s3 ls jasonacox.com.travis-build-stage-storage
 
 stages:
   - nghttp2
