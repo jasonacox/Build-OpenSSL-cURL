@@ -98,9 +98,12 @@ shift $((OPTIND-1))
 
 ## Welcome
 echo -e "${bold}Build-OpenSSL-cURL${dim}"
-echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), iOS and tvOS devices."
+if [ "$catalyst" == "-m" ]; then
+	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, Catalyst [beta], iOS and tvOS devices."
+else
+	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, iOS and tvOS devices."
+fi
 echo "Targets: x86_64, armv7, armv7s, arm64 and arm64e"
-echo
 
 ## Start Counter
 START=$(date +%s)
@@ -159,7 +162,7 @@ mkdir -p "$ARCHIVE/lib/iOS-simulator"
 mkdir -p "$ARCHIVE/lib/iOS-fat"
 mkdir -p "$ARCHIVE/lib/MacOS"
 mkdir -p "$ARCHIVE/lib/tvOS"
-if [ $catalyst == "-m" ]; then
+if [ "$catalyst" == "-m" ]; then
 mkdir -p "$ARCHIVE/lib/Catalyst"
 fi
 mkdir -p "$ARCHIVE/bin"
@@ -184,7 +187,7 @@ cp openssl/iOS-fat/lib/libssl.a $ARCHIVE/lib/iOS-fat/libssl.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
 
-if [ $catalyst == "-m" ]; then
+if [ "$catalyst" == "-m" ]; then
 cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
 cp openssl/Catalyst/lib/libcrypto.a $ARCHIVE/lib/Catalyst/libcrypto.a
 cp openssl/Catalyst/lib/libssl.a $ARCHIVE/lib/Catalyst/libssl.a
@@ -198,7 +201,7 @@ if [ "$buildnghttp2" != "" ]; then
 	cp nghttp2/lib/libnghttp2_iOS-fat.a $ARCHIVE/lib/iOS-fat/libnghttp2.a
 	cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2.a
 	cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2.a
-	if [ $catalyst == "-m" ]; then
+	if [ "$catalyst" == "-m" ]; then
 	cp nghttp2/lib/libnghttp2_Catalyst.a $ARCHIVE/lib/Catalyst/libnghttp2.a
 	fi
 fi
