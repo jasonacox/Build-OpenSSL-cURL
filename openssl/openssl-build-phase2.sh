@@ -40,13 +40,14 @@ usage ()
 	echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-v ${dim}<openssl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-e] [-m] [-x] [-h]"
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<openssl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-e] [-m] [-3] [-x] [-h]"
 	echo
 	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
 	echo "         -e   compile with engine support"
 	echo "         -m   compile Mac Catalyst library [beta]"
+	echo "         -3   compile with SSLv3 support"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"
 	echo
@@ -56,7 +57,7 @@ usage ()
 
 engine=0
 
-while getopts "v:s:t:emxh\?" o; do
+while getopts "v:s:t:emx3h\?" o; do
 	case "${o}" in
 		v)
 			OPENSSL_VERSION="openssl-${OPTARG}"
@@ -81,6 +82,9 @@ while getopts "v:s:t:emxh\?" o; do
 			alert=""
 			alertdim=""
 			archbold=""
+			;;
+		3)
+			CUSTOMCONFIG="enable-ssl3 enable-ssl3-method enable-ssl-trace"
 			;;
 		*)
 			usage
