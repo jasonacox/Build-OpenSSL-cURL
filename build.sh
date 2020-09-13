@@ -11,7 +11,7 @@
 ################################################
 
 OPENSSL="1.1.1g"	# https://www.openssl.org/source/
-LIBCURL="7.71.1"	# https://curl.haxx.se/download.html
+LIBCURL="7.72.0"	# https://curl.haxx.se/download.html
 NGHTTP2="1.41.0"	# https://nghttp2.org/
 
 ################################################
@@ -22,6 +22,7 @@ buildnghttp2="-n"
 disablebitcode=""
 colorflag=""
 catalyst=""
+sslv3=""
 
 # Formatting
 default="\033[39m"
@@ -42,7 +43,7 @@ usage ()
     echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-o ${dim}<OpenSSL version>${normal}] [-c ${dim}<curl version>${normal}] [-n ${dim}<nghttp2 version>${normal}] [-d] [-e] [-x] [-h]"
+	echo -e "  ${subbold}$0${normal} [-o ${dim}<OpenSSL version>${normal}] [-c ${dim}<curl version>${normal}] [-n ${dim}<nghttp2 version>${normal}] [-d] [-e] [-3] [-x] [-h]"
 	echo
 	echo "         -o <version>   Build OpenSSL version (default $OPENSSL)"
 	echo "         -c <version>   Build curl version (default $LIBCURL)"
@@ -51,13 +52,14 @@ usage ()
 	echo "         -e             Compile with OpenSSL engine support"
 	echo "         -b             Compile without bitcode"
 	echo "         -m             Compile Mac Catalyst library [beta]"
+	echo "         -3             Compile with SSLv3"
 	echo "         -x             No color output"
 	echo "         -h             Show usage"
 	echo
     exit 127
 }
 
-while getopts "o:c:n:debmxh\?" o; do
+while getopts "o:c:n:debm3xh\?" o; do
     case "${o}" in
 		o)
 			OPENSSL="${OPTARG}"
@@ -78,8 +80,11 @@ while getopts "o:c:n:debmxh\?" o; do
 			disablebitcode="-b"
 			;;
 		m)
-            catalyst="-m"
-	    	;;
+       		catalyst="-m"
+			;;
+		3)
+       		sslv3="-3"
+			;;
 		x)
 			bold=""
 			subbold=""
@@ -112,7 +117,7 @@ START=$(date +%s)
 echo
 cd openssl
 echo -e "${bold}Building OpenSSL${normal}"
-./openssl-build.sh -v "$OPENSSL" $engine $colorflag $catalyst
+./openssl-build.sh -v "$OPENSSL" $engine $colorflag $catalyst $sslv3
 cd ..
 
 ## Nghttp2 Build

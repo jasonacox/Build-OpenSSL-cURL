@@ -44,7 +44,7 @@ cd Build-OpenSSL-cURL
 Default versions are specified in the `build.sh` script but you can specify the version you want to build via the command line, e.g.:
 
 ```bash
-./build.sh -o 1.1.1g -c 7.71.1 -n 1.41.0
+./build.sh -o 1.1.1g -c 7.72.0 -n 1.41.0
 ```
 
 You can update the default version by editing this section in the `build.sh` script:
@@ -55,7 +55,7 @@ You can update the default version by editing this section in the `build.sh` scr
 ################################################
 
 OPENSSL="1.1.1g"	# https://www.openssl.org/source/
-LIBCURL="7.71.1"	# https://curl.haxx.se/download.html
+LIBCURL="7.72.0"	# https://curl.haxx.se/download.html
 NGHTTP2="1.41.0"	# https://nghttp2.org/
 
 ################################################
