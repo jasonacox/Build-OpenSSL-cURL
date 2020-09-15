@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,10 +15,13 @@
 		1B4AA22C1DE16AEF008187BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1B4AA22A1DE16AEF008187BD /* LaunchScreen.storyboard */; };
 		1B4AA24E1DE18290008187BD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA24D1DE18290008187BD /* libz.tbd */; };
 		1B4AA2501DE195DE008187BD /* cacert.pem in Resources */ = {isa = PBXBuildFile; fileRef = 1B4AA24F1DE195DE008187BD /* cacert.pem */; };
-		1B4AA2661DE1FCA5008187BD /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2621DE1FCA5008187BD /* libcrypto.a */; };
-		1B4AA2671DE1FCA5008187BD /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2631DE1FCA5008187BD /* libcurl.a */; };
-		1B4AA2681DE1FCA5008187BD /* libnghttp2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2641DE1FCA5008187BD /* libnghttp2.a */; };
-		1B4AA2691DE1FCA5008187BD /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2651DE1FCA5008187BD /* libssl.a */; };
+		1B4AA2661DE1FCA5008187BD /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2621DE1FCA5008187BD /* libcrypto.a */; platformFilter = ios; };
+		1B4AA2671DE1FCA5008187BD /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2631DE1FCA5008187BD /* libcurl.a */; platformFilter = ios; };
+		1B4AA2681DE1FCA5008187BD /* libnghttp2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2641DE1FCA5008187BD /* libnghttp2.a */; platformFilter = ios; };
+		1B4AA2691DE1FCA5008187BD /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2651DE1FCA5008187BD /* libssl.a */; platformFilter = ios; };
+		964F3E96250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964F3E93250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a */; platformFilter = maccatalyst; };
+		964F3E97250F274B004726C6 /* libcurl_Catalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964F3E94250F274B004726C6 /* libcurl_Catalyst.a */; platformFilter = maccatalyst; };
+		964F3E98250F274B004726C6 /* libnghttp2_Catalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964F3E95250F274B004726C6 /* libnghttp2_Catalyst.a */; platformFilter = maccatalyst; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +41,10 @@
 		1B4AA2631DE1FCA5008187BD /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = libs/libcurl.a; sourceTree = "<group>"; };
 		1B4AA2641DE1FCA5008187BD /* libnghttp2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnghttp2.a; path = libs/libnghttp2.a; sourceTree = "<group>"; };
 		1B4AA2651DE1FCA5008187BD /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = libs/libssl.a; sourceTree = "<group>"; };
+		964F3E93250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "openssl-ios-x86_64-maccatalyst.a"; path = "libs/openssl-ios-x86_64-maccatalyst.a"; sourceTree = "<group>"; };
+		964F3E94250F274B004726C6 /* libcurl_Catalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl_Catalyst.a; path = libs/libcurl_Catalyst.a; sourceTree = "<group>"; };
+		964F3E95250F274B004726C6 /* libnghttp2_Catalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnghttp2_Catalyst.a; path = libs/libnghttp2_Catalyst.a; sourceTree = "<group>"; };
+		96AAC802250F224E009E2EE3 /* iOS Test App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "iOS Test App.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -47,8 +54,11 @@
 			files = (
 				1B4AA24E1DE18290008187BD /* libz.tbd in Frameworks */,
 				1B4AA2681DE1FCA5008187BD /* libnghttp2.a in Frameworks */,
+				964F3E97250F274B004726C6 /* libcurl_Catalyst.a in Frameworks */,
 				1B4AA2671DE1FCA5008187BD /* libcurl.a in Frameworks */,
 				1B4AA2691DE1FCA5008187BD /* libssl.a in Frameworks */,
+				964F3E96250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a in Frameworks */,
+				964F3E98250F274B004726C6 /* libnghttp2_Catalyst.a in Frameworks */,
 				1B4AA2661DE1FCA5008187BD /* libcrypto.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -76,6 +86,7 @@
 		1B4AA21B1DE16AEF008187BD /* iOS Test App */ = {
 			isa = PBXGroup;
 			children = (
+				96AAC802250F224E009E2EE3 /* iOS Test App.entitlements */,
 				1B4AA21F1DE16AEF008187BD /* AppDelegate.h */,
 				1B4AA2201DE16AEF008187BD /* AppDelegate.m */,
 				1B4AA2221DE16AEF008187BD /* ViewController.h */,
@@ -106,6 +117,9 @@
 				1B4AA2641DE1FCA5008187BD /* libnghttp2.a */,
 				1B4AA2651DE1FCA5008187BD /* libssl.a */,
 				1B4AA24D1DE18290008187BD /* libz.tbd */,
+				964F3E94250F274B004726C6 /* libcurl_Catalyst.a */,
+				964F3E95250F274B004726C6 /* libnghttp2_Catalyst.a */,
+				964F3E93250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -325,19 +339,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "iOS Test App/iOS Test App.entitlements";
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 3VBZPX2GZ9;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/include/**",
 				);
 				INFOPLIST_FILE = "iOS Test App/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/libs/**",
+					"$(PROJECT_DIR)/libs_catalyst",
+					"$(PROJECT_DIR)/libs",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jasonacox.iOS-Test-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				USE_HEADERMAP = YES;
 			};
 			name = Debug;
@@ -346,19 +369,28 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "iOS Test App/iOS Test App.entitlements";
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 3VBZPX2GZ9;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/include/**",
 				);
 				INFOPLIST_FILE = "iOS Test App/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/libs/**",
+					"$(PROJECT_DIR)/libs_catalyst",
+					"$(PROJECT_DIR)/libs",
 				);
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jasonacox.iOS-Test-App";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTS_MACCATALYST = YES;
 				USE_HEADERMAP = YES;
 			};
 			name = Release;
