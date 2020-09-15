@@ -193,9 +193,9 @@ cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
 
 if [ "$catalyst" == "-m" ]; then
-cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
-cp openssl/Catalyst/lib/libcrypto.a $ARCHIVE/lib/Catalyst/libcrypto.a
-cp openssl/Catalyst/lib/libssl.a $ARCHIVE/lib/Catalyst/libssl.a
+	cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
+	cp openssl/Catalyst/lib/libcrypto.a $ARCHIVE/lib/Catalyst/libcrypto.a
+	cp openssl/Catalyst/lib/libssl.a $ARCHIVE/lib/Catalyst/libssl.a
 fi
 
 cp openssl/*.a $ARCHIVE/framework
@@ -224,6 +224,13 @@ echo "  See $EXAMPLE"
 cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
 cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
 cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
+if [ "$catalyst" == "-m" ]; then
+	cp openssl/openssl-ios-x86_64-maccatalyst.a "$EXAMPLE/libs/openssl-ios-x86_64-maccatalyst.a"
+	cp curl/lib/libcurl_Catalyst.a "$EXAMPLE/libs/libcurl_Catalyst.a"
+	if [ "$buildnghttp2" != "" ]; then
+		cp nghttp2/lib/libnghttp2_Catalyst.a "$EXAMPLE/libs/libnghttp2_Catalyst.a"
+	fi
+fi
 cp curl/include/curl/* "$EXAMPLE/include/curl/"
 cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
 if [ "$buildnghttp2" != "" ]; then
