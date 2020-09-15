@@ -354,8 +354,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/libs/**",
-					"$(PROJECT_DIR)/libs_catalyst",
-					"$(PROJECT_DIR)/libs",
 				);
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jasonacox.iOS-Test-App";
@@ -384,8 +382,6 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/libs/**",
-					"$(PROJECT_DIR)/libs_catalyst",
-					"$(PROJECT_DIR)/libs",
 				);
 				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.jasonacox.iOS-Test-App";
