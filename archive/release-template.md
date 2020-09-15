@@ -16,18 +16,23 @@ This directory contains the curl and openssl headers (in the `include` folder), 
              |
              |____cacert.pem
              |
+             |____framework
+             |
              |____bin/
              |  |____openssl*
              |  |____curl*
              |
-             |____lib/
-             |  |____iOS/
-             |  |____MacOS/
-             |  |____tvOS/
-             |
              |____include/
-                |____openssl/
-                |____curl/
+             |  |____openssl/
+             |  |____curl/
+             |        
+             |____lib
+                |____Catalyst
+                |____MacOS
+                |____iOS
+                |____iOS-fat
+                |____iOS-simulator
+                |____tvOS
  
 ## Usage
 
