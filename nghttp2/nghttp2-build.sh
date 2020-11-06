@@ -95,22 +95,29 @@ DEVELOPER=`xcode-select -print-path`
 NGHTTP2="${PWD}/../nghttp2"
 
 # Check to see if pkg-config is already installed
-if (type "pkg-config" > /dev/null) ; then
+if (type "pkg-config" > /dev/null 2>&1 ) ; then
 	echo "  pkg-config already installed"
 else
 	echo -e "${alertdim}** WARNING: pkg-config not installed... attempting to install.${dim}"
 
 	# Check to see if Brew is installed
-	if ! type "brew" > /dev/null; then
-		echo -e "${alert}** FATAL ERROR: brew not installed - unable to install pkg-config - exiting.${normal}"
-		exit 1
-	else
+	if (type "brew" > /dev/null 2>&1 ) ; then
 		echo "  brew installed - using to install pkg-config"
 		brew install pkg-config
+	else
+		# Build pkg-config from Source
+		curl -LO https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+		echo "  Building pkg-config"
+		tar xfz pkg-config-0.29.2.tar.gz
+		cd pkg-config-0.29.2
+		./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+		make >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+		make install >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+		PATH=$PATH:/tmp/pkg_config/bin
 	fi
 
 	# Check to see if installation worked
-	if (type "pkg-config" > /dev/null) ; then
+	if (type "pkg-config" > /dev/null 2>&1 ) ; then
 		echo "  SUCCESS: pkg-config installed"
 	else
 		echo -e "${alert}** FATAL ERROR: pkg-config failed to install - exiting.${normal}"
