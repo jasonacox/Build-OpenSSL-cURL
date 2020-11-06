@@ -10,7 +10,7 @@
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="1.1.1g"	# https://www.openssl.org/source/
+OPENSSL="1.1.1h"	# https://www.openssl.org/source/
 LIBCURL="7.72.0"	# https://curl.haxx.se/download.html
 NGHTTP2="1.41.0"	# https://nghttp2.org/
 
@@ -102,13 +102,19 @@ done
 shift $((OPTIND-1))
 
 ## Welcome
+echo
 echo -e "${bold}Build-OpenSSL-cURL${dim}"
+echo -e "${bold}-----------------L${dim}"
 if [ "$catalyst" == "-m" ]; then
 	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, Catalyst [beta], iOS and tvOS devices."
 else
 	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, iOS and tvOS devices."
 fi
 echo "Targets: x86_64, armv7, armv7s, arm64 and arm64e"
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'arm64' ]; then
+   echo "** Apple Silicon Detected - Adding MacOS Target: arm64 **"
+fi
 
 ## Start Counter
 START=$(date +%s)
@@ -116,7 +122,7 @@ START=$(date +%s)
 ## OpenSSL Build
 echo
 cd openssl
-echo -e "${bold}Building OpenSSL${normal}"
+echo -e "${bold}Building OpenSSL${dim}"
 ./openssl-build.sh -v "$OPENSSL" $engine $colorflag $catalyst $sslv3
 cd ..
 
@@ -125,7 +131,7 @@ if [ "$buildnghttp2" == "" ]; then
 	NGHTTP2="NONE"
 else
 	echo
-	echo -e "${bold}Building nghttp2 for HTTP2 support${normal}"
+	echo -e "${bold}Building nghttp2 for HTTP2 support${dim}"
 	cd nghttp2
 	./nghttp2-build.sh -v "$NGHTTP2" $colorflag $catalyst
 	cd ..
@@ -133,7 +139,7 @@ fi
 
 ## Curl Build
 echo
-echo -e "${bold}Building Curl${normal}"
+echo -e "${bold}Building Curl${dim}"
 cd curl
 ./libcurl-build.sh -v "$LIBCURL" $disablebitcode $colorflag $buildnghttp2 $catalyst
 cd ..
@@ -168,7 +174,7 @@ mkdir -p "$ARCHIVE/lib/iOS-fat"
 mkdir -p "$ARCHIVE/lib/MacOS"
 mkdir -p "$ARCHIVE/lib/tvOS"
 if [ "$catalyst" == "-m" ]; then
-mkdir -p "$ARCHIVE/lib/Catalyst"
+    mkdir -p "$ARCHIVE/lib/Catalyst"
 fi
 mkdir -p "$ARCHIVE/bin"
 mkdir -p "$ARCHIVE/framework"
@@ -221,6 +227,7 @@ echo
 # update test app
 echo -e "${bold}Copying libraries to Test App ...${dim}"
 echo "  See $EXAMPLE"
+mkdir -p "$EXAMPLE/libs"
 cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
 cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
 cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"

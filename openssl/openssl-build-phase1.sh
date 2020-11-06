@@ -13,7 +13,7 @@ CUSTOMCONFIG="enable-ssl-trace"
 
 # Formatting
 default="\033[39m"
-wihte="\033[97m"
+white="\033[97m"
 green="\033[32m"
 red="\033[91m"
 yellow="\033[33m"
@@ -99,7 +99,10 @@ buildMac()
 {
 	ARCH=$1
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for MacOS ${archbold}${ARCH}${dim}"
+
+	pushd . > /dev/null
+	cd "${OPENSSL_VERSION}"
 
 	TARGET="darwin-i386-cc"
 
@@ -107,10 +110,12 @@ buildMac()
 		TARGET="darwin64-x86_64-cc"
 	fi
 
+	if [[ $ARCH == "arm64" ]]; then
+		TARGET="darwin64-arm64-cc"
+	fi
+
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 
-	pushd . > /dev/null
-	cd "${OPENSSL_VERSION}"
 	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
 		./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-${ARCH}.log"
 	else
@@ -128,7 +133,7 @@ buildCatalyst()
 {
 	ARCH=$1
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for Catalyst ${archbold}${ARCH}${dim}"
 
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
@@ -223,7 +228,8 @@ buildTVOS()
 	popd > /dev/null
 }
 
-# echo -e "${bold}Cleaning up${dim}"
+# Prepare envrionment for build
+echo -e "${bold}Setting Up Environment${dim}"
 # rm -rf include/openssl/* lib/*
 
 mkdir -p Mac/lib
@@ -239,8 +245,8 @@ mkdir -p iOS-simulator/include/openssl/
 mkdir -p iOS-fat/include/openssl/
 mkdir -p tvOS/include/openssl/
 
-rm -rf "/tmp/${OPENSSL_VERSION}-*"
-rm -rf "/tmp/${OPENSSL_VERSION}-*.log"
+rm -rf /tmp/${OPENSSL_VERSION}-*
+rm -rf /tmp/${OPENSSL_VERSION}-*.log
 
 rm -rf "${OPENSSL_VERSION}"
 
@@ -270,36 +276,46 @@ if [ "$engine" == "1" ]; then
 	sed -ie 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
 fi
 
+# Patch configuration to add macOS arm64 config - for openssl 1.1.1h
+patch "${OPENSSL_VERSION}/Configurations/10-main.conf" 10-main.conf.patch >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
+
 ## Mac
 echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'arm64' ]; then
+	buildMac "arm64"
+fi
 
 echo "  Copying headers and libraries"
 cp /tmp/${OPENSSL_VERSION}-x86_64/include/openssl/* Mac/include/openssl/
 
 lipo \
-	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libcrypto.a" \
+	/tmp/${OPENSSL_VERSION}-*64/lib/libcrypto.a \
 	-create -output Mac/lib/libcrypto.a
 
 lipo \
-	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libssl.a" \
+	/tmp/${OPENSSL_VERSION}-*64/lib/libssl.a \
 	-create -output Mac/lib/libssl.a
 
 ## Catalyst
 if [ $catalyst == "1" ]; then
-echo -e "${bold}Building Catalyst libraries${dim}"
-buildCatalyst "x86_64"
+	echo -e "${bold}Building Catalyst libraries${dim}"
+	buildCatalyst "x86_64"
+	buildCatalyst "arm64"
 
-echo "  Copying headers and libraries"
-cp /tmp/${OPENSSL_VERSION}-catalyst-x86_64/include/openssl/* Catalyst/include/openssl/
+	echo "  Copying headers and libraries"
+	cp /tmp/${OPENSSL_VERSION}-catalyst-x86_64/include/openssl/* Catalyst/include/openssl/
 
-lipo \
-	"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libcrypto.a" \
-	-create -output Catalyst/lib/libcrypto.a
+	lipo \
+		"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libcrypto.a" \
+		"/tmp/${OPENSSL_VERSION}-catalyst-arm64/lib/libcrypto.a" \
+		-create -output Catalyst/lib/libcrypto.a
 
-lipo \
-	"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libssl.a" \
-	-create -output Catalyst/lib/libssl.a
+	lipo \
+		"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libssl.a" \
+		"/tmp/${OPENSSL_VERSION}-catalyst-arm64/lib/libssl.a" \
+		-create -output Catalyst/lib/libssl.a
 fi
 
 ## tvOS

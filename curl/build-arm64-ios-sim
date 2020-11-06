@@ -1,0 +1,8 @@
+#!/bin/bash
+
+export CC="/Applications/Xcode-beta.app/Contents/Developer/usr/bin/gcc"
+export CFLAGS="-arch arm64 -pipe -Os -gdwarf-2 -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk -fembed-bitcode -miphoneos-version-min=12.0"
+export LDFLAGS="-arch arm64 -isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk -L/Users/jason/Build-OpenSSL-cURL/curl/../openssl/iOS-simulator/lib"
+
+
+./configure -prefix=/tmp/curl-7.72.0-iOS-simulator-arm64-bitcode --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=/Users/jason/Build-OpenSSL-cURL/curl/../openssl/iOS-simulator --host=arm-apple-darwin

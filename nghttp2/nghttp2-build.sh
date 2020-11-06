@@ -17,7 +17,7 @@ set -e
 
 # Formatting
 default="\033[39m"
-wihte="\033[97m"
+white="\033[97m"
 green="\033[32m"
 red="\033[91m"
 yellow="\033[33m"
@@ -94,47 +94,58 @@ DEVELOPER=`xcode-select -print-path`
 
 NGHTTP2="${PWD}/../nghttp2"
 
-# Check to see if pkg-config is already installed
-if (type "pkg-config" > /dev/null 2>&1 ) ; then
-	echo "  pkg-config already installed"
-else
-	echo -e "${alertdim}** WARNING: pkg-config not installed... attempting to install.${dim}"
+# Install pkg-config if not already installed
+checkPkgConfig()
+{
+    if (type "pkg-config" > /dev/null 2>&1 ) ; then
+        echo "  pkg-config already installed"
+    else
+        if [ -f "/tmp/pkg_config/bin/pkg-config" ]; then
+            PATH=$PATH:/tmp/pkg_config/bin
+        else
+            echo -e "${alertdim}** WARNING: pkg-config not installed... attempting to install.${dim}"
+            # Check to see if Brew is installed
+            if (type "brew" > /dev/null 2>&1 ) ; then
+                echo "  brew installed - using to install pkg-config"
+                brew install pkg-config
+            else
+                # Build pkg-config from Source
+                curl -LO https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+                echo "  Building pkg-config"
+                tar xfz pkg-config-0.29.2.tar.gz
+                cd pkg-config-0.29.2
+                ./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+                make >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+                make install >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+                PATH=$PATH:/tmp/pkg_config/bin
+                cd ..
+            fi
+        fi
+        # Check to see if installation worked
+        if (type "pkg-config" > /dev/null 2>&1 ) ; then
+            echo "  SUCCESS: pkg-config installed"
+        else
+            echo -e "${alert}** FATAL ERROR: pkg-config failed to install - exiting.${normal}"
+            exit 1
+        fi
+    fi
+}
 
-	# Check to see if Brew is installed
-	if (type "brew" > /dev/null 2>&1 ) ; then
-		echo "  brew installed - using to install pkg-config"
-		brew install pkg-config
-	else
-		# Build pkg-config from Source
-		curl -LO https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
-		echo "  Building pkg-config"
-		tar xfz pkg-config-0.29.2.tar.gz
-		cd pkg-config-0.29.2
-		./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
-		make >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
-		make install >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
-		PATH=$PATH:/tmp/pkg_config/bin
-	fi
-
-	# Check to see if installation worked
-	if (type "pkg-config" > /dev/null 2>&1 ) ; then
-		echo "  SUCCESS: pkg-config installed"
-	else
-		echo -e "${alert}** FATAL ERROR: pkg-config failed to install - exiting.${normal}"
-		exit 1
-	fi
-fi 
-
+# MacOS Builds
 buildMac()
 {
 	ARCH=$1
 
-	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${archbold}${ARCH}${dim}"
+	echo -e "${subbold}Building ${NGHTTP2_VERSION} for MacOS ${archbold}${ARCH}${dim}"
 
 	TARGET="darwin-i386-cc"
 
 	if [[ $ARCH == "x86_64" ]]; then
 		TARGET="darwin64-x86_64-cc"
+	fi
+
+	if [[ $ARCH == "arm64" ]]; then
+		TARGET="darwin64-arm64-cc"
 	fi
 
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode"
@@ -150,6 +161,7 @@ buildMac()
 	popd > /dev/null
 }
 
+# Mac Catalyst Builds
 buildCatalyst()
 {
 	ARCH=$1
@@ -158,10 +170,10 @@ buildCatalyst()
 
 	TARGET="darwin64-${ARCH}-cc"
 
-	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target x86_64-apple-ios13.0-macabi"
+    export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target ${ARCH}-apple-ios13.0-macabi"
 
-    export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
-    export LDFLAGS="-arch ${ARCH}"
+	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
+	export LDFLAGS="-arch ${ARCH}"
 
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
@@ -172,6 +184,7 @@ buildCatalyst()
 	popd > /dev/null
 }
 
+# iOS Device Builds
 buildIOS()
 {
 	ARCH=$1
@@ -185,12 +198,16 @@ buildIOS()
 	else
 		PLATFORM="iPhoneOS"
 	fi
+    if [[ "${ARCH}" == "arm64sim" ]]; then
+        PLATFORM="iPhoneSimulator"
+        ARCH="arm64"
+    fi
 
-        if [[ "${BITCODE}" == "nobitcode" ]]; then
-                CC_BITCODE_FLAG=""
-        else
-                CC_BITCODE_FLAG="-fembed-bitcode"
-        fi
+    if [[ "${BITCODE}" == "nobitcode" ]]; then
+            CC_BITCODE_FLAG=""
+    else
+            CC_BITCODE_FLAG="-fembed-bitcode"
+    fi
   
 	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
@@ -201,18 +218,57 @@ buildIOS()
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK}"
    
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
-        if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
-		./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
-        else
-		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
-        fi
+    if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
+    ./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+    else
+    ./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+    fi
 
-        make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
-        make install >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
-        make clean >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
-        popd > /dev/null
+    make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
+    make install >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
+    make clean >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
+    popd > /dev/null
 }
 
+# iOS Simulator Builds
+buildIOSsim()
+{
+    ARCH=$1
+    BITCODE=$2
+
+    pushd . > /dev/null
+    cd "${NGHTTP2_VERSION}"
+
+    PLATFORM="iPhoneSimulator"
+
+    if [[ "${BITCODE}" == "nobitcode" ]]; then
+            CC_BITCODE_FLAG=""
+    else
+            CC_BITCODE_FLAG="-fembed-bitcode"
+    fi
+  
+    export $PLATFORM
+    export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
+    export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
+    export BUILD_TOOLS="${DEVELOPER}"
+    export CC="${BUILD_TOOLS}/usr/bin/gcc"
+    export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} ${CC_BITCODE_FLAG}"
+    export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK}"
+    
+    echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
+    if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
+    ./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS-simulator/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-simulator-${ARCH}-${BITCODE}.log"
+    else
+    ./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS-simulator/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-simulator-${ARCH}-${BITCODE}.log"
+    fi
+
+    make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-simulator-${ARCH}-${BITCODE}.log" 2>&1
+    make install >> "/tmp/${NGHTTP2_VERSION}-iOS-simulator-${ARCH}-${BITCODE}.log" 2>&1
+    make clean >> "/tmp/${NGHTTP2_VERSION}-iOS-simulator-${ARCH}-${BITCODE}.log" 2>&1
+    popd > /dev/null
+}
+
+# tvOS Builds
 buildTVOS()
 {
 	ARCH=$1
@@ -256,11 +312,12 @@ buildTVOS()
 	popd > /dev/null
 }
 
-echo -e "${bold}Cleaning up${dim}"
-rm -rf include/nghttp2/* lib/*
+# Prepare envrionment for build
+echo -e "${bold}Setting Up Environment${dim}"
+rm -fr include/nghttp2/* /lib/*
 rm -fr Mac
 rm -fr iOS
-rm -fr tvOS
+rm -fr tvOs
 rm -fr Catalyst
 
 mkdir -p lib
@@ -274,49 +331,62 @@ rm -rf "/tmp/${NGHTTP2_VERSION}-*.log"
 
 rm -rf "${NGHTTP2_VERSION}"
 
+# Check to see if pkg-config is already installed
+checkPkgConfig
+
+# Download and unpack nghttp2 source
 if [ ! -e ${NGHTTP2_VERSION}.tar.gz ]; then
-	echo "Downloading ${NGHTTP2_VERSION}.tar.gz"
+	echo "  Downloading ${NGHTTP2_VERSION}.tar.gz"
 	curl -LO https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERNUM}/${NGHTTP2_VERSION}.tar.gz
 else
-	echo "Using ${NGHTTP2_VERSION}.tar.gz"
+	echo "  Using ${NGHTTP2_VERSION}.tar.gz"
 fi
-
-echo "Unpacking nghttp2"
+echo "  Unpacking nghttp2"
 tar xfz "${NGHTTP2_VERSION}.tar.gz"
 
+# BUILD
 echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
+MACHINE_TYPE=`uname -m`
+if [ ${MACHINE_TYPE} == 'arm64' ]; then
+   buildMac "arm64"
+fi
 
+# Build macOS Library (include x86_64 and arm64 if present
 lipo \
-        "${NGHTTP2}/Mac/x86_64/lib/libnghttp2.a" \
+        ${NGHTTP2}/Mac/*64/lib/libnghttp2.a \
         -create -output "${NGHTTP2}/lib/libnghttp2_Mac.a"
 
 if [ $catalyst == "1" ]; then
-echo -e "${bold}Building Catalyst libraries${dim}"
-buildCatalyst "x86_64"
+	echo -e "${bold}Building Catalyst libraries${dim}"
+	buildCatalyst "x86_64"
 
-lipo \
-        "${NGHTTP2}/Catalyst/x86_64/lib/libnghttp2.a" \
-        -create -output "${NGHTTP2}/lib/libnghttp2_Catalyst.a"
+    # Build Mac Catalyst Library
+	lipo \
+		"${NGHTTP2}/Catalyst/x86_64/lib/libnghttp2.a" \
+		-create -output "${NGHTTP2}/lib/libnghttp2_Catalyst.a"
 fi
 
-echo -e "${bold}Building iOS libraries (bitcode)${dim}"
+echo -e "${bold}Building iOS libraries${dim}"
 buildIOS "armv7" "bitcode"
 buildIOS "armv7s" "bitcode"
 buildIOS "arm64" "bitcode"
 buildIOS "arm64e" "bitcode"
-buildIOS "x86_64" "bitcode"
-buildIOS "i386" "bitcode"
+buildIOSsim "i386" "bitcode"
+buildIOSsim "x86_64" "bitcode"
+buildIOSsim "arm64" "bitcode"
 
+# Build iOS + iOS Simulator Universal Library
 lipo \
 	"${NGHTTP2}/iOS/armv7/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/armv7s/lib/libnghttp2.a" \
-	"${NGHTTP2}/iOS/i386/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/arm64/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/arm64e/lib/libnghttp2.a" \
-	"${NGHTTP2}/iOS/x86_64/lib/libnghttp2.a" \
+    "${NGHTTP2}/iOS-simulator/i386/lib/libnghttp2.a" \
+	"${NGHTTP2}/iOS-simulator/x86_64/lib/libnghttp2.a" \
 	-create -output "${NGHTTP2}/lib/libnghttp2_iOS-fat.a"
 
+# Build iOS Library
 lipo \
 	"${NGHTTP2}/iOS/armv7/lib/libnghttp2.a" \
 	"${NGHTTP2}/iOS/armv7s/lib/libnghttp2.a" \
@@ -324,15 +394,18 @@ lipo \
 	"${NGHTTP2}/iOS/arm64e/lib/libnghttp2.a" \
 	-create -output "${NGHTTP2}/lib/libnghttp2_iOS.a"
 
+# Build iOS Simulator Library
 lipo \
-	"${NGHTTP2}/iOS/i386/lib/libnghttp2.a" \
-	"${NGHTTP2}/iOS/x86_64/lib/libnghttp2.a" \
+	"${NGHTTP2}/iOS-simulator/i386/lib/libnghttp2.a" \
+	"${NGHTTP2}/iOS-simulator/x86_64/lib/libnghttp2.a" \
+    "${NGHTTP2}/iOS-simulator/arm64/lib/libnghttp2.a" \
 	-create -output "${NGHTTP2}/lib/libnghttp2_iOS-simulator.a"
 
 echo -e "${bold}Building tvOS libraries${dim}"
 buildTVOS "arm64"
 buildTVOS "x86_64"
 
+# Build tvOS Library
 lipo \
         "${NGHTTP2}/tvOS/arm64/lib/libnghttp2.a" \
         "${NGHTTP2}/tvOS/x86_64/lib/libnghttp2.a" \

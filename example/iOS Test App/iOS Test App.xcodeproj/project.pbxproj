@@ -15,14 +15,29 @@
 		1B4AA22C1DE16AEF008187BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1B4AA22A1DE16AEF008187BD /* LaunchScreen.storyboard */; };
 		1B4AA24E1DE18290008187BD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA24D1DE18290008187BD /* libz.tbd */; };
 		1B4AA2501DE195DE008187BD /* cacert.pem in Resources */ = {isa = PBXBuildFile; fileRef = 1B4AA24F1DE195DE008187BD /* cacert.pem */; };
-		1B4AA2661DE1FCA5008187BD /* libcrypto.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2621DE1FCA5008187BD /* libcrypto.a */; platformFilter = ios; };
-		1B4AA2671DE1FCA5008187BD /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2631DE1FCA5008187BD /* libcurl.a */; platformFilter = ios; };
-		1B4AA2681DE1FCA5008187BD /* libnghttp2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2641DE1FCA5008187BD /* libnghttp2.a */; platformFilter = ios; };
-		1B4AA2691DE1FCA5008187BD /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2651DE1FCA5008187BD /* libssl.a */; platformFilter = ios; };
-		964F3E96250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964F3E93250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a */; platformFilter = maccatalyst; };
-		964F3E97250F274B004726C6 /* libcurl_Catalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964F3E94250F274B004726C6 /* libcurl_Catalyst.a */; platformFilter = maccatalyst; };
-		964F3E98250F274B004726C6 /* libnghttp2_Catalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 964F3E95250F274B004726C6 /* libnghttp2_Catalyst.a */; platformFilter = maccatalyst; };
+		960BFC2225297B5F008F0281 /* nghttp2-ios-simulator.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960BFC2125297B5E008F0281 /* nghttp2-ios-simulator.xcframework */; };
+		960BFC2325297B5F008F0281 /* nghttp2-ios-simulator.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 960BFC2125297B5E008F0281 /* nghttp2-ios-simulator.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		960BFC2625297B94008F0281 /* openssl-ios-simulator.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960BFC2525297B94008F0281 /* openssl-ios-simulator.xcframework */; };
+		960BFC2725297B94008F0281 /* openssl-ios-simulator.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 960BFC2525297B94008F0281 /* openssl-ios-simulator.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		960BFC2925297B99008F0281 /* libcurl-ios-simulator.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960BFC2825297B99008F0281 /* libcurl-ios-simulator.xcframework */; };
+		960BFC2A25297B99008F0281 /* libcurl-ios-simulator.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 960BFC2825297B99008F0281 /* libcurl-ios-simulator.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		960BFC2425297B5F008F0281 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				960BFC2325297B5F008F0281 /* nghttp2-ios-simulator.xcframework in Embed Frameworks */,
+				960BFC2725297B94008F0281 /* openssl-ios-simulator.xcframework in Embed Frameworks */,
+				960BFC2A25297B99008F0281 /* libcurl-ios-simulator.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		1B4AA2191DE16AEF008187BD /* iOS Test App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "iOS Test App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -37,13 +52,9 @@
 		1B4AA22D1DE16AEF008187BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1B4AA24D1DE18290008187BD /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		1B4AA24F1DE195DE008187BD /* cacert.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cacert.pem; sourceTree = "<group>"; };
-		1B4AA2621DE1FCA5008187BD /* libcrypto.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcrypto.a; path = libs/libcrypto.a; sourceTree = "<group>"; };
-		1B4AA2631DE1FCA5008187BD /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = libs/libcurl.a; sourceTree = "<group>"; };
-		1B4AA2641DE1FCA5008187BD /* libnghttp2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnghttp2.a; path = libs/libnghttp2.a; sourceTree = "<group>"; };
-		1B4AA2651DE1FCA5008187BD /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = libs/libssl.a; sourceTree = "<group>"; };
-		964F3E93250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "openssl-ios-x86_64-maccatalyst.a"; path = "libs/openssl-ios-x86_64-maccatalyst.a"; sourceTree = "<group>"; };
-		964F3E94250F274B004726C6 /* libcurl_Catalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl_Catalyst.a; path = libs/libcurl_Catalyst.a; sourceTree = "<group>"; };
-		964F3E95250F274B004726C6 /* libnghttp2_Catalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnghttp2_Catalyst.a; path = libs/libnghttp2_Catalyst.a; sourceTree = "<group>"; };
+		960BFC2125297B5E008F0281 /* nghttp2-ios-simulator.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "nghttp2-ios-simulator.xcframework"; path = "../../archive/libcurl-7.72.0-openssl-1.1.1h-nghttp2-1.41.0/nghttp2-ios-simulator.xcframework"; sourceTree = "<group>"; };
+		960BFC2525297B94008F0281 /* openssl-ios-simulator.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "openssl-ios-simulator.xcframework"; path = "../../archive/libcurl-7.72.0-openssl-1.1.1h-nghttp2-1.41.0/openssl-ios-simulator.xcframework"; sourceTree = "<group>"; };
+		960BFC2825297B99008F0281 /* libcurl-ios-simulator.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = "libcurl-ios-simulator.xcframework"; path = "../../archive/libcurl-7.72.0-openssl-1.1.1h-nghttp2-1.41.0/libcurl-ios-simulator.xcframework"; sourceTree = "<group>"; };
 		96AAC802250F224E009E2EE3 /* iOS Test App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "iOS Test App.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -52,14 +63,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				960BFC2625297B94008F0281 /* openssl-ios-simulator.xcframework in Frameworks */,
 				1B4AA24E1DE18290008187BD /* libz.tbd in Frameworks */,
-				1B4AA2681DE1FCA5008187BD /* libnghttp2.a in Frameworks */,
-				964F3E97250F274B004726C6 /* libcurl_Catalyst.a in Frameworks */,
-				1B4AA2671DE1FCA5008187BD /* libcurl.a in Frameworks */,
-				1B4AA2691DE1FCA5008187BD /* libssl.a in Frameworks */,
-				964F3E96250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a in Frameworks */,
-				964F3E98250F274B004726C6 /* libnghttp2_Catalyst.a in Frameworks */,
-				1B4AA2661DE1FCA5008187BD /* libcrypto.a in Frameworks */,
+				960BFC2925297B99008F0281 /* libcurl-ios-simulator.xcframework in Frameworks */,
+				960BFC2225297B5F008F0281 /* nghttp2-ios-simulator.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,14 +119,10 @@
 		1B4AA24C1DE18290008187BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				1B4AA2621DE1FCA5008187BD /* libcrypto.a */,
-				1B4AA2631DE1FCA5008187BD /* libcurl.a */,
-				1B4AA2641DE1FCA5008187BD /* libnghttp2.a */,
-				1B4AA2651DE1FCA5008187BD /* libssl.a */,
+				960BFC2825297B99008F0281 /* libcurl-ios-simulator.xcframework */,
+				960BFC2525297B94008F0281 /* openssl-ios-simulator.xcframework */,
+				960BFC2125297B5E008F0281 /* nghttp2-ios-simulator.xcframework */,
 				1B4AA24D1DE18290008187BD /* libz.tbd */,
-				964F3E94250F274B004726C6 /* libcurl_Catalyst.a */,
-				964F3E95250F274B004726C6 /* libnghttp2_Catalyst.a */,
-				964F3E93250F274B004726C6 /* openssl-ios-x86_64-maccatalyst.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -134,6 +137,7 @@
 				1B4AA2151DE16AEF008187BD /* Sources */,
 				1B4AA2161DE16AEF008187BD /* Frameworks */,
 				1B4AA2171DE16AEF008187BD /* Resources */,
+				960BFC2425297B5F008F0281 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -150,12 +154,11 @@
 		1B4AA2111DE16AEF008187BD /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1220;
 				ORGANIZATIONNAME = "Jason Cox";
 				TargetAttributes = {
 					1B4AA2181DE16AEF008187BD = {
 						CreatedOnToolsVersion = 8.0;
-						DevelopmentTeam = 3VBZPX2GZ9;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -250,6 +253,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -275,7 +279,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -308,6 +312,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -327,7 +332,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -340,6 +345,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "iOS Test App/iOS Test App.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 3VBZPX2GZ9;
 				HEADER_SEARCH_PATHS = (
@@ -368,6 +374,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "iOS Test App/iOS Test App.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = 3VBZPX2GZ9;
 				HEADER_SEARCH_PATHS = (

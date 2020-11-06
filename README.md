@@ -2,9 +2,11 @@
 
 [![Build Status](https://travis-ci.org/jasonacox/Build-OpenSSL-cURL.svg?branch=master)](https://travis-ci.org/jasonacox/Build-OpenSSL-cURL)
 
-This Script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), Mac Catalyst, iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
+BETA: Updated for Apple Silicon arm64 Build Host and Targets
 
-NEW: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/) [beta]
+This Script builds OpenSSL, nghttp2 and libcurl for MacOS (x86_64, arm64), Mac Catalyst (x86_64), iOS (armv7, armv7s, arm64 and arm64e, x86_64) and tvOS (arm64, x86_64).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
+
+NEW: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/) and will build on Apple Silicon for arm64 macOS libraries and binaries [Xcode beta].
 
 ## Build
 The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which download the specified release version, configure and build the libraries and binaries.  
@@ -71,7 +73,7 @@ The build script requires:
 
 ### OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
-* Mac - x86-64
+* Mac - x86-64 (and arm64 on Apple Silicon host)
 * iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
@@ -87,7 +89,7 @@ NOTE: This script allows building the OpenSSL 1.1.1 and 1.0.2 series libraries. 
 
 ### HTTP2 / nghttp2
 The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
-* Mac - x86-64
+* Mac - x86-64 (and arm64 on Apple Silicon host)
 * iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
@@ -111,7 +113,7 @@ DISABLE HTTP2: The nghttp2 build can be disabled by using:
 
 ### cURL / libcurl
 The `libcurl-build.sh` script create separate bitcode enabled targets libraries for:
-* Mac - x86-64
+* Mac - x86-64 (and arm64 on Apple Silicon host)
 * iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
 * tvOS - arm64 and AppleTVSimulator (x86-64)
 
@@ -221,7 +223,7 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 * Catalyst
 	* openssl/Catalyst/lib/libcrypto.a are: x86_64 
 	* openssl/Catalyst/lib/libssl.a are: x86_64 
-    * nghttp2/lib/libnghttp2_Catalyst.a are: x86_64 
+	* nghttp2/lib/libnghttp2_Catalyst.a are: x86_64 
 	* curl/lib/libcurl_Catalyst.a are: x86_64 
 
 * Mac
@@ -312,6 +314,8 @@ The MIT License is used for this project.  See LICENSE file.
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
 * Tom Peeters, Tommy2d, Brightfish, Mac Catalyst build support
    https://github.com/tommy2d
+* Sasmito Adibowo - How to Compile OpenSSL 1.1.1 for Apple Silicon
+   https://cutecoder.org/programming/compile-open-ssl-apple-silicon/
 
 * Jason Cox, @jasonacox
    https://github.com/jasonacox/Build-OpenSSL-cURL
