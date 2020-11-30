@@ -42,6 +42,8 @@ IPHONEOS_DEPLOYMENT_TARGET="6.0"
 nohttp2="0"
 catalyst="0"
 
+CORES=$(sysctl -n hw.ncpu)
+
 usage ()
 {
 	echo
@@ -144,7 +146,7 @@ buildMac()
 	cd "${CURL_VERSION}"
 	./configure -prefix="/tmp/${CURL_VERSION}-${ARCH}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/Mac ${NGHTTP2CFG} --host=${HOST} &> "/tmp/${CURL_VERSION}-${ARCH}.log"
 
-	make -j8 >> "/tmp/${CURL_VERSION}-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${CURL_VERSION}-${ARCH}.log" 2>&1
 	make install >> "/tmp/${CURL_VERSION}-${ARCH}.log" 2>&1
 	# Save curl binary for Mac Version
 	cp "/tmp/${CURL_VERSION}-${ARCH}/bin/curl" "/tmp/curl"
@@ -187,7 +189,7 @@ buildCatalyst()
 
 	./configure -prefix="/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/catalyst ${NGHTTP2CFG} --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
 
-	make -j8 >> "/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}.log" 2>&1
+	make -j${CORES} >> "/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}.log" 2>&1
 	make install >> "/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}.log" 2>&1
 	make clean >> "/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}.log" 2>&1
 	popd > /dev/null
@@ -239,7 +241,7 @@ buildIOS()
 		./configure -prefix="/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/${SSLVARIANT} ${NGHTTP2CFG} --host="${ARCH}-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
 	fi
 
-	make -j8 >> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
+	make -j${CORES} >> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
 	make install >> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
 	make clean >> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
 	popd > /dev/null
@@ -280,7 +282,7 @@ buildTVOS()
         LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "./lib/curl_config.h"
         LANG=C sed -i -- 's/HAVE_FORK"]=" 1"/HAVE_FORK\"]=" 0"/' "config.status"
 
-	make -j8 >> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make install >> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${CURL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	popd > /dev/null

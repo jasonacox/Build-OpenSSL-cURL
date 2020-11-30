@@ -35,6 +35,8 @@ TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
 catalyst="0"
 
+CORES=$(sysctl -n hw.ncpu)
+
 usage ()
 {
 	echo
@@ -142,7 +144,7 @@ buildIOS()
 		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} !" "Makefile"
 	fi
 
-	make >> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log" 2>&1
 	popd > /dev/null
