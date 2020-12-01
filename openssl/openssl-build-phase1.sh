@@ -35,6 +35,8 @@ TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
 catalyst="0"
 
+CORES=$(sysctl -n hw.ncpu)
+
 usage ()
 {
 	echo
@@ -116,7 +118,7 @@ buildMac()
 	else
 		./Configure no-asm ${TARGET} -no-shared  --openssldir="/tmp/${OPENSSL_VERSION}-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-${ARCH}.log"
 	fi
-	make >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	# Keep openssl binary for Mac version
 	cp "/tmp/${OPENSSL_VERSION}-${ARCH}/bin/openssl" "/tmp/openssl"
@@ -154,7 +156,7 @@ buildCatalyst()
 		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} !" "Makefile"
 	fi
 
-	make >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
 	popd > /dev/null
@@ -217,7 +219,7 @@ buildTVOS()
 		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
 	fi
 
-	make >> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	popd > /dev/null

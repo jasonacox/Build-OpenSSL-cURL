@@ -41,6 +41,8 @@ TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
 catalyst="0"
 
+CORES=$(sysctl -n hw.ncpu)
+
 usage ()
 {
 	echo
@@ -111,7 +113,7 @@ else
 		tar xfz pkg-config-0.29.2.tar.gz
 		cd pkg-config-0.29.2
 		./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
-		make >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+		make -j${CORES} >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
 		make install >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
 		PATH=$PATH:/tmp/pkg_config/bin
 	fi
@@ -144,7 +146,7 @@ buildMac()
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
 	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Mac/${ARCH}" &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
-	make >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make install >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	popd > /dev/null
@@ -166,7 +168,7 @@ buildCatalyst()
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
 	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
-	make >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
+	make -j${CORES} >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make install >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	popd > /dev/null
