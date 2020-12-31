@@ -39,8 +39,8 @@ jobs:
       script: 
         - cd openssl;./openssl-build-phase1.sh -v "$OPENSSL"
         - cd ..
-        - cp /tmp/openssl openssl/Mac
-        - /tmp/openssl version
+        - cp /tmp/openssl-x86_64 openssl/Mac
+        - /tmp/openssl-x86_64 version
         - tar -zcf "openssl-1.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
         - aws s3 cp "openssl-1.tgz" s3://jasonacox.com.travis-build-stage-storage/
         - aws s3 ls jasonacox.com.travis-build-stage-storage
