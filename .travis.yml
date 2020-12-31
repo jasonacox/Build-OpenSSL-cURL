@@ -1,5 +1,5 @@
 os: osx
-osx_image: xcode12.2
+osx_image: xcode12.3
 language: objective-c
 
 env:
@@ -8,13 +8,14 @@ env:
     - LIBCURL="7.71.1"	# https://curl.haxx.se/download.html
     - NGHTTP2="1.41.0"	# https://nghttp2.org/
     - EXAMPLE="example/iOS Test App"
-    - PATH=/Users/travis/Library/Python/3.8/bin:$PATH   # for AWS
+    - PATH=/Users/travis/Library/Python/3.9/bin:$PATH   # for AWS
 
 before_install:
   # set up awscli packages
   - python3 -m pip install pyopenssl
   - python3 -m pip install --user awscli
-  - ls /Users/travis/Library/Python/3.8/bin
+  - ls /Users/travis/Library/Python/
+  - ls /Users/travis/Library/Python/3.9/bin
   - aws s3 ls jasonacox.com.travis-build-stage-storage
 
 stages:
