@@ -35,7 +35,7 @@ if ! type "brew" > /dev/null; then
 	#./configure && make && sudo make install
 	cd ..
 	 
-	curl -OL http://ftpmirror.gnu.org/automake/${AUTOMAKE}.tar.gz
+	curl -OLs http://ftpmirror.gnu.org/automake/${AUTOMAKE}.tar.gz
 	tar -xzf ${AUTOMAKE}.tar.gz
 	cd ${AUTOMAKE}
 	echo "building..."

@@ -10,11 +10,14 @@
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="1.1.1g"	# https://www.openssl.org/source/
-LIBCURL="7.72.0"	# https://curl.haxx.se/download.html
-NGHTTP2="1.41.0"	# https://nghttp2.org/
+OPENSSL="1.1.1i"	# https://www.openssl.org/source/
+LIBCURL="7.74.0"	# https://curl.haxx.se/download.html
+NGHTTP2="1.42.0"	# https://nghttp2.org/
 
 ################################################
+
+# Build Machine
+BUILD_MACHINE=`uname -m`
 
 # Global flags
 engine=""
@@ -242,9 +245,10 @@ echo
 echo -e "${bold}Archiving Mac binaries for curl and openssl...${dim}"
 echo "  See $ARCHIVE/bin"
 mv /tmp/curl $ARCHIVE/bin
-mv /tmp/openssl $ARCHIVE/bin
+cp "/tmp/openssl-${BUILD_MACHINE}" $ARCHIVE/bin/openssl
+mv /tmp/openssl-* $ARCHIVE/bin
 echo
-echo -e "${bold}Testing Mac binaries...${dim}"
+echo -e "${bold}Testing Mac binaries for ${BUILD_MACHINE}...${dim}"
 $ARCHIVE/bin/curl -V
 $ARCHIVE/bin/openssl version
 date "+%c - End"

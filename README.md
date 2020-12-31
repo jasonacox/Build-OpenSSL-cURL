@@ -4,9 +4,13 @@
 
 This Script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), Mac Catalyst, iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
 
-NEW: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/) [beta]
+## News - Current State
+
+* Mac Catalyst: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/)
+* Apple Silicon [Beta]: This script currently builds OpenSSL binaries and libraries for Mac x86_64 and the new arm64 (apple silicon) targets (for x86_64 and arm64 build hosts), including iOS Simulator (x86_64 and arm64).  Plan is to build nghttp2 and curl for those targets as well.
 
 ## Build
+
 The `build.sh` script calls the three build scripts below (openssl, nghttp and curl) which download the specified release version, configure and build the libraries and binaries.  
 
 The build script accepts several arguments to adjust versions and toggle features:

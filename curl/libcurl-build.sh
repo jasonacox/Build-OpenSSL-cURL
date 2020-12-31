@@ -301,7 +301,7 @@ rm -rf "${CURL_VERSION}"
 
 if [ ! -e ${CURL_VERSION}.tar.gz ]; then
 	echo "Downloading ${CURL_VERSION}.tar.gz"
-	curl -LO https://curl.haxx.se/download/${CURL_VERSION}.tar.gz
+	curl -LOs https://curl.haxx.se/download/${CURL_VERSION}.tar.gz
 else
 	echo "Using ${CURL_VERSION}.tar.gz"
 fi

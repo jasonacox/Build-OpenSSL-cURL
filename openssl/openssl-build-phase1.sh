@@ -104,12 +104,40 @@ buildMac()
 	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim}"
 
 	TARGET="darwin-i386-cc"
+	BUILD_MACHINE=`uname -m`
 
 	if [[ $ARCH == "x86_64" ]]; then
-		TARGET="darwin64-x86_64-cc"
+		if [ ${BUILD_MACHINE} == 'arm64' ]; then
+   			# Apple ARM Silicon Build Machine Detected - cross compile
+			TARGET="darwin64-x86_64-cc"
+			#export CC="${BUILD_TOOLS}/usr/bin/gcc"
+			export CC="clang"
+			export CXX="clang"
+			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch x86_64 "
+			export LDFLAGS=" -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+		else
+			# Apple x86_64 Build Machine Detected 
+			TARGET="darwin64-x86_64-cc"
+		fi
 	fi
-
-	export CC="${BUILD_TOOLS}/usr/bin/gcc"
+	if [[ $ARCH == "arm64" ]]; then
+		if [ ${BUILD_MACHINE} == 'arm64' ]; then
+   			# Apple ARM Silicon Build Machine Detected 
+			TARGET="darwin64-arm64-cc"
+			export CC="${BUILD_TOOLS}/usr/bin/gcc"
+		else
+			# Apple x86_64 Build Machine Detected - cross compile
+			TARGET="darwin64-arm64-cc"
+			export CC="clang"
+			export CXX="clang"
+			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch arm64 "
+			export LDFLAGS=" -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+		fi
+	fi
 
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
@@ -121,9 +149,22 @@ buildMac()
 	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	# Keep openssl binary for Mac version
+	cp "/tmp/${OPENSSL_VERSION}-${ARCH}/bin/openssl" "/tmp/openssl-${ARCH}"
 	cp "/tmp/${OPENSSL_VERSION}-${ARCH}/bin/openssl" "/tmp/openssl"
 	make clean >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	popd > /dev/null
+
+	if [ $ARCH == ${BUILD_MACHINE} ]; then
+		echo -e "Testing binary for ${BUILD_MACHINE}:"
+		/tmp/openssl version
+	fi
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
 }
 
 buildCatalyst()
@@ -160,6 +201,13 @@ buildCatalyst()
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
 	popd > /dev/null
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
 }
 
 buildTVOS()
@@ -223,6 +271,13 @@ buildTVOS()
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log" 2>&1
 	popd > /dev/null
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
 }
 
 # echo -e "${bold}Cleaning up${dim}"
@@ -248,7 +303,7 @@ rm -rf "${OPENSSL_VERSION}"
 
 if [ ! -e ${OPENSSL_VERSION}.tar.gz ]; then
 	echo "Downloading ${OPENSSL_VERSION}.tar.gz"
-	curl -LO https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
+	curl -LOs https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
 else
 	echo "Using ${OPENSSL_VERSION}.tar.gz"
 fi
@@ -275,33 +330,36 @@ fi
 ## Mac
 echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
+buildMac "arm64"
 
 echo "  Copying headers and libraries"
 cp /tmp/${OPENSSL_VERSION}-x86_64/include/openssl/* Mac/include/openssl/
 
 lipo \
 	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-arm64/lib/libcrypto.a" \
 	-create -output Mac/lib/libcrypto.a
 
 lipo \
 	"/tmp/${OPENSSL_VERSION}-x86_64/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-arm64/lib/libssl.a" \
 	-create -output Mac/lib/libssl.a
 
 ## Catalyst
 if [ $catalyst == "1" ]; then
-echo -e "${bold}Building Catalyst libraries${dim}"
-buildCatalyst "x86_64"
+	echo -e "${bold}Building Catalyst libraries${dim}"
+	buildCatalyst "x86_64"
 
-echo "  Copying headers and libraries"
-cp /tmp/${OPENSSL_VERSION}-catalyst-x86_64/include/openssl/* Catalyst/include/openssl/
+	echo "  Copying headers and libraries"
+	cp /tmp/${OPENSSL_VERSION}-catalyst-x86_64/include/openssl/* Catalyst/include/openssl/
 
-lipo \
-	"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libcrypto.a" \
-	-create -output Catalyst/lib/libcrypto.a
+	lipo \
+		"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libcrypto.a" \
+		-create -output Catalyst/lib/libcrypto.a
 
-lipo \
-	"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libssl.a" \
-	-create -output Catalyst/lib/libssl.a
+	lipo \
+		"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libssl.a" \
+		-create -output Catalyst/lib/libssl.a
 fi
 
 ## tvOS
@@ -322,7 +380,7 @@ lipo \
 	-create -output tvOS/lib/libssl.a
 
 if [ $catalyst == "1" ]; then
-libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-maccatalyst.a Catalyst/lib/libcrypto.a Catalyst/lib/libssl.a
+	libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-maccatalyst.a Catalyst/lib/libcrypto.a Catalyst/lib/libssl.a
 fi
 
 #echo -e "${bold}Cleaning up${dim}"

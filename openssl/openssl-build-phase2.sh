@@ -148,6 +148,83 @@ buildIOS()
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log" 2>&1
 	popd > /dev/null
+
+	# Clean up exports
+	export PLATFORM=""
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
+	export CROSS_TOP=""
+	export CROSS_SDK=""
+	export BUILD_TOOLS=""
+}
+
+buildIOSsim()
+{
+	ARCH=$1
+
+	pushd . > /dev/null
+	cd "${OPENSSL_VERSION}"
+
+	PLATFORM="iPhoneSimulator"
+	export $PLATFORM
+
+	TARGET="darwin-i386-cc"
+	RUNTARGET=""
+	MIPHONEOS="10.0"
+	if [[ $ARCH != "i386" ]]; then
+		TARGET="darwin64-${ARCH}-cc"
+		RUNTARGET="-target ${ARCH}-apple-ios11.0-simulator"
+			# -target arm64-apple-ios11.0-simulator
+			# -target x86_64-apple-ios11.0-simulator 
+		MIPHONEOS="11.0"
+	fi
+	
+	# set up exports for build 
+	export CFLAGS=" -O2 -miphoneos-version-min=${MIPHONEOS} -fembed-bitcode -arch ${ARCH} ${RUNTARGET} "
+	export LDFLAGS=" -arch ${ARCH} -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
+	export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
+	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
+	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
+	export BUILD_TOOLS="${DEVELOPER}"
+	export CC="${BUILD_TOOLS}/usr/bin/gcc"
+	export CXX="${BUILD_TOOLS}/usr/bin/gcc"
+
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${iOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
+
+	# configure
+	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
+		./Configure no-asm ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log"
+	else
+		./Configure no-asm ${TARGET} -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log"
+	fi
+
+	# add -isysroot to CC=
+	# no longer needed with exports
+	#if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
+	#	sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} !" "Makefile"
+	#else
+	#	sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} !" "Makefile"
+	#fi
+
+	# make
+	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log" 2>&1
+	make install_sw >> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log" 2>&1
+	make clean >> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log" 2>&1
+	popd > /dev/null
+
+	# Clean up exports
+	export PLATFORM=""
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
+	export CROSS_TOP=""
+	export CROSS_SDK=""
+	export BUILD_TOOLS=""
 }
 
 #echo -e "${bold}Cleaning up${dim}"
@@ -173,7 +250,7 @@ rm -rf "${OPENSSL_VERSION}"
 
 if [ ! -e ${OPENSSL_VERSION}.tar.gz ]; then
 	echo "Downloading ${OPENSSL_VERSION}.tar.gz"
-	curl -LO https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
+	curl -LOs https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
 else
 	echo "Using ${OPENSSL_VERSION}.tar.gz"
 fi
@@ -203,8 +280,9 @@ buildIOS "armv7s"
 buildIOS "arm64"
 buildIOS "arm64e"
 
-buildIOS "i386"
-buildIOS "x86_64"
+buildIOSsim "i386"
+buildIOSsim "x86_64"
+buildIOSsim "arm64"
 
 echo "  Copying headers and libraries"
 cp /tmp/${OPENSSL_VERSION}-iOS-arm64/include/openssl/* iOS/include/openssl/
@@ -224,16 +302,18 @@ lipo \
 	-create -output iOS/lib/libssl.a
 
 
-cp /tmp/${OPENSSL_VERSION}-iOS-x86_64/include/openssl/* iOS-simulator/include/openssl/
+cp /tmp/${OPENSSL_VERSION}-iOS-Simulator-x86_64/include/openssl/* iOS-simulator/include/openssl/
 
 lipo \
-	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libcrypto.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-i386/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-x86_64/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-arm64/lib/libcrypto.a" \
 	-create -output iOS-simulator/lib/libcrypto.a
 
 lipo \
-	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libssl.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-i386/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-x86_64/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-arm64/lib/libssl.a" \
 	-create -output iOS-simulator/lib/libssl.a
 
 cp /tmp/${OPENSSL_VERSION}-iOS-arm64/include/openssl/* iOS-fat/include/openssl/
@@ -243,8 +323,8 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libcrypto.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64e/lib/libcrypto.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libcrypto.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-i386/lib/libcrypto.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-x86_64/lib/libcrypto.a" \
 	-create -output iOS-fat/lib/libcrypto.a
 
 lipo \
@@ -252,13 +332,13 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-armv7s/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64/lib/libssl.a" \
 	"/tmp/${OPENSSL_VERSION}-iOS-arm64e/lib/libssl.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-x86_64/lib/libssl.a" \
-	"/tmp/${OPENSSL_VERSION}-iOS-i386/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-x86_64/lib/libssl.a" \
+	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-i386/lib/libssl.a" \
 	-create -output iOS-fat/lib/libssl.a
 
 echo "  Creating combined OpenSSL libraries for iOS"
 libtool -no_warning_for_no_symbols -static -o openssl-ios-armv7_armv7s_arm64_arm64e.a iOS/lib/libcrypto.a iOS/lib/libssl.a
-libtool -no_warning_for_no_symbols -static -o openssl-ios-x86_64-simulator.a iOS-simulator/lib/libcrypto.a iOS-simulator/lib/libssl.a
+libtool -no_warning_for_no_symbols -static -o openssl-ios-i386_x86_64_arm64-simulator.a iOS-simulator/lib/libcrypto.a iOS-simulator/lib/libssl.a
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${OPENSSL_VERSION}-*

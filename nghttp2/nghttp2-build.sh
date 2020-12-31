@@ -150,6 +150,13 @@ buildMac()
 	make install >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log" 2>&1
 	popd > /dev/null
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
 }
 
 buildCatalyst()
@@ -172,6 +179,13 @@ buildCatalyst()
 	make install >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	popd > /dev/null
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
 }
 
 buildIOS()
@@ -203,16 +217,23 @@ buildIOS()
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK}"
    
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
-        if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
-		./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
-        else
-		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
-        fi
+	if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
+	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+	else
+	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+	fi
 
-        make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
-        make install >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
-        make clean >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
-        popd > /dev/null
+	make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
+	make install >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
+	make clean >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
+	popd > /dev/null
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
 }
 
 buildTVOS()
@@ -256,6 +277,13 @@ buildTVOS()
 	make install  >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
 	popd > /dev/null
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
 }
 
 echo -e "${bold}Cleaning up${dim}"
@@ -278,7 +306,7 @@ rm -rf "${NGHTTP2_VERSION}"
 
 if [ ! -e ${NGHTTP2_VERSION}.tar.gz ]; then
 	echo "Downloading ${NGHTTP2_VERSION}.tar.gz"
-	curl -LO https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERNUM}/${NGHTTP2_VERSION}.tar.gz
+	curl -LOs https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERNUM}/${NGHTTP2_VERSION}.tar.gz
 else
 	echo "Using ${NGHTTP2_VERSION}.tar.gz"
 fi
