@@ -92,6 +92,10 @@ jobs:
         - cp curl/include/curl/* "$EXAMPLE/include/curl/"
         - cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
         - cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
-        - echo "Building iOS Test App..."
+        - echo "Building iOS Test App for iPhoneOS..."
         - xcodebuild clean -project "$EXAMPLE/iOS Test App.xcodeproj"
-        - xcodebuild build -project "$EXAMPLE/iOS Test App.xcodeproj" -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO
+        - xcodebuild build -project "$EXAMPLE/iOS Test App.xcodeproj" -sdk iphoneos ONLY_ACTIVE_ARCH=NO
+        - echo "Building iOS Test App for iPhoneSimulator..."
+        - xcodebuild clean -project "$EXAMPLE/iOS Test App.xcodeproj"
+        - xcodebuild build -project "$EXAMPLE/iOS Test App.xcodeproj" -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -arch x86_64
+
