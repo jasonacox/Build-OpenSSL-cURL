@@ -244,7 +244,8 @@ echo
 # archive and run Mac binaries test
 echo -e "${bold}Archiving Mac binaries for curl and openssl...${dim}"
 echo "  See $ARCHIVE/bin"
-mv /tmp/curl $ARCHIVE/bin
+cp "/tmp/curl-${BUILD_MACHINE}" $ARCHIVE/bin/curl
+mv /tmp/curl-* $ARCHIVE/bin
 cp "/tmp/openssl-${BUILD_MACHINE}" $ARCHIVE/bin/openssl
 mv /tmp/openssl-* $ARCHIVE/bin
 echo

@@ -7,7 +7,7 @@ This Script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), Mac Catalyst, 
 ## News - Current State
 
 * Mac Catalyst: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/)
-* Apple Silicon build progress: The script now builds OpenSSL and nghttp2 libraries for MacOS x86_64 and the new arm64 (apple silicon) targets, including iOS Simulator (x86_64 and arm64). [Beta]  Not complete: libcurl libraries and Mac Catalyst targets.
+* Apple Silicon build progress: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS x86_64 and the new MacOS arm64 (Apple silicon) targets, including iOS Simulator (x86_64 and arm64). [Beta]  Not complete: tvOS and Mac Catalyst targets.
 
 ## Build
 
