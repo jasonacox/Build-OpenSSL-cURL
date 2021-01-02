@@ -65,7 +65,7 @@ jobs:
         - cd curl;./libcurl-build.sh -v "$LIBCURL"
         - cd ..
         - cp /tmp/curl curl/lib
-        - /tmp/curl -V
+        - /tmp/curl-x86_64 -V
         - echo "Uploading libcurl libraries..."
         - tar -zcf "curl.tgz" curl/lib curl/include
         - aws s3 cp "curl.tgz" s3://jasonacox.com.travis-build-stage-storage/
