@@ -199,9 +199,9 @@ buildCatalyst()
 	pushd . > /dev/null
 	cd "${CURL_VERSION}"
 
-
 	PLATFORM="MacOSX"
-	TARGET="x86_64-apple-ios13.0-macabi"
+	TARGET="${ARCH}-apple-ios13.0-macabi"
+	BUILD_MACHINE=`uname -m`
 
 	if [[ "${BITCODE}" == "nobitcode" ]]; then
 		CC_BITCODE_FLAG=""
@@ -222,10 +222,19 @@ buildCatalyst()
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -target $TARGET ${CC_BITCODE_FLAG}"
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/catalyst/lib ${NGHTTP2LIB}"
 
-	echo -e "${subbold}Building ${CURL_VERSION} for $TARGET ${archbold}${ARCH}${dim} ${BITCODE}"
+	echo -e "${subbold}Building ${CURL_VERSION} for ${archbold}${ARCH}${dim} ${BITCODE}"
 
-	./configure -prefix="/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/catalyst ${NGHTTP2CFG} --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
-
+	if [[ $ARCH != ${BUILD_MACHINE} ]]; then
+		# cross compile required
+		if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
+			./configure -prefix="/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/catalyst ${NGHTTP2CFG} --host="arm-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		else
+			./configure -prefix="/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/catalyst ${NGHTTP2CFG} --host="${ARCH}-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		fi
+	else
+		./configure -prefix="/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}" --disable-shared --enable-static -with-random=/dev/urandom --with-ssl=${OPENSSL}/catalyst ${NGHTTP2CFG} --host="${ARCH}-apple-darwin" &> "/tmp/${CURL_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+	fi
+	
 	make -j${CORES} >> "/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}.log" 2>&1
 	make install >> "/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}.log" 2>&1
 	make clean >> "/tmp/${CURL_VERSION}-catalyst-${ARCH}-${BITCODE}.log" 2>&1
@@ -418,9 +427,11 @@ lipo \
 if [ $catalyst == "1" ]; then
 echo -e "${bold}Building Catalyst libraries${dim}"
 buildCatalyst "x86_64" "bitcode"
+buildCatalyst "arm64" "bitcode"
 
 lipo \
 	"/tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-catalyst-arm64-bitcode/lib/libcurl.a" \
 	-create -output lib/libcurl_Catalyst.a
 fi
 

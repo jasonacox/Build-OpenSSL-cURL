@@ -177,13 +177,45 @@ buildCatalyst()
 	cd "${OPENSSL_VERSION}"
 
 	TARGET="darwin64-${ARCH}-cc"
-
+	BUILD_MACHINE=`uname -m`
 	export PLATFORM="MacOSX"
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
+	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target ${ARCH}-apple-ios13.0-macabi"
 
-	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target x86_64-apple-ios13.0-macabi"
+	if [[ $ARCH == "x86_64" ]]; then
+		if [ ${BUILD_MACHINE} == 'arm64' ]; then
+   			# Apple ARM Silicon Build Machine Detected - cross compile
+			TARGET="darwin64-x86_64-cc"
+			#export CC="${BUILD_TOOLS}/usr/bin/gcc"
+			export CC="clang"
+			export CXX="clang"
+			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch x86_64 -fembed-bitcode -target x86_64-apple-ios13.0-macabi "
+			export LDFLAGS=" -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+		else
+			# Apple x86_64 Build Machine Detected 
+			TARGET="darwin64-x86_64-cc"
+		fi
+	fi
+	if [[ $ARCH == "arm64" ]]; then
+		if [ ${BUILD_MACHINE} == 'arm64' ]; then
+   			# Apple ARM Silicon Build Machine Detected 
+			TARGET="darwin64-arm64-cc"
+			export CC="${BUILD_TOOLS}/usr/bin/gcc"
+		else
+			# Apple x86_64 Build Machine Detected - cross compile
+			TARGET="darwin64-arm64-cc"
+			#export CC="clang"
+			#export CXX="clang"
+			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch arm64 -fembed-bitcode -target arm64-apple-ios13.0-macabi "
+			export LDFLAGS=" -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+		fi
+	fi
 
 	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
 		./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
@@ -191,11 +223,11 @@ buildCatalyst()
 		./Configure no-asm ${TARGET} -no-shared  --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
 	fi
 
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} !" "Makefile"
-	else
-		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} !" "Makefile"
-	fi
+	#if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
+	#	sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} !" "Makefile"
+	#else
+	#	sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} !" "Makefile"
+	#fi
 
 	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log" 2>&1
@@ -349,16 +381,19 @@ lipo \
 if [ $catalyst == "1" ]; then
 	echo -e "${bold}Building Catalyst libraries${dim}"
 	buildCatalyst "x86_64"
+	buildCatalyst "arm64"
 
 	echo "  Copying headers and libraries"
 	cp /tmp/${OPENSSL_VERSION}-catalyst-x86_64/include/openssl/* Catalyst/include/openssl/
 
 	lipo \
 		"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libcrypto.a" \
+		"/tmp/${OPENSSL_VERSION}-catalyst-arm64/lib/libcrypto.a" \
 		-create -output Catalyst/lib/libcrypto.a
 
 	lipo \
 		"/tmp/${OPENSSL_VERSION}-catalyst-x86_64/lib/libssl.a" \
+		"/tmp/${OPENSSL_VERSION}-catalyst-arm64/lib/libssl.a" \
 		-create -output Catalyst/lib/libssl.a
 fi
 

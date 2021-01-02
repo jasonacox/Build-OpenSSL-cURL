@@ -203,15 +203,59 @@ buildCatalyst()
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${archbold}${ARCH}${dim}"
 
 	TARGET="darwin64-${ARCH}-cc"
+	BUILD_MACHINE=`uname -m`
 
-	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target x86_64-apple-ios13.0-macabi"
-
-    export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode"
+	export CC="${BUILD_TOOLS}/usr/bin/gcc"
+    export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -fembed-bitcode -target ${ARCH}-apple-ios13.0-macabi "
     export LDFLAGS="-arch ${ARCH}"
+
+	if [[ $ARCH == "x86_64" ]]; then
+		if [ ${BUILD_MACHINE} == 'arm64' ]; then
+   			# Apple ARM Silicon Build Machine Detected - cross compile
+			TARGET="darwin64-x86_64-cc"
+			#export CC="${BUILD_TOOLS}/usr/bin/gcc"
+			export CC="clang"
+			export CXX="clang"
+			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch x86_64 -gdwarf-2 -fembed-bitcode -target x86_64-apple-ios13.0-macabi "
+			export LDFLAGS=" -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+		else
+			# Apple x86_64 Build Machine Detected 
+			TARGET="darwin64-x86_64-cc"
+		fi
+	fi
+	if [[ $ARCH == "arm64" ]]; then
+		if [ ${BUILD_MACHINE} == 'arm64' ]; then
+   			# Apple ARM Silicon Build Machine Detected 
+			TARGET="darwin64-arm64-cc"
+		else
+			# Apple x86_64 Build Machine Detected - cross compile
+			TARGET="darwin64-arm64-cc"
+			export CC="clang"
+			export CXX="clang"
+			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch arm64 -gdwarf-2 -fembed-bitcode -target arm64-apple-ios13.0-macabi "
+			export LDFLAGS=" -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+		fi
+	fi
 
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
-	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
+
+	if [[ $ARCH != ${BUILD_MACHINE} ]]; then
+		# cross compile required
+		if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
+			./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/Catalyst/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
+		else
+			./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
+		fi
+	else
+		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
+	fi
+
+	
 	make -j${CORES} >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make install >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make clean >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
@@ -255,9 +299,9 @@ buildIOS()
    
 	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
 	if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
-	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/iOS/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
 	else
-	./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
+		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/iOS/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log"
 	fi
 
 	make -j8 >> "/tmp/${NGHTTP2_VERSION}-iOS-${ARCH}-${BITCODE}.log" 2>&1
@@ -419,9 +463,11 @@ lipo \
 if [ $catalyst == "1" ]; then
 echo -e "${bold}Building Catalyst libraries${dim}"
 buildCatalyst "x86_64"
+buildCatalyst "arm64"
 
 lipo \
         "${NGHTTP2}/Catalyst/x86_64/lib/libnghttp2.a" \
+		"${NGHTTP2}/Catalyst/arm64/lib/libnghttp2.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_Catalyst.a"
 fi
 
