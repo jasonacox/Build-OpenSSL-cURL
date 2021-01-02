@@ -19,6 +19,9 @@
 		1B4AA2671DE1FCA5008187BD /* libcurl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2631DE1FCA5008187BD /* libcurl.a */; platformFilter = ios; };
 		1B4AA2681DE1FCA5008187BD /* libnghttp2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2641DE1FCA5008187BD /* libnghttp2.a */; platformFilter = ios; };
 		1B4AA2691DE1FCA5008187BD /* libssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA2651DE1FCA5008187BD /* libssl.a */; platformFilter = ios; };
+		96A4D09925A03E5F008F69B4 /* libnghttp2_Catalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D09725A03E26008F69B4 /* libnghttp2_Catalyst.a */; platformFilter = maccatalyst; };
+		96A4D09A25A03E70008F69B4 /* libcurl_Catalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D09625A03E26008F69B4 /* libcurl_Catalyst.a */; platformFilter = maccatalyst; };
+		96A4D09B25A03E8D008F69B4 /* openssl-ios-x86_64-maccatalyst.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 96A4D09825A03E26008F69B4 /* openssl-ios-x86_64-maccatalyst.a */; platformFilter = maccatalyst; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +41,9 @@
 		1B4AA2631DE1FCA5008187BD /* libcurl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl.a; path = libs/libcurl.a; sourceTree = "<group>"; };
 		1B4AA2641DE1FCA5008187BD /* libnghttp2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnghttp2.a; path = libs/libnghttp2.a; sourceTree = "<group>"; };
 		1B4AA2651DE1FCA5008187BD /* libssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libssl.a; path = libs/libssl.a; sourceTree = "<group>"; };
+		96A4D09625A03E26008F69B4 /* libcurl_Catalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libcurl_Catalyst.a; path = libs/libcurl_Catalyst.a; sourceTree = "<group>"; };
+		96A4D09725A03E26008F69B4 /* libnghttp2_Catalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libnghttp2_Catalyst.a; path = libs/libnghttp2_Catalyst.a; sourceTree = "<group>"; };
+		96A4D09825A03E26008F69B4 /* openssl-ios-x86_64-maccatalyst.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "openssl-ios-x86_64-maccatalyst.a"; path = "libs/openssl-ios-x86_64-maccatalyst.a"; sourceTree = "<group>"; };
 		96AAC802250F224E009E2EE3 /* iOS Test App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "iOS Test App.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -48,6 +54,9 @@
 			files = (
 				1B4AA24E1DE18290008187BD /* libz.tbd in Frameworks */,
 				1B4AA2681DE1FCA5008187BD /* libnghttp2.a in Frameworks */,
+				96A4D09A25A03E70008F69B4 /* libcurl_Catalyst.a in Frameworks */,
+				96A4D09925A03E5F008F69B4 /* libnghttp2_Catalyst.a in Frameworks */,
+				96A4D09B25A03E8D008F69B4 /* openssl-ios-x86_64-maccatalyst.a in Frameworks */,
 				1B4AA2671DE1FCA5008187BD /* libcurl.a in Frameworks */,
 				1B4AA2691DE1FCA5008187BD /* libssl.a in Frameworks */,
 				1B4AA2661DE1FCA5008187BD /* libcrypto.a in Frameworks */,
@@ -103,6 +112,9 @@
 		1B4AA24C1DE18290008187BD /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				96A4D09625A03E26008F69B4 /* libcurl_Catalyst.a */,
+				96A4D09725A03E26008F69B4 /* libnghttp2_Catalyst.a */,
+				96A4D09825A03E26008F69B4 /* openssl-ios-x86_64-maccatalyst.a */,
 				1B4AA2621DE1FCA5008187BD /* libcrypto.a */,
 				1B4AA2631DE1FCA5008187BD /* libcurl.a */,
 				1B4AA2641DE1FCA5008187BD /* libnghttp2.a */,
