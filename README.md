@@ -2,12 +2,12 @@
 
 [![Build Status](https://travis-ci.org/jasonacox/Build-OpenSSL-cURL.svg?branch=master)](https://travis-ci.org/jasonacox/Build-OpenSSL-cURL)
 
-This Script builds OpenSSL, nghttp2 and libcurl for MacOS (OS X), Mac Catalyst, iOS and tvOS devices (x86_64, armv7, armv7s, arm64 and arm64e).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
+This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), Mac Catalyst (x86_64, arm64), iOS (armv7, armv7s, arm64 and arm64e), iOS Simulator (x86_64, arm64), tvOS (arm64) and tvOS Simulator (x86_64).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
 
-## News - Current State
+## News
 
-* Mac Catalyst: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/)
-* Apple Silicon build progress [Beta]: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS x86_64 and the new MacOS arm64 (Apple silicon) targets, including iOS Simulator and Mac Catalyst. Not complete: tvOS target.
+* 02-Jan-2021: Apple Silicon builds added [Beta]: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS arm64 targets, including iOS Simulator and Mac Catalyst. Not complete: tvOS Simulator.
+* 14-Sep-2020: Mac Catalyst: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/)
 
 ## Build
 
@@ -49,6 +49,9 @@ Default versions are specified in the `build.sh` script but you can specify the 
 
 ```bash
 ./build.sh -o 1.1.1g -c 7.72.0 -n 1.41.0
+
+# Use -m to build for Mac Catalyst as well
+./build.sh -o 1.1.1g -c 7.72.0 -n 1.41.0 -m
 ```
 
 You can update the default version by editing this section in the `build.sh` script:
@@ -69,14 +72,14 @@ NGHTTP2="1.41.0"	# https://nghttp2.org/
 
 ### Dependencies
 The build script requires:
-* Xcode 7.1 or higher (10+ recommended)
+* Xcode 10 or higher (12+ recommended)
 * Xcode Command Line Tools
 * pkg-config tool for nghttp2 (or `brew` to auto-install)
 
 ### OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
-* Mac - x86-64
-* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64)
+* MacOS - OS X (x86-64, arm64)
+* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64, arm64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
 By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use `build.sh -e`
@@ -91,9 +94,9 @@ NOTE: This script allows building the OpenSSL 1.1.1 and 1.0.2 series libraries. 
 
 ### HTTP2 / nghttp2
 The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
-* Mac - x86-64
-* iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
-* tvOS - arm64 and AppleTVSimulator (x86-64)
+* MacOS - OS X (x86-64, arm64)
+* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64, arm64)
+* tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
 Edit `build.sh` to change the default version of nghttp2 that will be downloaded and built or specify the version on the command line.
 
@@ -115,9 +118,9 @@ DISABLE HTTP2: The nghttp2 build can be disabled by using:
 
 ### cURL / libcurl
 The `libcurl-build.sh` script create separate bitcode enabled targets libraries for:
-* Mac - x86-64
-* iOS - armv7, armv7s, arm64, arm64e and iPhoneSimulator (i386, x86-64)
-* tvOS - arm64 and AppleTVSimulator (x86-64)
+* MacOS - OS X (x86-64, arm64)
+* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64, arm64)
+* tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
 The curl build uses `--with-ssl` pointing to the above OpenSSL builds and `--with-nghttp2` pointing to the above nghttp2 builds..
 Edit `build.sh` to change the version of cURL that will be downloaded and built or specify the version on the command line.
@@ -127,12 +130,12 @@ Edit `build.sh` to change the version of cURL that will be downloaded and built 
 Include the relevant library into your project.  Rename the appropriate file to libcurl.a:
 
 	|____lib
-	   |____libcurl_iOS.a
-	   |____libcurl_iOS-simulator.a
-	   |____libcurl_iOS-fat.a        <-- Contains both iOS and iOS-simulator binaries
-	   |____libcurl_Mac.a
-	   |____libcurl_tvOS.a
-	   |____libcurl_Catalyst.a
+	   |____libcurl_iOS.a            <-- Contains iOS (armv7, armv7s, arm64 and arm64e) libraries
+	   |____libcurl_iOS-simulator.a  <-- Contains iOS-simulator (x86_64, arm64) libraries
+	   |____libcurl_iOS-fat.a        <-- Contains iOS and iOS-simulator (x86_64) libraries
+	   |____libcurl_Mac.a            <-- Contains MacOS (x86_64, arm64) libraries
+	   |____libcurl_tvOS.a           <-- Contains MacOS (x86_64, arm64) libraries
+	   |____libcurl_Catalyst.a       <-- Contains Mac Catalyst (x86_64, arm64) libraries
 
 NOTE: By default, this script only builds bitcode versions. To build non-bitcode versions:
 
