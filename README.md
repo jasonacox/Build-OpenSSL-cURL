@@ -134,7 +134,7 @@ Include the relevant library into your project.  Rename the appropriate file to 
 	   |____libcurl_iOS-simulator.a  <-- Contains iOS-simulator (x86_64, arm64) libraries
 	   |____libcurl_iOS-fat.a        <-- Contains iOS and iOS-simulator (x86_64) libraries
 	   |____libcurl_Mac.a            <-- Contains MacOS (x86_64, arm64) libraries
-	   |____libcurl_tvOS.a           <-- Contains MacOS (x86_64, arm64) libraries
+	   |____libcurl_tvOS.a           <-- Contains tvOS (arm64) and tvOS-simulator (x86_64) libraries
 	   |____libcurl_Catalyst.a       <-- Contains Mac Catalyst (x86_64, arm64) libraries
 
 NOTE: By default, this script only builds bitcode versions. To build non-bitcode versions:
@@ -225,33 +225,37 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 	xcrun -sdk iphoneos lipo -info nghttp2/lib/*.a
 	xcrun -sdk iphoneos lipo -info curl/lib/*.a
 
-* Catalyst
-	* openssl/Catalyst/lib/libcrypto.a are: x86_64 
-	* openssl/Catalyst/lib/libssl.a are: x86_64 
-    * nghttp2/lib/libnghttp2_Catalyst.a are: x86_64 
-	* curl/lib/libcurl_Catalyst.a are: x86_64 
+* Catalyst (Intel + Apple Silicon)
+	* openssl/Catalyst/lib/libcrypto.a are: x86_64 arm64 
+	* openssl/Catalyst/lib/libssl.a are: x86_64 arm64 
+	* nghttp2/lib/libnghttp2_Catalyst.a are: x86_64 arm64 
+	* curl/lib/libcurl_Catalyst.a are: x86_64 arm64 
 
-* Mac
-	* openssl/Mac/lib/libcrypto.a are: x86_64 
-	* openssl/Mac/lib/libssl.a are: x86_64 
-	* nghttp2/lib/libnghttp2_Mac.a are: x86_64 
-	* curl/lib/libcurl_Mac.a are: x86_64 
+* Mac (Intel + Apple Silicon)
+	* openssl/Mac/lib/libcrypto.a are: x86_64 arm64 
+	* openssl/Mac/lib/libssl.a are: x86_64 arm64 
+	* nghttp2/lib/libnghttp2_Mac.a are: x86_64 arm64 
+	* curl/lib/libcurl_Mac.a are: x86_64 arm64 
 
-* iOS
-	* openssl/iOS-fat/lib/libcrypto.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
-	* openssl/iOS-fat/lib/libssl.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
-	* openssl/iOS-simulator/lib/libcrypto.a are: i386 x86_64 
-	* openssl/iOS-simulator/lib/libssl.a are: i386 x86_64 
+* iOS Only
 	* openssl/iOS/lib/libcrypto.a are: armv7 armv7s arm64 arm64e 
 	* openssl/iOS/lib/libssl.a are: armv7 armv7s arm64 arm64e 
-	* nghttp2/lib/libnghttp2_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
-	* nghttp2/lib/libnghttp2_iOS-simulator.a are: i386 x86_64 
 	* nghttp2/lib/libnghttp2_iOS.a are: armv7 armv7s arm64 arm64e 
-	* curl/lib/libcurl_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
-	* curl/lib/libcurl_iOS-simulator.a are: i386 x86_64 
 	* curl/lib/libcurl_iOS.a are: armv7 armv7s arm64 arm64e 
 
-* tvOS
+* iOS Simulator (Intel + Apple Silicon)
+	* openssl/iOS-simulator/lib/libcrypto.a are: i386 x86_64 arm64 
+	* openssl/iOS-simulator/lib/libssl.a are: i386 x86_64 arm64 
+	* nghttp2/lib/libnghttp2_iOS-simulator.a are: i386 x86_64 arm64 
+	* curl/lib/libcurl_iOS-simulator.a are: i386 x86_64 arm64 
+
+* iOS + Intel Mac Simulator 
+	* openssl/iOS-fat/lib/libcrypto.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* openssl/iOS-fat/lib/libssl.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* nghttp2/lib/libnghttp2_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* curl/lib/libcurl_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+
+* tvOS + Intel Mac Simulator
 	* openssl/tvOS/lib/libcrypto.a are: x86_64 arm64 
 	* openssl/tvOS/lib/libssl.a are: x86_64 arm64 
 	* nghttp2/lib/libnghttp2_tvOS.a are: x86_64 arm64 
