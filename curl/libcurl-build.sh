@@ -121,6 +121,36 @@ else
 	NGHTTP2LIB=""
 fi
 
+# Check to see if pkg-config is already installed
+PATH=$PATH:/tmp/pkg_config/bin
+if ! (type "pkg-config" > /dev/null 2>&1 ) ; then
+	echo -e "${alertdim}** WARNING: pkg-config not installed... attempting to install.${dim}"
+
+	# Check to see if Brew is installed
+	if (type "brew" > /dev/null 2>&1 ) ; then
+		echo "  brew installed - using to install pkg-config"
+		brew install pkg-config
+	else
+		# Build pkg-config from Source
+		curl -LOs https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+		echo "  Building pkg-config"
+		tar xfz pkg-config-0.29.2.tar.gz
+		pushd pkg-config-0.29.2 > /dev/null
+		./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+		make -j${CORES} >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+		make install >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
+		popd > /dev/null
+	fi
+
+	# Check to see if installation worked
+	if (type "pkg-config" > /dev/null 2>&1 ) ; then
+		echo "  SUCCESS: pkg-config now installed"
+	else
+		echo -e "${alert}** FATAL ERROR: pkg-config failed to install - exiting.${normal}"
+		exit 1
+	fi
+fi 
+
 buildMac()
 {
 	ARCH=$1
@@ -397,6 +427,7 @@ rm -rf include/curl/* lib/*
 mkdir -p lib
 mkdir -p include/curl/
 
+rm -fr "/tmp/curl"
 rm -rf "/tmp/${CURL_VERSION}-*"
 rm -rf "/tmp/${CURL_VERSION}-*.log"
 
