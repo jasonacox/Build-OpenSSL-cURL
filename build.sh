@@ -224,6 +224,8 @@ echo
 # update test app
 echo -e "${bold}Copying libraries to Test App ...${dim}"
 echo "  See $EXAMPLE"
+mkdir -p "$EXAMPLE/libs"
+mkdir -p "$EXAMPLE/include"
 cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
 cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
 cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
@@ -241,16 +243,20 @@ if [ "$buildnghttp2" != "" ]; then
 fi
 cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
 echo
-# archive and run Mac binaries test
+# create universal Mac binaries and run test
 echo -e "${bold}Archiving Mac binaries for curl and openssl...${dim}"
 echo "  See $ARCHIVE/bin"
-cp "/tmp/curl-${BUILD_MACHINE}" $ARCHIVE/bin/curl
+lipo -create -output $ARCHIVE/bin/curl /tmp/curl-x86_64 /tmp/curl-arm64
 mv /tmp/curl-* $ARCHIVE/bin
-cp "/tmp/openssl-${BUILD_MACHINE}" $ARCHIVE/bin/openssl
+lipo -create -output $ARCHIVE/bin/openssl /tmp/openssl-x86_64 /tmp/openssl-arm64
 mv /tmp/openssl-* $ARCHIVE/bin
 echo
-echo -e "${bold}Testing Mac binaries for ${BUILD_MACHINE}...${dim}"
+echo -e "${bold}Testing Universal Mac binaries for ${BUILD_MACHINE}...${dim}"
+echo "  cURL"
+file $ARCHIVE/bin/curl
 $ARCHIVE/bin/curl -V
+echo "  OpenSSL"
+file $ARCHIVE/bin/openssl
 $ARCHIVE/bin/openssl version
 date "+%c - End"
 
