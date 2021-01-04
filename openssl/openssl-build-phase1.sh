@@ -328,6 +328,7 @@ mkdir -p iOS-simulator/include/openssl/
 mkdir -p iOS-fat/include/openssl/
 mkdir -p tvOS/include/openssl/
 
+rm -rf "/tmp/openssl"
 rm -rf "/tmp/${OPENSSL_VERSION}-*"
 rm -rf "/tmp/${OPENSSL_VERSION}-*.log"
 
