@@ -6,7 +6,7 @@ This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), 
 
 ## News
 
-* 02-Jan-2021: Apple Silicon builds added [Beta]: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS arm64 targets, including iOS Simulator and Mac Catalyst. Not complete: tvOS Simulator.
+* 02-Jan-2021: Apple Silicon [Beta]: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS arm64 targets, including iOS Simulator and Mac Catalyst. Script runs on Apple Silicon arm64 and Intel x86_64 build hosts. Not complete: tvOS Simulator.
 * 14-Sep-2020: Mac Catalyst: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/)
 
 ## Build
@@ -260,6 +260,14 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 	* openssl/tvOS/lib/libssl.a are: x86_64 arm64 
 	* nghttp2/lib/libnghttp2_tvOS.a are: x86_64 arm64 
 	* curl/lib/libcurl_tvOS.a are: x86_64 arm64 
+
+* Universal Mac Binaries
+	* curl: Mach-O universal binary with 2 architectures:
+		* (for architecture x86_64): Mach-O 64-bit executable x86_64
+		* (for architecture arm64):  Mach-O 64-bit executable arm64
+	* openssl: Mach-O universal binary with 2 architectures:
+		* (for architecture x86_64): Mach-O 64-bit executable x86_64
+		* (for architecture arm64):  Mach-O 64-bit executable arm64
 
 * Consolidated OpenSSL Libraries for iOS
 	* openssl/openssl-ios-armv7_armv7s_arm64_arm64e.a are: armv7 armv7s arm64 arm64e 
