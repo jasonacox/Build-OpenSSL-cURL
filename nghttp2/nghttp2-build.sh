@@ -108,14 +108,15 @@ else
 		brew install pkg-config
 	else
 		# Build pkg-config from Source
-		curl -LO https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
+		curl -LOs https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
 		echo "  Building pkg-config"
 		tar xfz pkg-config-0.29.2.tar.gz
-		cd pkg-config-0.29.2
+		pushd pkg-config-0.29.2 > /dev/null
 		./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
 		make -j${CORES} >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
 		make install >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
 		PATH=$PATH:/tmp/pkg_config/bin
+		popd > /dev/null
 	fi
 
 	# Check to see if installation worked
