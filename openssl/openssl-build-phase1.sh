@@ -26,9 +26,13 @@ dim="\033[0m${white}\033[2m"
 alert="\033[0m${red}\033[1m"
 alertdim="\033[0m${red}\033[2m"
 
-# set trap to help debug build errors
+# Set trap to help debug build errors
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/openssl*.log${alertdim}"; tail -3 /tmp/openssl*.log' INT TERM EXIT
 
+# Set minimum OS versions for target
+MACOS_X86_64_VERSION=""			# Empty = use host version
+MACOS_ARM64_VERSION=""			# Min supported is MacOS 11.0 Big Sur
+CATALYST_IOS="13.0"				# Min supported is iOS 13.0 for Mac Catalyst
 IOS_MIN_SDK_VERSION="7.1"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
@@ -36,6 +40,16 @@ TVOS_SDK_VERSION=""
 catalyst="0"
 
 CORES=$(sysctl -n hw.ncpu)
+
+if [ -z "${MACOS_X86_64_VERSION}" ]; then
+	MACOS_X86_64_VERSION=$(sw_vers -productVersion)
+fi
+if [ -z "${MACOS_ARM64_VERSION}" ]; then
+	MACOS_ARM64_VERSION=$(sw_vers -productVersion)
+fi
+if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
+	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
+fi
 
 usage ()
 {
@@ -48,7 +62,7 @@ usage ()
 	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
 	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
 	echo "         -e   compile with engine support"
-	echo "         -m   compile Mac Catalyst library [beta]"
+	echo "         -m   compile Mac Catalyst library"
 	echo "         -3   compile with SSLv3 support"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"
@@ -101,43 +115,42 @@ buildMac()
 {
 	ARCH=$1
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim}"
-
 	TARGET="darwin-i386-cc"
 	BUILD_MACHINE=`uname -m`
 
 	if [[ $ARCH == "x86_64" ]]; then
+		TARGET="darwin64-x86_64-cc"
+		MACOS_VER="${MACOS_X86_64_VERSION}"
 		if [ ${BUILD_MACHINE} == 'arm64' ]; then
    			# Apple ARM Silicon Build Machine Detected - cross compile
-			TARGET="darwin64-x86_64-cc"
-			#export CC="${BUILD_TOOLS}/usr/bin/gcc"
 			export CC="clang"
 			export CXX="clang"
-			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch x86_64 "
-			export LDFLAGS=" -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} "
+			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		else
-			# Apple x86_64 Build Machine Detected 
-			TARGET="darwin64-x86_64-cc"
+			# Apple x86_64 Build Machine Detected - native build
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} "
 		fi
 	fi
 	if [[ $ARCH == "arm64" ]]; then
+		TARGET="darwin64-arm64-cc"
+		MACOS_VER="${MACOS_ARM64_VERSION}"
 		if [ ${BUILD_MACHINE} == 'arm64' ]; then
-   			# Apple ARM Silicon Build Machine Detected 
-			TARGET="darwin64-arm64-cc"
+   			# Apple ARM Silicon Build Machine Detected - native build
 			export CC="${BUILD_TOOLS}/usr/bin/gcc"
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} "
 		else
 			# Apple x86_64 Build Machine Detected - cross compile
-			TARGET="darwin64-arm64-cc"
 			export CC="clang"
 			export CXX="clang"
-			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch arm64 "
-			export LDFLAGS=" -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} "
+			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		fi
 	fi
+
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim} (MacOS ${MACOS_VER})"
 
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
@@ -155,7 +168,7 @@ buildMac()
 	popd > /dev/null
 
 	if [ $ARCH == ${BUILD_MACHINE} ]; then
-		echo -e "Testing binary for ${BUILD_MACHINE}:"
+		echo -e "  Testing binary for ${BUILD_MACHINE}:"
 		/tmp/openssl version
 	fi
 
@@ -171,8 +184,6 @@ buildCatalyst()
 {
 	ARCH=$1
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim}"
-
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
 
@@ -185,37 +196,36 @@ buildCatalyst()
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target ${ARCH}-apple-ios13.0-macabi"
 
 	if [[ $ARCH == "x86_64" ]]; then
+		TARGET="darwin64-x86_64-cc"
+		MACOS_VER="${MACOS_X86_64_VERSION}"
 		if [ ${BUILD_MACHINE} == 'arm64' ]; then
    			# Apple ARM Silicon Build Machine Detected - cross compile
-			TARGET="darwin64-x86_64-cc"
-			#export CC="${BUILD_TOOLS}/usr/bin/gcc"
 			export CC="clang"
 			export CXX="clang"
-			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch x86_64 -fembed-bitcode -target x86_64-apple-ios13.0-macabi "
-			export LDFLAGS=" -arch x86_64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
+			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		else
-			# Apple x86_64 Build Machine Detected 
-			TARGET="darwin64-x86_64-cc"
+			# Apple x86_64 Build Machine Detected - native build
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
 		fi
 	fi
 	if [[ $ARCH == "arm64" ]]; then
+		TARGET="darwin64-arm64-cc"
+		MACOS_VER="${MACOS_ARM64_VERSION}"
 		if [ ${BUILD_MACHINE} == 'arm64' ]; then
-   			# Apple ARM Silicon Build Machine Detected 
-			TARGET="darwin64-arm64-cc"
+   			# Apple ARM Silicon Build Machine Detected - native build
 			export CC="${BUILD_TOOLS}/usr/bin/gcc"
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
 		else
 			# Apple x86_64 Build Machine Detected - cross compile
-			TARGET="darwin64-arm64-cc"
-			#export CC="clang"
-			#export CXX="clang"
-			export CFLAGS=" -O2 -mmacosx-version-min=11.0 -arch arm64 -fembed-bitcode -target arm64-apple-ios13.0-macabi "
-			export LDFLAGS=" -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
-			# ./Configure shared enable-rc5 zlib darwin64-arm64-cc
+			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
+			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
+			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		fi
 	fi
+
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim} (MacOS ${MACOS_VER} Catalyst iOS ${CATALYST_IOS})"
 
 	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
 		./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
@@ -263,7 +273,7 @@ buildTVOS()
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
 	export LC_CTYPE=C
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim} (tvOS ${TVOS_MIN_SDK_VERSION})"
 
 	# Patch apps/speed.c to not use fork() since it's not available on tvOS
 	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "./apps/speed.c"
