@@ -29,17 +29,21 @@ alertdim="\033[0m${red}\033[2m"
 # Set trap to help debug build errors
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/openssl*.log${alertdim}"; tail -3 /tmp/openssl*.log' INT TERM EXIT
 
+# Set defaults
+VERSION="1.1.1i"				# OpenSSL version default
+catalyst="0"
+
 # Set minimum OS versions for target
 MACOS_X86_64_VERSION=""			# Empty = use host version
 MACOS_ARM64_VERSION=""			# Min supported is MacOS 11.0 Big Sur
 CATALYST_IOS="13.0"				# Min supported is iOS 13.0 for Mac Catalyst
-IOS_MIN_SDK_VERSION="7.1"
+IOS_MIN_SDK_VERSION="8.0"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
-catalyst="0"
 
 CORES=$(sysctl -n hw.ncpu)
+OPENSSL_VERSION="openssl-${VERSION}"
 
 if [ -z "${MACOS_X86_64_VERSION}" ]; then
 	MACOS_X86_64_VERSION=$(sw_vers -productVersion)
@@ -47,22 +51,22 @@ fi
 if [ -z "${MACOS_ARM64_VERSION}" ]; then
 	MACOS_ARM64_VERSION=$(sw_vers -productVersion)
 fi
-if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
-	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
-fi
 
 usage ()
 {
 	echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-v ${dim}<openssl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-e] [-m] [-3] [-x] [-h]"
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<version>${normal}] [-s ${dim}<version>${normal}] [-t ${dim}<version>${normal}] [-i ${dim}<version>${normal}] [-a ${dim}<version>${normal}] [-u ${dim}<version>${normal}] [-e] [-m] [-3] [-x] [-h]"
 	echo
-	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
-	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
-	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -v   version of OpenSSL (default $VERSION)"
+	echo "         -s   iOS min target version (default $IOS_MIN_SDK_VERSION)"
+	echo "         -t   tvOS min target version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -i   macOS 86_64 min target version (default $MACOS_X86_64_VERSION)"
+	echo "         -a   macOS arm64 min target version (default $MACOS_ARM64_VERSION)"
 	echo "         -e   compile with engine support"
 	echo "         -m   compile Mac Catalyst library"
+	echo "         -u   Mac Catalyst iOS min target version (default $CATALYST_IOS)"
 	echo "         -3   compile with SSLv3 support"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"
@@ -73,22 +77,32 @@ usage ()
 
 engine=0
 
-while getopts "v:s:t:emx3h\?" o; do
+while getopts "v:s:t:i:a:u:emx3h\?" o; do
 	case "${o}" in
 		v)
 			OPENSSL_VERSION="openssl-${OPTARG}"
 			;;
 		s)
-			IOS_SDK_VERSION="${OPTARG}"
+			IOS_MIN_SDK_VERSION="${OPTARG}"
 			;;
 		t)
-			TVOS_SDK_VERSION="${OPTARG}"
+			TVOS_MIN_SDK_VERSION="${OPTARG}"
+			;;
+		i)
+			MACOS_X86_64_VERSION="${OPTARG}"
+			;;
+		a)
+			MACOS_ARM64_VERSION="${OPTARG}"
 			;;
 		e)
 			engine=1
 			;;
 		m)
 			catalyst="1"
+			;;
+		u)
+			catalyst="1"
+			CATALYST_IOS="${OPTARG}"
 			;;
 		x)
 			bold=""
@@ -111,6 +125,10 @@ shift $((OPTIND-1))
 
 DEVELOPER=`xcode-select -print-path`
 
+if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
+	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
+fi
+
 buildMac()
 {
 	ARCH=$1
@@ -125,12 +143,12 @@ buildMac()
    			# Apple ARM Silicon Build Machine Detected - cross compile
 			export CC="clang"
 			export CXX="clang"
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} "
 			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		else
 			# Apple x86_64 Build Machine Detected - native build
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} "
 		fi
 	fi
 	if [[ $ARCH == "arm64" ]]; then
@@ -139,12 +157,12 @@ buildMac()
 		if [ ${BUILD_MACHINE} == 'arm64' ]; then
    			# Apple ARM Silicon Build Machine Detected - native build
 			export CC="${BUILD_TOOLS}/usr/bin/gcc"
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} "
 		else
 			# Apple x86_64 Build Machine Detected - cross compile
 			export CC="clang"
 			export CXX="clang"
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} "
 			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		fi
@@ -168,7 +186,7 @@ buildMac()
 	popd > /dev/null
 
 	if [ $ARCH == ${BUILD_MACHINE} ]; then
-		echo -e "  Testing binary for ${BUILD_MACHINE}:"
+		echo -e "Testing binary for ${BUILD_MACHINE}:"
 		/tmp/openssl version
 	fi
 
@@ -193,7 +211,7 @@ buildCatalyst()
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
-	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target ${ARCH}-apple-ios13.0-macabi"
+	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH} -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi"
 
 	if [[ $ARCH == "x86_64" ]]; then
 		TARGET="darwin64-x86_64-cc"
@@ -202,12 +220,12 @@ buildCatalyst()
    			# Apple ARM Silicon Build Machine Detected - cross compile
 			export CC="clang"
 			export CXX="clang"
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
 			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		else
 			# Apple x86_64 Build Machine Detected - native build
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_X86_64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
 		fi
 	fi
 	if [[ $ARCH == "arm64" ]]; then
@@ -216,10 +234,10 @@ buildCatalyst()
 		if [ ${BUILD_MACHINE} == 'arm64' ]; then
    			# Apple ARM Silicon Build Machine Detected - native build
 			export CC="${BUILD_TOOLS}/usr/bin/gcc"
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
 		else
 			# Apple x86_64 Build Machine Detected - cross compile
-			export CFLAGS=" -O2 -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
+			export CFLAGS=" -Os -mmacosx-version-min=${MACOS_ARM64_VERSION} -arch ${ARCH} -fembed-bitcode -target ${ARCH}-apple-ios${CATALYST_IOS}-macabi "
 			export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 			export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk "
 		fi

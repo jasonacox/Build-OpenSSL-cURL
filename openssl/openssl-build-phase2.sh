@@ -29,26 +29,42 @@ alertdim="\033[0m${red}\033[2m"
 # set trap to help debug build errors
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/openssl*.log${alertdim}"; tail -3 /tmp/openssl*.log' INT TERM EXIT
 
-IOS_MIN_SDK_VERSION="7.1"
+# Set minimum OS versions for target
+MACOS_X86_64_VERSION=""			# Empty = use host version
+MACOS_ARM64_VERSION=""			# Min supported is MacOS 11.0 Big Sur
+CATALYST_IOS="13.0"				# Min supported is iOS 13.0 for Mac Catalyst
+IOS_MIN_SDK_VERSION="8.0"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
 catalyst="0"
+VERSION="1.1.1i"				# OpenSSL version default
 
 CORES=$(sysctl -n hw.ncpu)
+OPENSSL_VERSION="openssl-${VERSION}"
+
+if [ -z "${MACOS_X86_64_VERSION}" ]; then
+	MACOS_X86_64_VERSION=$(sw_vers -productVersion)
+fi
+if [ -z "${MACOS_ARM64_VERSION}" ]; then
+	MACOS_ARM64_VERSION=$(sw_vers -productVersion)
+fi
 
 usage ()
 {
 	echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-v ${dim}<openssl version>${normal}] [-s ${dim}<iOS SDK version>${normal}] [-t ${dim}<tvOS SDK version>${normal}] [-e] [-m] [-3] [-x] [-h]"
+	echo -e "  ${subbold}$0${normal} [-v ${dim}<version>${normal}] [-s ${dim}<version>${normal}] [-t ${dim}<version>${normal}] [-i ${dim}<version>${normal}] [-a ${dim}<version>${normal}] [-u ${dim}<version>${normal}]  [-e] [-m] [-3] [-x] [-h]"
 	echo
-	echo "         -v   version of OpenSSL (default $OPENSSL_VERSION)"
-	echo "         -s   iOS SDK version (default $IOS_MIN_SDK_VERSION)"
-	echo "         -t   tvOS SDK version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -v   version of OpenSSL (default $VERSION)"
+	echo "         -s   iOS min target version (default $IOS_MIN_SDK_VERSION)"
+	echo "         -t   tvOS min target version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -i   macOS 86_64 min target version (default $MACOS_X86_64_VERSION)"
+	echo "         -a   macOS arm64 min target version (default $MACOS_ARM64_VERSION)"
 	echo "         -e   compile with engine support"
-	echo "         -m   compile Mac Catalyst library [beta]"
+	echo "         -m   compile Mac Catalyst library"
+	echo "         -u   Mac Catalyst iOS min target version (default $CATALYST_IOS)"
 	echo "         -3   compile with SSLv3 support"
 	echo "         -x   disable color output"
 	echo "         -h   show usage"
@@ -59,22 +75,32 @@ usage ()
 
 engine=0
 
-while getopts "v:s:t:emx3h\?" o; do
+while getopts "v:s:t:i:a:u:emx3h\?" o; do
 	case "${o}" in
 		v)
 			OPENSSL_VERSION="openssl-${OPTARG}"
 			;;
 		s)
-			IOS_SDK_VERSION="${OPTARG}"
+			IOS_MIN_SDK_VERSION="${OPTARG}"
 			;;
 		t)
-			TVOS_SDK_VERSION="${OPTARG}"
+			TVOS_MIN_SDK_VERSION="${OPTARG}"
+			;;
+		i)
+			MACOS_X86_64_VERSION="${OPTARG}"
+			;;
+		a)
+			MACOS_ARM64_VERSION="${OPTARG}"
 			;;
 		e)
 			engine=1
 			;;
 		m)
 			catalyst="1"
+			;;
+		u)
+			catalyst="1"
+			CATALYST_IOS="${OPTARG}"
 			;;
 		x)
 			bold=""
@@ -97,6 +123,10 @@ shift $((OPTIND-1))
 
 DEVELOPER=`xcode-select -print-path`
 
+if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
+	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
+fi
+
 buildIOS()
 {
 	ARCH=$1
@@ -117,7 +147,7 @@ buildIOS()
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim} (iOS ${IOS_MIN_SDK_VERSION})"
 
 	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]]; then
 		TARGET="darwin-i386-cc"
@@ -173,26 +203,29 @@ buildIOSsim()
 
 	TARGET="darwin-i386-cc"
 	RUNTARGET=""
-	MIPHONEOS="10.0"
+	MIPHONEOS="${IOS_MIN_SDK_VERSION}"
 	if [[ $ARCH != "i386" ]]; then
 		TARGET="darwin64-${ARCH}-cc"
-		RUNTARGET="-target ${ARCH}-apple-ios11.0-simulator"
-			# -target arm64-apple-ios11.0-simulator
-			# -target x86_64-apple-ios11.0-simulator 
-		MIPHONEOS="11.0"
+		RUNTARGET="-target ${ARCH}-apple-ios${IOS_MIN_SDK_VERSION}-simulator"
+			# e.g. -target arm64-apple-ios11.0-simulator
+		#if [[ $ARCH == "arm64" ]]; then
+		#	if (( $(echo "${MIPHONEOS} < 11.0" |bc -l) )); then
+		#		MIPHONEOS="11.0"	# Min support for Apple Silicon is iOS 11.0 
+		#	fi
+		#fi
 	fi
 	
 	# set up exports for build 
-	export CFLAGS=" -O2 -miphoneos-version-min=${MIPHONEOS} -fembed-bitcode -arch ${ARCH} ${RUNTARGET} "
-	export LDFLAGS=" -arch ${ARCH} -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
-	export CPPFLAGS=" -I.. -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
+	export CFLAGS=" -Os -miphoneos-version-min=${MIPHONEOS} -fembed-bitcode -arch ${ARCH} ${RUNTARGET} "
+	export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
+	export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 	export CXX="${BUILD_TOOLS}/usr/bin/gcc"
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${iOS_SDK_VERSION} ${archbold}${ARCH}${dim}"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${iOS_SDK_VERSION} ${archbold}${ARCH}${dim} (iOS ${MIPHONEOS})"
 
 	# configure
 	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then

@@ -6,6 +6,7 @@ This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), 
 
 ## News
 
+* 16-Jan-2021: Updated build scripts to allow user defined minimum macOS, iOS, tvOS and catalyst target build versions. 
 * 02-Jan-2021: Apple Silicon [Beta]: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS arm64 targets, including iOS Simulator and Mac Catalyst. Script runs on Apple Silicon arm64 and Intel x86_64 build hosts. Not complete: tvOS Simulator.
 * 14-Sep-2020: Mac Catalyst: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/)
 
@@ -16,15 +17,21 @@ The `build.sh` script calls the three build scripts below (openssl, nghttp and c
 The build script accepts several arguments to adjust versions and toggle features:
 
 ```
-  ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-x] [-h]
+  ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-x] [-h] [...]
 
-         -o <version>   Build OpenSSL version (default 1.1.1d)
-         -c <version>   Build curl version (default 7.68.0)
-         -n <version>   Build nghttp2 version (default 1.40.0)
+         -o <version>   Build OpenSSL version (default 1.1.1i)
+         -c <version>   Build curl version (default 7.74.0)
+         -n <version>   Build nghttp2 version (default 1.42.0)
          -d             Compile without HTTP2 support
          -e             Compile with OpenSSL engine support
          -b             Compile without bitcode
-         -m             Compile Mac Catalyst binaries [beta]"
+         -m             Compile Mac Catalyst library
+         -u <version>   Mac Catalyst iOS min target version (default 13.0)
+         -3             Compile with SSLv3
+         -s <version>   iOS min target version (default 8.0)
+         -t <version>   tvOS min target version (default 9.0)
+         -i <version>   macOS 86_64 min target version (default 11.1)
+         -a <version>   macOS arm64 min target version (default 11.1)
          -x             No color output
          -h             Show usage
 ```
@@ -32,6 +39,8 @@ The build script accepts several arguments to adjust versions and toggle feature
 _OpenSSL Engine Note: By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use this and the static engine support will be included:_ `./build.sh -e`
 
 _Mac Catalyst Note: Static libraries can be built for Mac Catalyst. This requires a current version of Xcode (11.6+). To build Catalyst binaries use the switch:_ `./build.sh -m`
+
+Minimum macOS, iOS and tvOS target build versions are set by default in the build scripts or can be specified using command line arguments indicated above.  Apple Silicon arm64 macOS targets will need to be 11.0 or higher.
 
 ## Quick Start
 
@@ -61,9 +70,9 @@ You can update the default version by editing this section in the `build.sh` scr
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="1.1.1g"	# https://www.openssl.org/source/
-LIBCURL="7.72.0"	# https://curl.haxx.se/download.html
-NGHTTP2="1.41.0"	# https://nghttp2.org/
+OPENSSL="1.1.1i"        # https://www.openssl.org/source/
+LIBCURL="7.74.0"        # https://curl.haxx.se/download.html
+NGHTTP2="1.42.0"        # https://nghttp2.org/
 
 ################################################
 ```

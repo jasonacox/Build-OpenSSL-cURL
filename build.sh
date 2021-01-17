@@ -19,6 +19,23 @@ NGHTTP2="1.42.0"	# https://nghttp2.org/
 # Build Machine
 BUILD_MACHINE=`uname -m`
 
+# Set minimum OS versions for target
+MACOS_X86_64_VERSION=""			# Empty = use host version
+MACOS_ARM64_VERSION=""			# Min supported is MacOS 11.0 Big Sur
+CATALYST_IOS="13.0"				# Min supported is iOS 13.0 for Mac Catalyst
+IOS_MIN_SDK_VERSION="8.0"
+TVOS_MIN_SDK_VERSION="9.0"
+
+if [ -z "${MACOS_X86_64_VERSION}" ]; then
+	MACOS_X86_64_VERSION=$(sw_vers -productVersion)
+fi
+if [ -z "${MACOS_ARM64_VERSION}" ]; then
+	MACOS_ARM64_VERSION=$(sw_vers -productVersion)
+fi
+if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
+	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
+fi
+
 # Global flags
 engine=""
 buildnghttp2="-n"
@@ -41,12 +58,13 @@ dim="\033[0m${white}\033[2m"
 alert="\033[0m${red}\033[1m"
 alertdim="\033[0m${red}\033[2m"
 
+# Show Usage
 usage ()
 {
     echo
 	echo -e "${bold}Usage:${normal}"
 	echo
-	echo -e "  ${subbold}$0${normal} [-o ${dim}<OpenSSL version>${normal}] [-c ${dim}<curl version>${normal}] [-n ${dim}<nghttp2 version>${normal}] [-d] [-e] [-3] [-x] [-h]"
+	echo -e "  ${subbold}$0${normal} [-o ${dim}<OpenSSL version>${normal}] [-c ${dim}<curl version>${normal}] [-n ${dim}<nghttp2 version>${normal}] [-d] [-e] [-3] [-x] [-h] [...]"
 	echo
 	echo "         -o <version>   Build OpenSSL version (default $OPENSSL)"
 	echo "         -c <version>   Build curl version (default $LIBCURL)"
@@ -54,15 +72,21 @@ usage ()
 	echo "         -d             Compile without HTTP2 support"
 	echo "         -e             Compile with OpenSSL engine support"
 	echo "         -b             Compile without bitcode"
-	echo "         -m             Compile Mac Catalyst library [beta]"
+	echo "         -m             Compile Mac Catalyst library"
+	echo "         -u <version>   Mac Catalyst iOS min target version (default $CATALYST_IOS)"
 	echo "         -3             Compile with SSLv3"
+	echo "         -s <version>   iOS min target version (default $IOS_MIN_SDK_VERSION)"
+	echo "         -t <version>   tvOS min target version (default $TVOS_MIN_SDK_VERSION)"
+	echo "         -i <version>   macOS 86_64 min target version (default $MACOS_X86_64_VERSION)"
+	echo "         -a <version>   macOS arm64 min target version (default $MACOS_ARM64_VERSION)"
 	echo "         -x             No color output"
 	echo "         -h             Show usage"
 	echo
     exit 127
 }
 
-while getopts "o:c:n:debm3xh\?" o; do
+# Process command line arguments
+while getopts "o:c:n:u:s:t:i:a:debm3xh\?" o; do
     case "${o}" in
 		o)
 			OPENSSL="${OPTARG}"
@@ -85,8 +109,24 @@ while getopts "o:c:n:debm3xh\?" o; do
 		m)
        		catalyst="-m"
 			;;
+		u)
+			catalyst="-m -u ${OPTARG}"
+			CATALYST_IOS="${OPTARG}"
+			;;
 		3)
        		sslv3="-3"
+			;;
+		s)
+			IOS_MIN_SDK_VERSION="${OPTARG}"
+			;;
+		t)
+			TVOS_MIN_SDK_VERSION="${OPTARG}"
+			;;
+		i)
+			MACOS_X86_64_VERSION="${OPTARG}"
+			;;
+		a)
+			MACOS_ARM64_VERSION="${OPTARG}"
 			;;
 		x)
 			bold=""
@@ -104,10 +144,13 @@ while getopts "o:c:n:debm3xh\?" o; do
 done
 shift $((OPTIND-1))
 
+# Set OS min versions
+OSARGS="-s ${IOS_MIN_SDK_VERSION} -t ${TVOS_MIN_SDK_VERSION} -i ${MACOS_X86_64_VERSION} -a ${MACOS_ARM64_VERSION}"
+
 ## Welcome
 echo -e "${bold}Build-OpenSSL-cURL${dim}"
 if [ "$catalyst" == "-m" ]; then
-	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, Catalyst [beta], iOS and tvOS devices."
+	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, Catalyst, iOS and tvOS devices."
 else
 	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, iOS and tvOS devices."
 fi
@@ -120,7 +163,7 @@ START=$(date +%s)
 echo
 cd openssl
 echo -e "${bold}Building OpenSSL${normal}"
-./openssl-build.sh -v "$OPENSSL" $engine $colorflag $catalyst $sslv3
+./openssl-build.sh -v "$OPENSSL" $engine $colorflag $catalyst $sslv3 $OSARGS
 cd ..
 
 ## Nghttp2 Build
@@ -130,7 +173,7 @@ else
 	echo
 	echo -e "${bold}Building nghttp2 for HTTP2 support${normal}"
 	cd nghttp2
-	./nghttp2-build.sh -v "$NGHTTP2" $colorflag $catalyst
+	./nghttp2-build.sh -v "$NGHTTP2" $colorflag $catalyst $OSARGS
 	cd ..
 fi
 
@@ -138,7 +181,7 @@ fi
 echo
 echo -e "${bold}Building Curl${normal}"
 cd curl
-./libcurl-build.sh -v "$LIBCURL" $disablebitcode $colorflag $buildnghttp2 $catalyst
+./libcurl-build.sh -v "$LIBCURL" $disablebitcode $colorflag $buildnghttp2 $catalyst $OSARGS
 cd ..
 
 ## Archive Libraries and Clean Up
