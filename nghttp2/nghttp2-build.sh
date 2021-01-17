@@ -142,6 +142,7 @@ else
 		brew install pkg-config
 	else
 		# Build pkg-config from Source
+		echo "  Downloading pkg-config-0.29.2.tar.gz"
 		curl -LOs https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
 		echo "  Building pkg-config"
 		tar xfz pkg-config-0.29.2.tar.gz
@@ -282,17 +283,12 @@ buildCatalyst()
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
 
-	if [[ $ARCH != ${BUILD_MACHINE} ]]; then
-		# cross compile required
-		if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
-			./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/Catalyst/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
-		else
-			./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
-		fi
+	# Cross compile required for Catalyst
+	if [[ "${ARCH}" == "arm64" ]]; then
+		./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/Catalyst/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
 	else
-		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
+		./configure --disable-shared --disable-app --disable-threads --enable-lib-only --prefix="${NGHTTP2}/Catalyst/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log"
 	fi
-
 	
 	make -j${CORES} >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
 	make install >> "/tmp/${NGHTTP2_VERSION}-catalyst-${ARCH}.log" 2>&1
