@@ -49,6 +49,13 @@ TVOS_SDK_VERSION=""
 
 CORES=$(sysctl -n hw.ncpu)
 
+if [ -z "${MACOS_X86_64_VERSION}" ]; then
+	MACOS_X86_64_VERSION=$(sw_vers -productVersion)
+fi
+if [ -z "${MACOS_ARM64_VERSION}" ]; then
+	MACOS_ARM64_VERSION=$(sw_vers -productVersion)
+fi
+
 usage ()
 {
 	echo
@@ -120,6 +127,10 @@ shift $((OPTIND-1))
 
 OPENSSL="${PWD}/../openssl"
 DEVELOPER=`xcode-select -print-path`
+
+if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
+	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
+fi
 
 # HTTP2 support
 if [ $nohttp2 == "1" ]; then
