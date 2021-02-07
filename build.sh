@@ -218,6 +218,7 @@ mkdir -p "$ARCHIVE/lib/Catalyst"
 fi
 mkdir -p "$ARCHIVE/bin"
 mkdir -p "$ARCHIVE/framework"
+mkdir -p "$ARCHIVE/xcframework"
 
 # libraries
 cp curl/lib/libcurl_iOS.a $ARCHIVE/lib/iOS/libcurl.a
@@ -226,17 +227,33 @@ cp curl/lib/libcurl_iOS-fat.a $ARCHIVE/lib/iOS-fat/libcurl.a
 cp curl/lib/libcurl_tvOS.a $ARCHIVE/lib/tvOS/libcurl.a
 cp curl/lib/libcurl_Mac.a $ARCHIVE/lib/MacOS/libcurl.a
 
+xcodebuild -create-xcframework \
+	-library $ARCHIVE/lib/iOS/libcurl.a \
+	-library $ARCHIVE/lib/iOS-simulator/libcurl.a \
+	-output $ARCHIVE/xcframework/libcurl.xcframework
+
 cp openssl/iOS/lib/libcrypto.a $ARCHIVE/lib/iOS/libcrypto.a
 cp openssl/iOS-simulator/lib/libcrypto.a $ARCHIVE/lib/iOS-simulator/libcrypto.a
 cp openssl/iOS-fat/lib/libcrypto.a $ARCHIVE/lib/iOS-fat/libcrypto.a
 cp openssl/tvOS/lib/libcrypto.a $ARCHIVE/lib/tvOS/libcrypto.a
 cp openssl/Mac/lib/libcrypto.a $ARCHIVE/lib/MacOS/libcrypto.a
 
+xcodebuild -create-xcframework \
+	-library $ARCHIVE/lib/iOS/libcrypto.a \
+	-library $ARCHIVE/lib/iOS-simulator/libcrypto.a \
+	-output $ARCHIVE/xcframework/libcrypto.xcframework
+
+
 cp openssl/iOS/lib/libssl.a $ARCHIVE/lib/iOS/libssl.a
 cp openssl/iOS-simulator/lib/libssl.a $ARCHIVE/lib/iOS-simulator/libssl.a
 cp openssl/iOS-fat/lib/libssl.a $ARCHIVE/lib/iOS-fat/libssl.a
 cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
+
+xcodebuild -create-xcframework \
+	-library $ARCHIVE/lib/iOS/libssl.a \
+	-library $ARCHIVE/lib/iOS-simulator/libssl.a \
+	-output $ARCHIVE/xcframework/libssl.xcframework
 
 if [ "$catalyst" == "-m" ]; then
 	cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
@@ -255,6 +272,12 @@ if [ "$buildnghttp2" != "" ]; then
 	if [ "$catalyst" == "-m" ]; then
 	cp nghttp2/lib/libnghttp2_Catalyst.a $ARCHIVE/lib/Catalyst/libnghttp2.a
 	fi
+
+	xcodebuild -create-xcframework \
+		-library $ARCHIVE/lib/iOS/libnghttp2.a \
+		-library $ARCHIVE/lib/iOS-simulator/libnghttp2.a \
+		-output $ARCHIVE/xcframework/libnghttp2.xcframework
+
 fi
 # archive header files
 cp openssl/iOS/include/openssl/* "$ARCHIVE/include/openssl"
