@@ -455,6 +455,59 @@ buildTVOS()
 	export CPPFLAGS=""
 }
 
+buildTVOSsim()
+{
+	ARCH=$1
+
+	pushd . > /dev/null
+	cd "${NGHTTP2_VERSION}"
+
+	PLATFORM="AppleTVSimulator"
+
+	TARGET="darwin64-${ARCH}-cc"
+	RUNTARGET="-target ${ARCH}-apple-tvos${TVOS_MIN_SDK_VERSION}-simulator"
+
+	export $PLATFORM
+	export SYSROOT=$(xcrun --sdk appletvsimulator --show-sdk-path)
+	export BUILD_TOOLS="${DEVELOPER}"
+	export CC="${BUILD_TOOLS}/usr/bin/gcc"
+	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} -fembed-bitcode ${RUNTARGET}"
+	export LDFLAGS="-arch ${ARCH} -isysroot ${SYSROOT} ${NGHTTP2LIB}"
+	export LC_CTYPE=C
+
+	echo -e "${subbold}Building ${NGHTTP2_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim} (tvOS Simulator ${TVOS_MIN_SDK_VERSION})"
+
+	# Patch apps/speed.c to not use fork() since it's not available on tvOS
+	# LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "./apps/speed.c"
+
+	# Patch Configure to build for tvOS, not iOS
+	# LANG=C sed -i -- 's/D\_REENTRANT\:iOS/D\_REENTRANT\:tvOS/' "./Configure"
+	# chmod u+x ./Configure
+
+	if [[ "${ARCH}" == "arm64" ]]; then
+	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS-simulator/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-tvOS-simulator${ARCH}.log"
+	else
+	./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/tvOS-simulator/${ARCH}" --host="${ARCH}-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-tvOS-simulator${ARCH}.log"
+	fi
+
+	LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "config.h"
+
+	# add -isysroot to CC=
+	#sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
+
+	make -j8 >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
+	make install  >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
+	make clean >> "/tmp/${NGHTTP2_VERSION}-tvOS-${ARCH}.log" 2>&1
+	popd > /dev/null
+
+	# Clean up exports
+	export CC=""
+	export CXX=""
+	export CFLAGS=""
+	export LDFLAGS=""
+	export CPPFLAGS=""
+}
+
 echo -e "${bold}Cleaning up${dim}"
 rm -rf include/nghttp2/* lib/*
 rm -fr Mac
@@ -537,12 +590,23 @@ lipo \
 
 echo -e "${bold}Building tvOS libraries${dim}"
 buildTVOS "arm64"
-buildTVOS "x86_64"
 
 lipo \
         "${NGHTTP2}/tvOS/arm64/lib/libnghttp2.a" \
-        "${NGHTTP2}/tvOS/x86_64/lib/libnghttp2.a" \
         -create -output "${NGHTTP2}/lib/libnghttp2_tvOS.a"
+
+buildTVOSsim "x86_64"
+buildTVOSsim "arm64"
+
+lipo \
+        "${NGHTTP2}/tvOS/arm64/lib/libnghttp2.a" \
+        "${NGHTTP2}/tvOS-simulator/x86_64/lib/libnghttp2.a" \
+        -create -output "${NGHTTP2}/lib/libnghttp2_tvOS-fat.a"
+
+lipo \
+	"${NGHTTP2}/tvOS-simulator/x86_64/lib/libnghttp2.a" \
+	"${NGHTTP2}/tvOS-simulator/arm64/lib/libnghttp2.a" \
+	-create -output "${NGHTTP2}/lib/libnghttp2_tvOS-simulator.a"
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${NGHTTP2_VERSION}-*

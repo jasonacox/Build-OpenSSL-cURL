@@ -429,6 +429,52 @@ buildTVOS()
 	popd > /dev/null
 }
 
+
+buildTVOSsim()
+{
+	ARCH=$1
+
+	pushd . > /dev/null
+	cd "${CURL_VERSION}"
+
+	PLATFORM="AppleTVSimulator"
+	PLATFORMDIR="tvOS-simulator"
+
+	if [ $nohttp2 == "1" ]; then
+		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/${PLATFORMDIR}/${ARCH}"
+		NGHTTP2LIB="-L${NGHTTP2}/${PLATFORMDIR}/${ARCH}/lib"
+	fi
+
+	TARGET="darwin64-${ARCH}-cc"
+	RUNTARGET="-target ${ARCH}-apple-tvos${TVOS_MIN_SDK_VERSION}-simulator"
+
+	export $PLATFORM
+	export SYSROOT=$(xcrun --sdk appletvsimulator --show-sdk-path)
+	export CC="${DEVELOPER}/usr/bin/gcc"
+	export CXX="${DEVELOPER}/usr/bin/gcc"
+	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} -fembed-bitcode ${RUNTARGET}"
+	export LDFLAGS="-arch ${ARCH} -isysroot ${SYSROOT} -L${OPENSSL}/${PLATFORMDIR}/lib ${NGHTTP2LIB}"
+	export CPPFLAGS=" -I.. -isysroot ${SYSROOT} "
+
+
+	echo -e "${subbold}Building ${CURL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim} (tvOS SIM ${TVOS_MIN_SDK_VERSION})"
+
+	if [[ "${ARCH}" == "arm64" ]]; then
+		./configure --prefix="/tmp/${CURL_VERSION}-tvOS-simulator-${ARCH}" --host="arm-apple-darwin" --disable-shared -with-random=/dev/urandom --disable-ntlm-wb --with-ssl="${OPENSSL}/${PLATFORMDIR}" ${NGHTTP2CFG}  &> "/tmp/${CURL_VERSION}-tvOS-simulator-${ARCH}.log"
+	else
+		./configure --prefix="/tmp/${CURL_VERSION}-tvOS-simulator-${ARCH}" --host="${ARCH}-apple-darwin" --disable-shared  -with-random=/dev/urandom --disable-ntlm-wb --with-ssl="${OPENSSL}/${PLATFORMDIR}" ${NGHTTP2CFG}  &> "/tmp/${CURL_VERSION}-tvOS-simulator-${ARCH}.log"
+	fi
+
+	# Patch to not use fork() since it's not available on tvOS
+        LANG=C sed -i -- 's/define HAVE_FORK 1/define HAVE_FORK 0/' "./lib/curl_config.h"
+        LANG=C sed -i -- 's/HAVE_FORK"]=" 1"/HAVE_FORK\"]=" 0"/' "config.status"
+
+	make -j${CORES} >> "/tmp/${CURL_VERSION}-tvOS-simulator-${ARCH}.log" 2>&1
+	make install >> "/tmp/${CURL_VERSION}-tvOS-simulator-${ARCH}.log" 2>&1
+	make clean >> "/tmp/${CURL_VERSION}-tvOS-simulator-${ARCH}.log" 2>&1
+	popd > /dev/null
+}
+
 echo -e "${bold}Cleaning up${dim}"
 rm -rf include/curl/* lib/*
 
@@ -528,13 +574,23 @@ fi
 
 echo -e "${bold}Building tvOS libraries${dim}"
 buildTVOS "arm64"
-buildTVOS "x86_64"
 
 lipo \
 	"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-tvOS-x86_64/lib/libcurl.a" \
 	-create -output lib/libcurl_tvOS.a
 
+buildTVOSsim "x86_64"
+buildTVOSsim "arm64"
+
+lipo \
+	"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-tvOS-simulator-x86_64/lib/libcurl.a" \
+	-create -output lib/libcurl_tvOS-fat.a
+
+lipo \
+	"/tmp/${CURL_VERSION}-tvOS-simulator-x86_64/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-tvOS-simulator-arm64/lib/libcurl.a" \
+	-create -output lib/libcurl_tvOS-simulator.a
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${CURL_VERSION}-*
