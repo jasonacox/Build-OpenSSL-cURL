@@ -126,8 +126,12 @@ DEVELOPER=`xcode-select -print-path`
 
 NGHTTP2="${PWD}/../nghttp2"
 
-if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
-	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
+# Semantic Version Comparison
+version_lte() {
+    [  "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+if version_lte $MACOS_ARM64_VERSION 11.0; then
+        MACOS_ARM64_VERSION="11.0"      # Min support for Apple Silicon is 11.0
 fi
 
 # Check to see if pkg-config is already installed

@@ -26,14 +26,19 @@ CATALYST_IOS="13.0"				# Min supported is iOS 13.0 for Mac Catalyst
 IOS_MIN_SDK_VERSION="8.0"
 TVOS_MIN_SDK_VERSION="9.0"
 
+# Semantic Version Comparison
+version_lte() {
+    [  "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+
 if [ -z "${MACOS_X86_64_VERSION}" ]; then
 	MACOS_X86_64_VERSION=$(sw_vers -productVersion)
 fi
 if [ -z "${MACOS_ARM64_VERSION}" ]; then
 	MACOS_ARM64_VERSION=$(sw_vers -productVersion)
 fi
-if (( $(echo "${MACOS_ARM64_VERSION} < 11.0" |bc -l) )); then
-	MACOS_ARM64_VERSION="11.0"	# Min support for Apple Silicon is 11.0 
+if version_lte $MACOS_ARM64_VERSION 11.0; then
+        MACOS_ARM64_VERSION="11.0"      # Min support for Apple Silicon is 11.0
 fi
 
 # Global flags
