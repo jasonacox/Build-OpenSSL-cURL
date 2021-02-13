@@ -31,7 +31,7 @@ jobs:
       script:
         - cd nghttp2;./nghttp2-build.sh -v "$NGHTTP2"
         - cd ..
-        - tar -zcf "nghttp2.tgz" nghttp2/Catalyst nghttp2/iOS* nghttp2/tvOS nghttp2/lib 
+        - tar -zcf "nghttp2.tgz" nghttp2/Catalyst nghttp2/iOS* nghttp2/tvOS* nghttp2/lib 
         - aws s3 cp "nghttp2.tgz" s3://jasonacox.com.travis-build-stage-storage/
         - aws s3 ls jasonacox.com.travis-build-stage-storage
 
@@ -41,7 +41,7 @@ jobs:
         - cd ..
         - cp /tmp/openssl-x86_64 openssl/Mac/openssl
         - /tmp/openssl-x86_64 version
-        - tar -zcf "openssl-1.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
+        - tar -zcf "openssl-1.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS*
         - aws s3 cp "openssl-1.tgz" s3://jasonacox.com.travis-build-stage-storage/
         - aws s3 ls jasonacox.com.travis-build-stage-storage
 
@@ -49,7 +49,7 @@ jobs:
       script: 
         - cd openssl;./openssl-build-phase2.sh -v "$OPENSSL"
         - cd ..
-        - tar -zcf "openssl-2.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS
+        - tar -zcf "openssl-2.tgz" openssl/Mac openssl/Catalyst openssl/iOS* openssl/tvOS*
         - aws s3 cp "openssl-2.tgz" s3://jasonacox.com.travis-build-stage-storage/
         - aws s3 ls jasonacox.com.travis-build-stage-storage
 
