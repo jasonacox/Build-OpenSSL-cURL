@@ -301,7 +301,7 @@ fi
 cp openssl/iOS/include/openssl/* "$ARCHIVE/include/openssl"
 cp curl/include/curl/* "$ARCHIVE/include/curl"
 # grab root certs
-curl -s https://curl.haxx.se/ca/cacert.pem > $ARCHIVE/cacert.pem
+curl -sL https://curl.se/ca/cacert.pem > $ARCHIVE/cacert.pem
 # create README for archive
 sed -e "s/ZZZLIBCURL/$LIBCURL/g" -e "s/ZZZOPENSSL/$OPENSSL/g" -e "s/ZZZNGHTTP2/$NGHTTP2/g" archive/release-template.md > $ARCHIVE/README.md
 echo
