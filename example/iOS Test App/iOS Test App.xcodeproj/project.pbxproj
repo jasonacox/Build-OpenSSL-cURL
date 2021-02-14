@@ -15,10 +15,10 @@
 		1B4AA22C1DE16AEF008187BD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1B4AA22A1DE16AEF008187BD /* LaunchScreen.storyboard */; };
 		1B4AA24E1DE18290008187BD /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 1B4AA24D1DE18290008187BD /* libz.tbd */; };
 		1B4AA2501DE195DE008187BD /* cacert.pem in Resources */ = {isa = PBXBuildFile; fileRef = 1B4AA24F1DE195DE008187BD /* cacert.pem */; };
-		960E025825D8AC640093AB63 /* libcrypto.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E025725D8AC630093AB63 /* libcrypto.xcframework */; };
-		960E025B25D8AC6D0093AB63 /* libcurl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E025A25D8AC6D0093AB63 /* libcurl.xcframework */; };
-		960E025E25D8AC740093AB63 /* libnghttp2.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E025D25D8AC740093AB63 /* libnghttp2.xcframework */; };
-		960E026125D8AC7A0093AB63 /* libssl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E026025D8AC7A0093AB63 /* libssl.xcframework */; };
+		960E026825D8B8E10093AB63 /* libcrypto.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E026725D8B8E10093AB63 /* libcrypto.xcframework */; };
+		960E026B25D8B8E80093AB63 /* libcurl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E026A25D8B8E80093AB63 /* libcurl.xcframework */; };
+		960E026E25D8B8EE0093AB63 /* libnghttp2.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E026D25D8B8EE0093AB63 /* libnghttp2.xcframework */; };
+		960E027125D8B8F30093AB63 /* libssl.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 960E027025D8B8F30093AB63 /* libssl.xcframework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,10 +34,10 @@
 		1B4AA22D1DE16AEF008187BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1B4AA24D1DE18290008187BD /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		1B4AA24F1DE195DE008187BD /* cacert.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = cacert.pem; sourceTree = "<group>"; };
-		960E025725D8AC630093AB63 /* libcrypto.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libcrypto.xcframework; path = "../../archive/libcurl-7.74.0-openssl-1.1.1i-nghttp2-1.42.0/xcframework/libcrypto.xcframework"; sourceTree = "<group>"; };
-		960E025A25D8AC6D0093AB63 /* libcurl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libcurl.xcframework; path = "../../archive/libcurl-7.74.0-openssl-1.1.1i-nghttp2-1.42.0/xcframework/libcurl.xcframework"; sourceTree = "<group>"; };
-		960E025D25D8AC740093AB63 /* libnghttp2.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libnghttp2.xcframework; path = "../../archive/libcurl-7.74.0-openssl-1.1.1i-nghttp2-1.42.0/xcframework/libnghttp2.xcframework"; sourceTree = "<group>"; };
-		960E026025D8AC7A0093AB63 /* libssl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libssl.xcframework; path = "../../archive/libcurl-7.74.0-openssl-1.1.1i-nghttp2-1.42.0/xcframework/libssl.xcframework"; sourceTree = "<group>"; };
+		960E026725D8B8E10093AB63 /* libcrypto.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libcrypto.xcframework; path = libs/libcrypto.xcframework; sourceTree = "<group>"; };
+		960E026A25D8B8E80093AB63 /* libcurl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libcurl.xcframework; path = libs/libcurl.xcframework; sourceTree = "<group>"; };
+		960E026D25D8B8EE0093AB63 /* libnghttp2.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libnghttp2.xcframework; path = libs/libnghttp2.xcframework; sourceTree = "<group>"; };
+		960E027025D8B8F30093AB63 /* libssl.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = libssl.xcframework; path = libs/libssl.xcframework; sourceTree = "<group>"; };
 		96AAC802250F224E009E2EE3 /* iOS Test App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "iOS Test App.entitlements"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -46,11 +46,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				960E025825D8AC640093AB63 /* libcrypto.xcframework in Frameworks */,
+				960E026825D8B8E10093AB63 /* libcrypto.xcframework in Frameworks */,
 				1B4AA24E1DE18290008187BD /* libz.tbd in Frameworks */,
-				960E026125D8AC7A0093AB63 /* libssl.xcframework in Frameworks */,
-				960E025B25D8AC6D0093AB63 /* libcurl.xcframework in Frameworks */,
-				960E025E25D8AC740093AB63 /* libnghttp2.xcframework in Frameworks */,
+				960E027125D8B8F30093AB63 /* libssl.xcframework in Frameworks */,
+				960E026B25D8B8E80093AB63 /* libcurl.xcframework in Frameworks */,
+				960E026E25D8B8EE0093AB63 /* libnghttp2.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -104,10 +104,10 @@
 			isa = PBXGroup;
 			children = (
 				1B4AA24D1DE18290008187BD /* libz.tbd */,
-				960E025725D8AC630093AB63 /* libcrypto.xcframework */,
-				960E025A25D8AC6D0093AB63 /* libcurl.xcframework */,
-				960E025D25D8AC740093AB63 /* libnghttp2.xcframework */,
-				960E026025D8AC7A0093AB63 /* libssl.xcframework */,
+				960E026725D8B8E10093AB63 /* libcrypto.xcframework */,
+				960E026A25D8B8E80093AB63 /* libcurl.xcframework */,
+				960E026D25D8B8EE0093AB63 /* libnghttp2.xcframework */,
+				960E027025D8B8F30093AB63 /* libssl.xcframework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
