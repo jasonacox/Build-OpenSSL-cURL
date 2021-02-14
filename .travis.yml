@@ -83,15 +83,15 @@ jobs:
         - tar -zxf nghttp2.tgz
         - tar -zxf curl.tgz
         - echo "Fetching root certs..."
-        - curl -s https://curl.haxx.se/ca/cacert.pem > "$EXAMPLE/cacert.pem"
+        - curl -sL https://curl.haxx.se/ca/cacert.pem > "$EXAMPLE/cacert.pem"
         - echo "Copying libraries to Test App ..."
         - mkdir -p "$EXAMPLE/libs/"
-        - cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
-        - cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
-        - cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
+        - echo "Making XCFrameworks..."
+        - xcodebuild -create-xcframework -library curl/lib/libcurl_iOS.a -library curl/lib/libcurl_iOS-simulator.a -output "$EXAMPLE/libs/libcurl.xcframework"
+        - xcodebuild -create-xcframework -library openssl/iOS/lib/libcrypto.a -library openssl/iOS-simulator/lib/libcrypto.a -output "$EXAMPLE/libs/libcrypto.xcframework"
+        - xcodebuild -create-xcframework -library openssl/iOS/lib/libssl.a -library openssl/iOS-simulator/lib/libssl.a -output  "$EXAMPLE/libs/libssl.xcframework"
+        - xcodebuild -create-xcframework -library nghttp2/lib/libnghttp2_iOS.a -library nghttp2/lib/libnghttp2_iOS-simulator.a -output "$EXAMPLE/libs/libnghttp2.xcframework"
         - cp curl/include/curl/* "$EXAMPLE/include/curl/"
-        - cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
-        - cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
         - echo "Building iOS Test App for iPhoneSimulator..."
         - xcodebuild clean -project "$EXAMPLE/iOS Test App.xcodeproj"
         - xcodebuild build -project "$EXAMPLE/iOS Test App.xcodeproj" -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -arch x86_64
