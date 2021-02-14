@@ -6,6 +6,7 @@ This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), 
 
 ## News
 
+* 13-Feb-2021: Update now builds XCFrameworks which supports all platforms and targets for easy import into your projects.
 * 16-Jan-2021: Updated build scripts to allow user defined minimum macOS, iOS, tvOS and catalyst target build versions. 
 * 02-Jan-2021: Apple Silicon [Beta]: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS arm64 targets, including iOS Simulator and Mac Catalyst. Script runs on Apple Silicon arm64 and Intel x86_64 build hosts. Not complete: tvOS Simulator.
 * 14-Sep-2020: Mac Catalyst: This now optionally builds libraries for [Mac Catalyst](https://developer.apple.com/mac-catalyst/)
@@ -165,9 +166,9 @@ See the example 'iOS Test App'.
 
  1. Clone this Repo 
  2. Run `build.sh` 
- 3. Libraries are created in curl/lib, openssl/*/lib, and nghttp2/lib or you can find them in the archives folder.
- 4. Copy libs and headers to your project.
- 5. Import appropriate "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a".
+ 3. Headers, libraries and XCFrameworks are stored in the archives folder. 
+ 4. Copy the headers to your project.
+ 5. Import appropriate "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a", or alternatively, you can copy the appropriate xcframework folder into your Xcode project. 
  6. Reference Headers, "Headers/openssl", "Headers/curl".
  7. Specifying the flag  "-lz" in "Other Linker Flags" (OTHER_LDFLAGS) setting in the "Linking" section in the Build settings of the target.
  8. To use cURL, see below:
@@ -202,7 +203,7 @@ You may also need to edit this section:
 
 ### Example Apps
 
-Example Xcode project "iOS Test App" is located in the example folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2 libraries. The app provides a simple single text field interface for URL input and produces a curl response.
+Example Xcode project "iOS Test App" is located in the example folder.  This project builds an iPhone Objective C App using libcurl, openssl, and nghttp2 libraries via XCFrameworks. The app provides a simple single text field interface for URL input and produces a curl response.
 
 The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 
@@ -212,7 +213,6 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 	|____archive
 	|
 	|____curl
-	| |____lib
 	| |____libcurl-build.sh
 	|
 	|____example
@@ -283,11 +283,33 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 	* openssl/openssl-ios-x86_64-simulator.a are: i386 x86_64 
 	* openssl/openssl-ios-x86_64-maccatalyst.a is architecture: x86_64
 
+* XCFrameworks
+        |__ libcrypto.xcframework
+        │   |__ ios-arm64_arm64e_armv7_armv7s
+        │   |__ ios-arm64_i386_x86_64-simulator
+        │   |__ tvos-arm64
+        │   |__ tvos-arm64_x86_64-simulator
+        |__ libcurl.xcframework
+        │   |__ ios-arm64_arm64e_armv7_armv7s
+        │   |__ ios-arm64_i386_x86_64-simulator
+        │   |__ tvos-arm64
+        │   |__ tvos-arm64_x86_64-simulator
+        |__ libnghttp2.xcframework
+        │   |__ ios-arm64_arm64e_armv7_armv7s
+        │   |__ ios-arm64_i386_x86_64-simulator
+        │   |__ tvos-arm64
+        │   |__ tvos-arm64_x86_64-simulator
+        |__ libssl.xcframework
+            |__ ios-arm64_arm64e_armv7_armv7s
+            |__ ios-arm64_i386_x86_64-simulator
+            |__ tvos-arm64
+            |__ tvos-arm64_x86_64-simulator
+
 ### Archive
 
 The `build.sh` script will create an ./archive folder and store all the *.a libraries built along with the header files and a MacOS binaries for `curl` and `openssl`.
 
-	   |___libcurl-7.66.0-openssl-1.1.1d-nghttp2-1.39.2
+        |___libcurl-7.66.0-openssl-1.1.1d-nghttp2-1.39.2
              |
              |____cacert.pem
              |
@@ -312,7 +334,7 @@ The `build.sh` script will create an ./archive folder and store all the *.a libr
 ## Download Compressed Archives
 
 Previous builds can be downloaded form the Github releases for this project: https://github.com/jasonacox/Build-OpenSSL-cURL/releases
- 
+
 ## License
 
 The MIT License is used for this project.  See LICENSE file.
@@ -354,4 +376,4 @@ If you see "FATAL ERROR" during the nghttp2 build phase, this is likely due to n
 
 If you are on a new macOS installation and wonder why the build is failing, you might need to set the correct path for the command line tools:
 
-	xcode-select --switch /Applications/Xcode.app
+    xcode-select --switch /Applications/Xcode.app
