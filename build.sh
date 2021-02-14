@@ -210,6 +210,7 @@ ARCHIVE="archive/libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2"
 echo
 echo -e "${bold}Creating archive with XCFrameworks for release v$LIBCURL...${dim}"
 echo "  See $ARCHIVE"
+rm -rf "$ARCHIVE"
 mkdir -p "$ARCHIVE"
 mkdir -p "$ARCHIVE/include/openssl"
 mkdir -p "$ARCHIVE/include/curl"
