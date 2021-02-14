@@ -85,6 +85,7 @@ jobs:
         - echo "Fetching root certs..."
         - curl -sL https://curl.haxx.se/ca/cacert.pem > "$EXAMPLE/cacert.pem"
         - echo "Copying libraries to Test App ..."
+        - rm -fr "$EXAMPLE/libs/"
         - mkdir -p "$EXAMPLE/libs/"
         - echo "Making XCFrameworks..."
         - xcodebuild -create-xcframework -library curl/lib/libcurl_iOS.a -library curl/lib/libcurl_iOS-simulator.a -output "$EXAMPLE/libs/libcurl.xcframework"
