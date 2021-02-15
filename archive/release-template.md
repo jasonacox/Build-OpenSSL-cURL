@@ -1,6 +1,6 @@
 # Release ZZZLIBCURL Library and Headers
 
-This release includes cURL+OpenSSL+Nghttp2 libraries and header files for MacOS, iOS and tvOS projects.
+This release includes cURL, OpenSSL and Nghttp2 libraries and header files for MacOS, Mac Catalyst, iOS and tvOS projects.
 
 ## Versions
 
@@ -10,22 +10,24 @@ This release includes cURL+OpenSSL+Nghttp2 libraries and header files for MacOS,
 
 ## Archive
 
-This directory contains the curl and openssl headers (in the `include` folder), the various *.a libraries built along with a MacOS binary for `curl` and `openssl` (built for intel and arm64).
+This directory contains the curl and openssl headers (in the `include` folder), the *.a libraries and XCFrameworks along with MacOS executable binaries for `curl` and `openssl` (intel x86_64 and Apple silicon arm64).
 
     |__libcurl-ZZZLIBCURL-openssl-ZZZOPENSSL-nghttp2-ZZZNGHTTP2
-        |__ README.md
+        |
         |__ bin/
-        │   |__ curl*
+        │   |__ curl*  (universal binary)
         │   |__ curl-arm64*
         │   |__ curl-x86_64*
-        │   |__ openssl*
+        │   |__ openssl*  (universal binary)
         │   |__ openssl-arm64*
         │   |__ openssl-x86_64*
+        |
         |__ cacert.pem
-        |__ framework/
+        |
         |__ include/
         │   |__ curl/
         │   |__ openssl/
+        |
         |__ lib/
         │   |__ Catalyst/
         │   |__ MacOS/
@@ -34,6 +36,7 @@ This directory contains the curl and openssl headers (in the `include` folder), 
         │   |__ iOS-simulator/
         │   |__ tvOS/
         │   |__ tvOS-simulator/
+        |
         |__ xcframework/
             |__ libcrypto.xcframework/
             │   |__ ios-arm64_arm64e_armv7_armv7s/
@@ -60,7 +63,7 @@ This directory contains the curl and openssl headers (in the `include` folder), 
 
  1. Copy headers to your project.
  2. Import appropriate libraries: "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a" *or*
-    Alternative: Import appropriate *xcframework* folders into your project in Xcode.
+    **XCFrameworks Alternative**: Import appropriate *xcframework* folders into your project in Xcode.
  3. Reference Headers.
  4. Specifying the flag  "-lz" in "Other Linker Flags" (OTHER_LDFLAGS) setting in the "Linking" section in the Build settings of the target.
  5. Initialize curl in your code:

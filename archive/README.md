@@ -1,6 +1,6 @@
 # Build-OpenSSL-cURL Binaries 
 
-The `build.sh` script stores the builds in this archive directory. The directory names are based on the version of the releases of OpenSSL, nghttp2 and libcurl and includes the libraries for MacOS, Mac Catalyst, iOS and tvOS.  
+The `build.sh` script stores the builds in this archive directory. The directory names are based on the version of the releases of OpenSSL, nghttp2 and libcurl and include the libraries for MacOS, Mac Catalyst, iOS and tvOS.  
 
 ## Build Your Own or Use These
 
