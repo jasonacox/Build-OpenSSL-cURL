@@ -6,12 +6,31 @@ Author: Jason Cox, @jasonacox, https://github.com/jasonacox/Build-OpenSSL-cURL
 If your name is not listed and you have contributed, please edit and 
 submit a pull request.
 
-* Daniel Stenberg, @bagder, author and maintainer of cURL and libcurl 
+## Library Authors
+
+* Daniel Stenberg, @bagder, author and maintainer of cURL and libcurl
    https://daniel.haxx.se/
 * OpenSSL Software Foundation, maintainer of OpenSSL
    https://www.openssl.org/
 * Tatsuhiro Tsujikawa, @tatsuhiro_t, author and maintainer of nghttp2 library and tools
-   https://github.com/nghttp2/nghttp2 
+   https://github.com/nghttp2/nghttp2
+
+## Maintainer
+
+* Jason Cox, @jasonacox
+   https://github.com/jasonacox/Build-OpenSSL-cURL
+
+## Contributors
+
+* Preston Jennings, @prestonj, Fixed Mac target build (was building for iOS not OSX) #2
+* TosSense, @tossense, Fixed typo and add a header example of curlbuild.h #13
+* Jbfitb, @jbfitb, Added armv7s to lipo for libcrypto and libssl #25
+* Sammy Lan, @SammyLan, Added support for -b(disablebitcode) option #37
+* Tom Peeters, @Tommy2d, Mac Catalyst build support and separated binaries for simulators #42 #45
+* Foster Brereton, @fosterbrereton, Increased compilation speed using all cores #48
+* Mo Farajmandi, @mofarajmandi, Added support for XCFramework and Apple Silicon tvOS Simulator #51
+
+## Reference Projects
 
 * Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
    https://gist.github.com/c61c0f7d9ab60f53ebb0.git
@@ -25,5 +44,7 @@ submit a pull request.
    https://gist.github.com/foozmeat/5154962
 * Peter Steinberger, PSPDFKit GmbH, @steipete.
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
-* Tom Peeters, Tommy2d, Brightfish
-   https://github.com/tommy2d
+
+## Issues and Feedback
+
+* Thanks to all of you who submit feedback and create issue tickets to help us improve the build script!

@@ -284,21 +284,25 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 	* openssl/openssl-ios-x86_64-maccatalyst.a is architecture: x86_64
 
 * XCFrameworks
+
         |__ libcrypto.xcframework
         │   |__ ios-arm64_arm64e_armv7_armv7s
         │   |__ ios-arm64_i386_x86_64-simulator
         │   |__ tvos-arm64
         │   |__ tvos-arm64_x86_64-simulator
+        |
         |__ libcurl.xcframework
         │   |__ ios-arm64_arm64e_armv7_armv7s
         │   |__ ios-arm64_i386_x86_64-simulator
         │   |__ tvos-arm64
         │   |__ tvos-arm64_x86_64-simulator
+        |
         |__ libnghttp2.xcframework
         │   |__ ios-arm64_arm64e_armv7_armv7s
         │   |__ ios-arm64_i386_x86_64-simulator
         │   |__ tvos-arm64
         │   |__ tvos-arm64_x86_64-simulator
+        |
         |__ libssl.xcframework
             |__ ios-arm64_arm64e_armv7_armv7s
             |__ ios-arm64_i386_x86_64-simulator
@@ -339,7 +343,9 @@ Previous builds can be downloaded form the Github releases for this project: htt
 
 The MIT License is used for this project.  See LICENSE file.
 
-## Credits & Thanks
+## Credit and Thanks
+
+### Library Authors
 
 * Daniel Stenberg, @bagder, author and maintainer of cURL and libcurl
    https://daniel.haxx.se/
@@ -347,6 +353,23 @@ The MIT License is used for this project.  See LICENSE file.
    https://www.openssl.org/
 * Tatsuhiro Tsujikawa, @tatsuhiro_t, author and maintainer of nghttp2 library and tools
    https://github.com/nghttp2/nghttp2
+
+### Maintainer
+
+* Jason Cox, @jasonacox
+   https://github.com/jasonacox/Build-OpenSSL-cURL
+
+### Contributors
+
+* Preston Jennings, @prestonj, Fixed Mac target build (was building for iOS not OSX) #2
+* TosSense, @tossense, Fixed typo and add a header example of curlbuild.h #13
+* Jbfitb, @jbfitb, Added armv7s to lipo for libcrypto and libssl #25
+* Sammy Lan, @SammyLan, Added support for -b(disablebitcode) option #37
+* Tom Peeters, @Tommy2d, Mac Catalyst build support and separated binaries for simulators #42 #45
+* Foster Brereton, @fosterbrereton, Increased compilation speed using all cores #48
+* Mo Farajmandi, @mofarajmandi, Added support for XCFramework and Apple Silicon tvOS Simulator #51
+
+### Reference Projects
 
 * Felix Schwarz, IOSPIRIT GmbH, @@felix_schwarz.
    https://gist.github.com/c61c0f7d9ab60f53ebb0.git
@@ -360,11 +383,10 @@ The MIT License is used for this project.  See LICENSE file.
    https://gist.github.com/foozmeat/5154962
 * Peter Steinberger, PSPDFKit GmbH, @steipete.
    https://gist.github.com/felix-schwarz/c61c0f7d9ab60f53ebb0
-* Tom Peeters, Tommy2d, Brightfish, Mac Catalyst build support
-   https://github.com/tommy2d
 
-* Jason Cox, @jasonacox
-   https://github.com/jasonacox/Build-OpenSSL-cURL
+### Issues and Feedback
+
+* Thanks to all of you who submit feedback and create issue tickets to help us improve the build scripts!
 
 ## Build Troubleshooting Tips
 
