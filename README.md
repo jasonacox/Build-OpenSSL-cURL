@@ -1,6 +1,6 @@
 # Build-OpenSSL-cURL
 
-[![Build Status](https://travis-ci.com/jasonacox/Build-OpenSSL-cURL.svg?branch=master)](https://travis-ci.com/jasonacox/Build-OpenSSL-cURL)
+[![Build Status](https://app.travis-ci.com/jasonacox/Build-OpenSSL-cURL.svg?branch=master)](https://app.travis-ci.com/jasonacox/Build-OpenSSL-cURL)
 
 This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), Mac Catalyst (x86_64, arm64), iOS (armv7, armv7s, arm64 and arm64e), iOS Simulator (x86_64, arm64), tvOS (arm64) and tvOS Simulator (x86_64).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
 
