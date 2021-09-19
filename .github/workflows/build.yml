@@ -27,4 +27,8 @@ jobs:
       - name: Run build script
         run: bash build.sh
 
+      # Build test iOS App
+      - name: Build Test iOS App
+        run: xcodebuild clean -project "example/iOS Test App/iOS Test App.xcodeproj"
+        run: xcodebuild build -project "example/iOS Test App/iOS Test App.xcodeproj" -sdk iphonesimulator ONLY_ACTIVE_ARCH=NO -arch x86_64
 
