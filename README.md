@@ -19,11 +19,11 @@ The `build.sh` script calls the three build scripts below (openssl, nghttp and c
 The build script accepts several arguments to adjust versions and toggle features:
 
 ```
-  ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-x] [-h] [...]
+  ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-3] [-x] [-h] [...]
 
-         -o <version>   Build OpenSSL version (default 1.1.1i)
-         -c <version>   Build curl version (default 7.74.0)
-         -n <version>   Build nghttp2 version (default 1.42.0)
+         -o <version>   Build OpenSSL version (default 1.1.1o)
+         -c <version>   Build curl version (default 7.83.1)
+         -n <version>   Build nghttp2 version (default 1.47.0)
          -d             Compile without HTTP2 support
          -e             Compile with OpenSSL engine support
          -b             Compile without bitcode
@@ -32,8 +32,8 @@ The build script accepts several arguments to adjust versions and toggle feature
          -3             Compile with SSLv3
          -s <version>   iOS min target version (default 8.0)
          -t <version>   tvOS min target version (default 9.0)
-         -i <version>   macOS 86_64 min target version (default 11.1)
-         -a <version>   macOS arm64 min target version (default 11.1)
+         -i <version>   macOS 86_64 min target version (default 11.6.6)
+         -a <version>   macOS arm64 min target version (default 11.6.6)
          -x             No color output
          -h             Show usage
 ```
@@ -72,9 +72,9 @@ You can update the default version by editing this section in the `build.sh` scr
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="1.1.1i"        # https://www.openssl.org/source/
-LIBCURL="7.74.0"        # https://curl.haxx.se/download.html
-NGHTTP2="1.42.0"        # https://nghttp2.org/
+OPENSSL="1.1.1o"        # https://www.openssl.org/source/
+LIBCURL="7.83.1"        # https://curl.haxx.se/download.html
+NGHTTP2="1.47.0"        # https://nghttp2.org/
 
 ################################################
 ```
