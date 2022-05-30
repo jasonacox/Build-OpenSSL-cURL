@@ -8,7 +8,7 @@
 //
 //  COPYRIGHT AND PERMISSION NOTICE
 //
-//  Copyright (c) 2014-2021 Jason A. Cox, jason@jasonacox.com, and contributors,
+//  Copyright (c) 2014-2022 Jason A. Cox, jason@jasonacox.com, and contributors,
 //  see the THANKS file.
 //
 //  All rights reserved.
