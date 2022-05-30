@@ -57,6 +57,12 @@ if [ -z "${MACOS_ARM64_VERSION}" ]; then
 	MACOS_ARM64_VERSION=$(sw_vers -productVersion)
 fi
 
+# Semantic Version Comparison
+version_lte() {
+    [  "$1" = "`echo -e "$1\n$2" | sort -V | head -n1`" ]
+}
+
+# Usage Instructions
 usage ()
 {
 	echo
@@ -507,11 +513,16 @@ echo "Unpacking curl"
 tar xfz "${CURL_VERSION}.tar.gz"
 
 if [ ${FORCE_SSLV3} == 'yes' ]; then
-	# for library
-	sed -i '' '/version == CURL_SSLVERSION_SSLv3/d' "${CURL_VERSION}/lib/setopt.c"
-	patch "${CURL_VERSION}/lib/vtls/openssl.c" sslv3.patch
-	# for command line
-	sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\\n\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
+	if version_lte ${CURL_VERSION} "curl-7.76.1"; then
+		echo "SSLv3 Requested: No patch needed for ${CURL_VERSION}."
+	else
+		echo "SSLv3 Requested: This requires a patch for 7.77.0 and above - mileage may vary."
+		# for library
+		sed -i '' '/version == CURL_SSLVERSION_SSLv3/d' "${CURL_VERSION}/lib/setopt.c"
+		patch -N "${CURL_VERSION}/lib/vtls/openssl.c" sslv3.patch || true
+		# for command line
+		sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\\n\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
+	fi
 fi
 
 echo -e "${bold}Building Mac libraries${dim}"
