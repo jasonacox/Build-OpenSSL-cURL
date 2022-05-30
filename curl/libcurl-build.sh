@@ -37,6 +37,7 @@ trap 'echo -e "${alert}** ERROR with Build - Check /tmp/curl*.log${alertdim}"; t
 CURL_VERSION="curl-7.74.0"
 nohttp2="0"
 catalyst="0"
+FORCE_SSLV3="no"
 
 # Set minimum OS versions for target
 MACOS_X86_64_VERSION=""			# Empty = use host version
@@ -73,13 +74,14 @@ usage ()
 	echo "         -u   Mac Catalyst iOS min target version (default $CATALYST_IOS)"
 	echo "         -m   compile Mac Catalyst library [beta]"
 	echo "         -x   disable color output"
+	echo "         -3   enable SSLv3 support"
 	echo "         -h   show usage"
 	echo
 	trap - INT TERM EXIT
 	exit 127
 }
 
-while getopts "v:s:t:i:a:u:nmbxh\?" o; do
+while getopts "v:s:t:i:a:u:nmb3xh\?" o; do
     case "${o}" in
         v)
 			CURL_VERSION="curl-${OPTARG}"
@@ -117,6 +119,9 @@ while getopts "v:s:t:i:a:u:nmbxh\?" o; do
 			alert=""
 			alertdim=""
 			archbold=""
+			;;
+		3)
+			FORCE_SSLV3="yes"
 			;;
         *)
             usage
@@ -500,6 +505,14 @@ fi
 
 echo "Unpacking curl"
 tar xfz "${CURL_VERSION}.tar.gz"
+
+if [ ${FORCE_SSLV3} == 'yes' ]; then
+	# for library
+	sed -i '' '/version == CURL_SSLVERSION_SSLv3/d' "${CURL_VERSION}/lib/setopt.c"
+	patch "${CURL_VERSION}/lib/vtls/openssl.c" sslv3.patch
+	# for command line
+	sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\\n\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
+fi
 
 echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
