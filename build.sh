@@ -22,7 +22,7 @@ BUILD_MACHINE=`uname -m`
 # Set minimum OS versions for target
 MACOS_X86_64_VERSION=""			# Empty = use host version
 MACOS_ARM64_VERSION=""			# Min supported is MacOS 11.0 Big Sur
-CATALYST_IOS="13.0"				# Min supported is iOS 13.0 for Mac Catalyst
+CATALYST_IOS="15.0"				# Min supported is iOS 15.0 for Mac Catalyst
 IOS_MIN_SDK_VERSION="8.0"
 TVOS_MIN_SDK_VERSION="9.0"
 
@@ -154,7 +154,7 @@ OSARGS="-s ${IOS_MIN_SDK_VERSION} -t ${TVOS_MIN_SDK_VERSION} -i ${MACOS_X86_64_V
 
 ## Welcome
 echo -e "${bold}Build-OpenSSL-cURL${dim}"
-if [ "$catalyst" == "-m" ]; then
+if [ "$catalyst" != "" ]; then
 	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, Catalyst, iOS and tvOS devices."
 else
 	echo "This script builds OpenSSL, nghttp2 and libcurl for MacOS, iOS and tvOS devices."
@@ -220,8 +220,8 @@ mkdir -p "$ARCHIVE/lib/iOS-fat"
 mkdir -p "$ARCHIVE/lib/MacOS"
 mkdir -p "$ARCHIVE/lib/tvOS"
 mkdir -p "$ARCHIVE/lib/tvOS-simulator"
-if [ "$catalyst" == "-m" ]; then
-mkdir -p "$ARCHIVE/lib/Catalyst"
+if [ "$catalyst" != "" ]; then
+	mkdir -p "$ARCHIVE/lib/Catalyst"
 fi
 mkdir -p "$ARCHIVE/bin"
 mkdir -p "$ARCHIVE/framework"
@@ -249,7 +249,7 @@ cp openssl/tvOS/lib/libssl.a $ARCHIVE/lib/tvOS/libssl.a
 cp openssl/tvOS-simulator/lib/libssl.a $ARCHIVE/lib/tvOS-simulator/libssl.a
 cp openssl/Mac/lib/libssl.a $ARCHIVE/lib/MacOS/libssl.a
 
-if [ "$catalyst" == "-m" ]; then
+if [ "$catalyst" != "" ]; then
 	# Add catalyst libraries
 	cp curl/lib/libcurl_Catalyst.a $ARCHIVE/lib/Catalyst/libcurl.a
 	cp openssl/Catalyst/lib/libcrypto.a $ARCHIVE/lib/Catalyst/libcrypto.a
@@ -310,7 +310,7 @@ if [ "$buildnghttp2" != "" ]; then
 	cp nghttp2/lib/libnghttp2_tvOS.a $ARCHIVE/lib/tvOS/libnghttp2.a
 	cp nghttp2/lib/libnghttp2_tvOS-simulator.a $ARCHIVE/lib/tvOS-simulator/libnghttp2.a
 	cp nghttp2/lib/libnghttp2_Mac.a $ARCHIVE/lib/MacOS/libnghttp2.a
-	if [ "$catalyst" == "-m" ]; then
+	if [ "$catalyst" != "" ]; then
 		cp nghttp2/lib/libnghttp2_Catalyst.a $ARCHIVE/lib/Catalyst/libnghttp2.a
 		xcodebuild -create-xcframework \
 			-library $ARCHIVE/lib/iOS/libnghttp2.a \

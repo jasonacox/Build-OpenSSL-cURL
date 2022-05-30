@@ -7,14 +7,11 @@ This is a test app for iOS using the curl, openssl and nghttp2 libraries.
 Build the libraries with Mac Catalyst support:
 
 ```bash
-# For x86-64 Build Nodes
-./build.sh -m
-
-# For arm64 (m1) Build nodes
-./build.sh
+# Build Mac Catalyst Support for iOS Target 15.0
+./build.sh -m -u 15.0
 ```
 
-Load and build the project using Xcode (tested with version 8.2). Example lib binaries (xcframework)and header files are included but will be replaced when you run the build script.
+Load and build the project using Xcode. Example lib binaries (xcframework)and header files are included but will be replaced when you run the build script.
 
 ## Screenshot
 

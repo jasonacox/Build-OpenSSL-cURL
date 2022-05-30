@@ -28,7 +28,7 @@ The build script accepts several arguments to adjust versions and toggle feature
          -e             Compile with OpenSSL engine support
          -b             Compile without bitcode
          -m             Compile Mac Catalyst library
-         -u <version>   Mac Catalyst iOS min target version (default 13.0)
+         -u <version>   Mac Catalyst iOS min target version (default 15.0)
          -3             Compile with SSLv3
          -s <version>   iOS min target version (default 8.0)
          -t <version>   tvOS min target version (default 9.0)
@@ -40,7 +40,7 @@ The build script accepts several arguments to adjust versions and toggle feature
 
 _OpenSSL Engine Note: By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use this and the static engine support will be included:_ `./build.sh -e`
 
-_Mac Catalyst Note: Static libraries can be built for Mac Catalyst. This requires a current version of Xcode (11.6+). To build Catalyst binaries use the switch:_ `./build.sh -m`
+_Mac Catalyst Note: Static libraries can be built for Mac Catalyst. This often requires that you specify an recent Mac Catalyst iOS target version (e.g. 15.0). To build Catalyst binaries use the -m switch and specify the iOS target with -u:_ `./build.sh -m -u 15.0`
 
 Minimum macOS, iOS and tvOS target build versions are set by default in the build scripts or can be specified using command line arguments indicated above.  Apple Silicon arm64 macOS targets will need to be 11.0 or higher.
 
