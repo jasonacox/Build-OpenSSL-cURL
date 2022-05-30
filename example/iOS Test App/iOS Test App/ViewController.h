@@ -47,6 +47,7 @@
     NSData *_dataToSend;
     size_t _dataToSendBookmark;
     NSMutableData *_dataReceived;
+    NSString *cacertPath;                   // path to cacert.pem file
 }
 
 @property (retain, nonatomic) UITextField *_urlText;

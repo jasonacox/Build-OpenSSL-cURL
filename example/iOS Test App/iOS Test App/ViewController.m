@@ -217,8 +217,9 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
         curl_easy_setopt(_curl, CURLOPT_CUSTOMREQUEST,nil);
         curl_easy_setopt(_curl, CURLOPT_HTTPGET, 1L); // use HTTP GET method
         // CA root certs - loaded into project from libcurl http://curl.haxx.se/ca/cacert.pem
-        NSString *cacertPath = [[NSBundle mainBundle] pathForResource:@"cacert" ofType:@"pem"];
+        cacertPath = [[NSBundle mainBundle] pathForResource:@"cacert" ofType:@"pem"];
         curl_easy_setopt(_curl, CURLOPT_CAINFO, [cacertPath UTF8String]); // set root CA certs
+        
 
         // set URL
         curl_easy_setopt(_curl, CURLOPT_URL, url.absoluteString.UTF8String);

@@ -348,7 +348,7 @@ mkdir -p "$EXAMPLE/include"
 # Includes
 cp openssl/iOS-fat/include/openssl/* "$EXAMPLE/include/openssl/"
 cp curl/include/curl/* "$EXAMPLE/include/curl/"
-cp $ARCHIVE/cacert.pem "$EXAMPLE/cacert.pem"
+cp $ARCHIVE/cacert.pem "$EXAMPLE/iOS Test App/cacert.pem"
 # XCFrameworks
 cp -R $ARCHIVE/xcframework/libcrypto.xcframework "$EXAMPLE/libs/"
 cp -R $ARCHIVE/xcframework/libssl.xcframework "$EXAMPLE/libs/"
@@ -357,16 +357,6 @@ if [ "$buildnghttp2" != "" ]; then
 	#cp nghttp2/lib/libnghttp2_iOS-fat.a "$EXAMPLE/libs/libnghttp2.a"
 	cp -R $ARCHIVE/xcframework/libnghttp2.xcframework "$EXAMPLE/libs/"
 fi
-#cp openssl/iOS-fat/lib/libcrypto.a "$EXAMPLE/libs/libcrypto.a"
-#cp openssl/iOS-fat/lib/libssl.a "$EXAMPLE/libs/libssl.a"
-#cp curl/lib/libcurl_iOS-fat.a "$EXAMPLE/libs/libcurl.a"
-# if [ "$catalyst" == "-m" ]; then
-# 	cp openssl/openssl-ios-x86_64-maccatalyst.a "$EXAMPLE/libs/openssl-ios-x86_64-maccatalyst.a"
-# 	cp curl/lib/libcurl_Catalyst.a "$EXAMPLE/libs/libcurl_Catalyst.a"
-# 	if [ "$buildnghttp2" != "" ]; then
-# 		cp nghttp2/lib/libnghttp2_Catalyst.a "$EXAMPLE/libs/libnghttp2_Catalyst.a"
-# 	fi
-# fi
 
 echo
 # create universal Mac binaries and run test
