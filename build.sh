@@ -18,6 +18,7 @@ NGHTTP2="1.47.0"	# https://nghttp2.org/
 
 # Build Machine
 BUILD_MACHINE=`uname -m`
+BUILD_CMD=$*
 
 # Set minimum OS versions for target
 MACOS_X86_64_VERSION=""			# Empty = use host version
@@ -337,7 +338,7 @@ cp curl/include/curl/* "$ARCHIVE/include/curl"
 curl -sL https://curl.se/ca/cacert.pem > $ARCHIVE/cacert.pem
 
 # create README for archive
-sed -e "s/ZZZLIBCURL/$LIBCURL/g" -e "s/ZZZOPENSSL/$OPENSSL/g" -e "s/ZZZNGHTTP2/$NGHTTP2/g" archive/release-template.md > $ARCHIVE/README.md
+sed -e "s/ZZZCMDS/$BUILD_CMD/g" -e "s/ZZZLIBCURL/$LIBCURL/g" -e "s/ZZZOPENSSL/$OPENSSL/g" -e "s/ZZZNGHTTP2/$NGHTTP2/g" archive/release-template.md > $ARCHIVE/README.md
 echo
 
 # EXAMPLE App - update test app with latest includes and XCFrameworks

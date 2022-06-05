@@ -2,6 +2,10 @@
 
 This release includes cURL, OpenSSL and Nghttp2 libraries and header files for MacOS, Mac Catalyst, iOS and tvOS projects.
 
+## Build Command
+
+    ./build.sh ZZZCMDS
+
 ## Versions
 
     LIBCURL="ZZZLIBCURL"        # https://curl.haxx.se/download.html
