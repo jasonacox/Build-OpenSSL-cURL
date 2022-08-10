@@ -10,9 +10,9 @@
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="1.1.1q"	# https://www.openssl.org/source/
-LIBCURL="7.84.0"	# https://curl.haxx.se/download.html
-NGHTTP2="1.48.0"	# https://nghttp2.org/
+OPENSSL="1.1.1o"	# https://www.openssl.org/source/
+LIBCURL="7.83.1"	# https://curl.haxx.se/download.html
+NGHTTP2="1.47.0"	# https://nghttp2.org/
 
 ################################################
 

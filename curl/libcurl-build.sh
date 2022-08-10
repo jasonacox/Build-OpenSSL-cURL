@@ -42,7 +42,7 @@ FORCE_SSLV3="no"
 # Set minimum OS versions for target
 MACOS_X86_64_VERSION=""			# Empty = use host version
 MACOS_ARM64_VERSION=""			# Min supported is MacOS 11.0 Big Sur
-CATALYST_IOS="13.0"				# Min supported is iOS 13.0 for Mac Catalyst
+CATALYST_IOS="15.0"				# Min supported is iOS 15.0 for Mac Catalyst
 IOS_MIN_SDK_VERSION="8.0"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
