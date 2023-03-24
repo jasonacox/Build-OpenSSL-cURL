@@ -262,17 +262,31 @@ if [ "$catalyst" != "" ]; then
 	# Build XCFrameworks with Catalyst library
 	xcodebuild -create-xcframework \
 		-library $ARCHIVE/lib/iOS/libcurl.a \
+        -headers curl/include \
 		-library $ARCHIVE/lib/iOS-simulator/libcurl.a \
+        -headers curl/include \
 		-library $ARCHIVE/lib/tvOS/libcurl.a \
+        -headers curl/include \
 		-library $ARCHIVE/lib/tvOS-simulator/libcurl.a \
+        -headers curl/include \
 		-library $ARCHIVE/lib/Catalyst/libcurl.a \
+        -headers curl/include \
+        -library $ARCHIVE/lib/MacOS/libcurl.a \
+        -headers curl/include \
 		-output $ARCHIVE/xcframework/libcurl.xcframework
 	xcodebuild -create-xcframework \
 		-library $ARCHIVE/lib/iOS/libcrypto.a \
+        -headers openssl/iOS/include \
 		-library $ARCHIVE/lib/iOS-simulator/libcrypto.a \
+        -headers openssl/iOS-simulator/include \
 		-library $ARCHIVE/lib/tvOS/libcrypto.a \
+        -headers openssl/tvOS/include \
 		-library $ARCHIVE/lib/tvOS-simulator/libcrypto.a \
+        -headers openssl/tvOS-simulator/include \
 		-library $ARCHIVE/lib/Catalyst/libcrypto.a \
+        -headers openssl/Mac/include \
+        -library $ARCHIVE/lib/MacOS/libcrypto.a \
+        -headers openssl/Mac/include \
 		-output $ARCHIVE/xcframework/libcrypto.xcframework
 	xcodebuild -create-xcframework \
 		-library $ARCHIVE/lib/iOS/libssl.a \
@@ -280,26 +294,40 @@ if [ "$catalyst" != "" ]; then
 		-library $ARCHIVE/lib/tvOS/libssl.a \
 		-library $ARCHIVE/lib/tvOS-simulator/libssl.a \
 		-library $ARCHIVE/lib/Catalyst/libssl.a \
+        -library $ARCHIVE/lib/MacOS/libssl.a \
 		-output $ARCHIVE/xcframework/libssl.xcframework
 else
 	# Build XCFrameworks
 	xcodebuild -create-xcframework \
 		-library $ARCHIVE/lib/iOS/libcurl.a \
+        -headers curl/include \
 		-library $ARCHIVE/lib/iOS-simulator/libcurl.a \
+        -headers curl/include \
 		-library $ARCHIVE/lib/tvOS/libcurl.a \
+        -headers curl/include \
 		-library $ARCHIVE/lib/tvOS-simulator/libcurl.a \
+        -headers curl/include \
+        -library $ARCHIVE/lib/MacOS/libcurl.a \
+        -headers curl/include \
 		-output $ARCHIVE/xcframework/libcurl.xcframework
 	xcodebuild -create-xcframework \
 		-library $ARCHIVE/lib/iOS/libcrypto.a \
+        -headers openssl/iOS/include \
 		-library $ARCHIVE/lib/iOS-simulator/libcrypto.a \
+        -headers openssl/iOS-simulator/include \
 		-library $ARCHIVE/lib/tvOS/libcrypto.a \
+        -headers openssl/tvOS/include \
 		-library $ARCHIVE/lib/tvOS-simulator/libcrypto.a \
+        -headers openssl/tvOS-simulator/include \
+        -library $ARCHIVE/lib/MacOS/libcrypto.a \
+        -headers openssl/Mac/include \
 		-output $ARCHIVE/xcframework/libcrypto.xcframework
 	xcodebuild -create-xcframework \
 		-library $ARCHIVE/lib/iOS/libssl.a \
 		-library $ARCHIVE/lib/iOS-simulator/libssl.a \
 		-library $ARCHIVE/lib/tvOS/libssl.a \
 		-library $ARCHIVE/lib/tvOS-simulator/libssl.a \
+        -library $ARCHIVE/lib/MacOS/libssl.a \
 		-output $ARCHIVE/xcframework/libssl.xcframework
 fi
 
@@ -322,6 +350,7 @@ if [ "$buildnghttp2" != "" ]; then
 			-library $ARCHIVE/lib/tvOS/libnghttp2.a \
 			-library $ARCHIVE/lib/tvOS-simulator/libnghttp2.a \
 			-library $ARCHIVE/lib/Catalyst/libnghttp2.a \
+            -library $ARCHIVE/lib/MacOS/libnghttp2.a \
 			-output $ARCHIVE/xcframework/libnghttp2.xcframework
 	else
 		xcodebuild -create-xcframework \
@@ -329,6 +358,7 @@ if [ "$buildnghttp2" != "" ]; then
 			-library $ARCHIVE/lib/iOS-simulator/libnghttp2.a \
 			-library $ARCHIVE/lib/tvOS/libnghttp2.a \
 			-library $ARCHIVE/lib/tvOS-simulator/libnghttp2.a \
+            -library $ARCHIVE/lib/MacOS/libnghttp2.a \
 			-output $ARCHIVE/xcframework/libnghttp2.xcframework
 	fi
 fi
