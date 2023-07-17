@@ -149,7 +149,16 @@ buildIOS()
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
-	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
+	ADDCFLAG=""
+	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+		export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
+		if [[ "${ARCH}" == "armv7" || "${ARCH}" == "armv7s" ]]; then
+		    # armv7 doesn't work with atomic
+			ADDCFLAG="-DBROKEN_CLANG_ATOMICS "
+		fi
+	else
+		export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
+	fi
 
 	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim} (iOS ${IOS_MIN_SDK_VERSION})"
 
@@ -158,24 +167,24 @@ buildIOS()
 		if [[ $ARCH == "x86_64" ]]; then
 			TARGET="darwin64-x86_64-cc"
 		fi
-		if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-			./Configure no-asm ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
-		else
+		if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 			./Configure no-asm ${TARGET} -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
+		else
+			./Configure no-asm ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
 		fi
 	else
-		if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
+		if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 			# export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
-			./Configure iphoneos-cross DSO_LDFLAGS=-fembed-bitcode --prefix="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
-		else
 			./Configure iphoneos-cross -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
+		else
+			./Configure iphoneos-cross DSO_LDFLAGS=-fembed-bitcode --prefix="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
 		fi
 	fi
 	# add -isysroot to CC=
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} !" "Makefile"
-	else
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} !" "Makefile"
+	else
+		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} ${ADDCFLAG} !" "Makefile"
 	fi
 
 	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log" 2>&1
@@ -218,9 +227,18 @@ buildIOSsim()
 		#	fi
 		#fi
 	fi
-	
+
 	# set up exports for build 
-	export CFLAGS=" -Os -miphoneos-version-min=${MIPHONEOS} -fembed-bitcode -arch ${ARCH} ${RUNTARGET} "
+	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+		if [[ "${ARCH}" == "armv7" || "${ARCH}" == "armv7s" || "${ARCH}" == "i386" ]]; then
+		    # armv7 and i386 doesn't work with atomic
+			export CFLAGS=" -Os -miphoneos-version-min=${MIPHONEOS} -DBROKEN_CLANG_ATOMICS -arch ${ARCH} ${RUNTARGET} "
+		else
+			export CFLAGS=" -Os -miphoneos-version-min=${MIPHONEOS} ${ADDCFLAG} -arch ${ARCH} ${RUNTARGET} "
+		fi
+	else
+		export CFLAGS=" -Os -miphoneos-version-min=${MIPHONEOS} -fembed-bitcode -arch ${ARCH} ${RUNTARGET} "
+	fi
 	export LDFLAGS=" -arch ${ARCH} -isysroot ${DEVELOPER}/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
 	export CPPFLAGS=" -I.. -isysroot ${DEVELOPER}/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk "
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
@@ -232,10 +250,10 @@ buildIOSsim()
 	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${iOS_SDK_VERSION} ${archbold}${ARCH}${dim} (iOS ${MIPHONEOS})"
 
 	# configure
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		./Configure no-asm ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log"
-	else
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		./Configure no-asm ${TARGET} -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log"
+	else
+		./Configure no-asm ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-Simulator-${ARCH}.log"
 	fi
 
 	# add -isysroot to CC=
@@ -292,11 +310,11 @@ else
 	echo "Using ${OPENSSL_VERSION}.tar.gz"
 fi
 
-if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-	echo "** Building OpenSSL 1.1.1 **"
+if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* || "$OPENSSL_VERSION" = "openssl-3"* ]]; then
+	echo "** Building OpenSSL ${OPENSSL_VERSION} **"
 else
 	if [[ "$OPENSSL_VERSION" = "openssl-1.0."* ]]; then
-		echo "** Building OpenSSL 1.0.x ** "
+		echo "** Building OpenSSL ${OPENSSL_VERSION} ** "
 		echo -e "${alert}** WARNING: End of Life Version - Upgrade to 1.1.1 **${dim}"
 	else
 		echo -e "${alert}** WARNING: This build script has not been tested with $OPENSSL_VERSION **${dim}"
@@ -312,6 +330,7 @@ if [ "$engine" == "1" ]; then
 fi
 
 echo -e "${bold}Building iOS libraries${dim}"
+
 buildIOS "armv7"
 buildIOS "armv7s"
 buildIOS "arm64"

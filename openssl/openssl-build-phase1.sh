@@ -176,10 +176,10 @@ buildMac()
 
 	pushd . > /dev/null
 	cd "${OPENSSL_VERSION}"
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-${ARCH}.log"
-	else
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		./Configure no-asm ${TARGET} -no-shared  --openssldir="/tmp/${OPENSSL_VERSION}-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-${ARCH}.log"
+	else
+		./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-${ARCH}.log"
 	fi
 	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
 	make install_sw >> "/tmp/${OPENSSL_VERSION}-${ARCH}.log" 2>&1
@@ -249,10 +249,10 @@ buildCatalyst()
 
 	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${archbold}${ARCH}${dim} (MacOS ${MACOS_VER} Catalyst iOS ${CATALYST_IOS})"
 
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
-	else
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		./Configure no-asm ${TARGET} -no-shared  --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
+	else
+		./Configure no-asm ${TARGET} -no-shared  --prefix="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-catalyst-${ARCH}.log"
 	fi
 
 	#if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
@@ -305,30 +305,37 @@ buildTVOS()
 		LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
 		LANG=C sed -i -- 's/!defined(OPENSSL_NO_ASYNC)/defined(HAVE_FORK)/' "./crypto/async/arch/async_posix.h"
 	fi
+	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+		# LANG=C sed -i -- 's/!defined(OPENSSL_NO_POSIX_IO)/defined(HAVE_FORK)/' "./apps/ocsp.c"
+		LANG=C sed -i -- 's/fork()/-1/' "./apps/speed.c"
+		LANG=C sed -i -- 's/fork()/-1/' "./apps/lib/http_server.c"
+		LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
+		LANG=C sed -i -- 's/undef NO_FORK/define NO_FORK/' "./crypto/async/arch/async_posix.h"
+		export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
+	fi
 
 	# Patch Configure to build for tvOS, not iOS
 	LANG=C sed -i -- 's/D\_REENTRANT\:iOS/D\_REENTRANT\:tvOS/' "./Configure"
 	chmod u+x ./Configure
 
 	if [[ "${ARCH}" == "x86_64" ]]; then
-		if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-			./Configure no-asm darwin64-x86_64-cc -no-shared --prefix="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log"
-		else
+		if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 			./Configure no-asm darwin64-x86_64-cc --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log"
+		else
+			./Configure no-asm darwin64-x86_64-cc -no-shared --prefix="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log"
 		fi
 	else
-		export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
-		if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-			./Configure iphoneos-cross DSO_LDFLAGS=-fembed-bitcode --prefix="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log"
-		else
+		if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 			./Configure iphoneos-cross --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log"
+		else
+			./Configure iphoneos-cross DSO_LDFLAGS=-fembed-bitcode --prefix="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log"
 		fi
 	fi
 	# add -isysroot to CC=
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
-	else
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
+	else
+		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
 	fi
 
 	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-tvOS-${ARCH}.log" 2>&1
@@ -377,22 +384,31 @@ buildTVOSsim()
 		LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
 		LANG=C sed -i -- 's/!defined(OPENSSL_NO_ASYNC)/defined(HAVE_FORK)/' "./crypto/async/arch/async_posix.h"
 	fi
+	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+		# LANG=C sed -i -- 's/!defined(OPENSSL_NO_POSIX_IO)/defined(HAVE_FORK)/' "./apps/ocsp.c"
+		LANG=C sed -i -- 's/fork()/-1/' "./apps/speed.c"
+		LANG=C sed -i -- 's/fork()/-1/' "./apps/lib/http_server.c"
+		LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
+		LANG=C sed -i -- 's/undef NO_FORK/define NO_FORK/' "./crypto/async/arch/async_posix.h"
+		export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
+		export CFLAGS=" -Os -arch ${ARCH} ${RUNTARGET} "
+	fi
 
 	# Patch Configure to build for tvOS, not iOS
 	LANG=C sed -i -- 's/D\_REENTRANT\:iOS/D\_REENTRANT\:tvOS/' "./Configure"
 	chmod u+x ./Configure
 
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		./Configure no-asm  ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}.log"
-	else
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		./Configure no-asm  --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}.log"
+	else
+		./Configure no-asm  ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}.log"
 	fi
 
 	# add -isysroot to CC=
-	if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
-	else
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
+	else
+		sed -ie "s!^CFLAGS=!CFLAGS=-isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} !" "Makefile"
 	fi
 
 	make -j${CORES} >> "/tmp/${OPENSSL_VERSION}-tvOS-Simulator-${ARCH}.log" 2>&1
@@ -440,11 +456,11 @@ else
 	echo "Using ${OPENSSL_VERSION}.tar.gz"
 fi
 
-if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* ]]; then
-	echo "** Building OpenSSL 1.1.1 **"
+if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* || "$OPENSSL_VERSION" = "openssl-3"* ]]; then
+	echo "** Building OpenSSL ${OPENSSL_VERSION} **"
 else
 	if [[ "$OPENSSL_VERSION" = "openssl-1.0."* ]]; then
-		echo "** Building OpenSSL 1.0.x ** "
+		echo "** Building OpenSSL ${OPENSSL_VERSION} ** "
 		echo -e "${alert}** WARNING: End of Life Version - Upgrade to 1.1.1 **${dim}"
 	else
 		echo -e "${alert}** WARNING: This build script has not been tested with $OPENSSL_VERSION **${dim}"
