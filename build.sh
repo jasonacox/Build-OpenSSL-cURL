@@ -408,17 +408,19 @@ lipo -create -output $ARCHIVE/bin/openssl /tmp/openssl-x86_64 /tmp/openssl-arm64
 mv /tmp/openssl-* $ARCHIVE/bin
 echo
 echo -e "${bold}Testing Universal Mac binaries for ${BUILD_MACHINE}...${dim}"
-echo "  cURL"
+echo -e "  ${bold}cURL${normal}"
 file $ARCHIVE/bin/curl
+echo -e "${dim}"
 $ARCHIVE/bin/curl -V
-echo "  OpenSSL"
+echo -e "  ${bold}OpenSSL${normal}"
 file $ARCHIVE/bin/openssl
+echo -e "${dim}"
 $ARCHIVE/bin/openssl version
-date "+%c - End"
 
 ## Done - Display Build Duration
 echo
 echo -e "${bold}Build Complete${dim}"
+date "+  %c - End"
 END=$(date +%s)
 secs=$(echo "$END - $START" | bc)
 printf '  Duration %02dh:%02dm:%02ds\n' $(($secs/3600)) $(($secs%3600/60)) $(($secs%60))

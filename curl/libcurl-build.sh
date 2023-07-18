@@ -154,9 +154,9 @@ if [ $nohttp2 == "1" ]; then
 fi
 
 if [ $nohttp2 == "1" ]; then
-	echo "Building with HTTP2 Support (nghttp2)"
+	echo -e "${dim}Building with HTTP2 Support (nghttp2)"
 else
-	echo "Building without HTTP2 Support (nghttp2)"
+	echo -e "${dim}Building without HTTP2 Support (nghttp2)"
 	NGHTTP2CFG=""
 	NGHTTP2LIB=""
 fi
@@ -168,12 +168,12 @@ if ! (type "pkg-config" > /dev/null 2>&1 ) ; then
 
 	# Check to see if Brew is installed
 	if (type "brew" > /dev/null 2>&1 ) ; then
-		echo "  brew installed - using to install pkg-config"
+		echo -e "  ${dim}brew installed - using to install pkg-config"
 		brew install pkg-config
 	else
 		# Build pkg-config from Source
 		curl -LOs https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
-		echo "  Building pkg-config"
+		echo -e "  ${dim}Building pkg-config"
 		tar xfz pkg-config-0.29.2.tar.gz
 		pushd pkg-config-0.29.2 > /dev/null
 		./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
@@ -184,7 +184,7 @@ if ! (type "pkg-config" > /dev/null 2>&1 ) ; then
 
 	# Check to see if installation worked
 	if (type "pkg-config" > /dev/null 2>&1 ) ; then
-		echo "  SUCCESS: pkg-config now installed"
+		echo -e "  ${dim}SUCCESS: pkg-config now installed"
 	else
 		echo -e "${alert}** FATAL ERROR: pkg-config failed to install - exiting.${normal}"
 		exit 1
@@ -516,20 +516,20 @@ rm -rf "/tmp/${CURL_VERSION}-*.log"
 rm -rf "${CURL_VERSION}"
 
 if [ ! -e ${CURL_VERSION}.tar.gz ]; then
-	echo "Downloading ${CURL_VERSION}.tar.gz"
+	echo -e "${dim}Downloading ${CURL_VERSION}.tar.gz"
 	curl -LOs https://curl.haxx.se/download/${CURL_VERSION}.tar.gz
 else
-	echo "Using ${CURL_VERSION}.tar.gz"
+	echo -e"${dim}Using ${CURL_VERSION}.tar.gz"
 fi
 
-echo "Unpacking curl"
+echo -e "${dim}Unpacking curl"
 tar xfz "${CURL_VERSION}.tar.gz"
 
 if [ ${FORCE_SSLV3} == 'yes' ]; then
 	if version_lte ${CURL_VERSION} "curl-7.76.1"; then
-		echo "SSLv3 Requested: No patch needed for ${CURL_VERSION}."
+		echo -e "${dim}SSLv3 Requested: No patch needed for ${CURL_VERSION}."
 	else
-		echo "SSLv3 Requested: This requires a patch for 7.77.0 and above - mileage may vary."
+		echo -e "${dim}SSLv3 Requested: This requires a patch for 7.77.0 and above - mileage may vary."
 		# for library
 		sed -i '' '/version == CURL_SSLVERSION_SSLv3/d' "${CURL_VERSION}/lib/setopt.c"
 		patch -N "${CURL_VERSION}/lib/vtls/openssl.c" sslv3.patch || true
@@ -542,7 +542,7 @@ echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
 buildMac "arm64"
 
-echo "  Copying headers"
+echo -e "  ${dim}Copying headers"
 cp /tmp/${CURL_VERSION}-x86_64/include/curl/* include/curl/
 
 lipo \
@@ -643,7 +643,7 @@ echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${CURL_VERSION}-*
 rm -rf ${CURL_VERSION}
 
-echo "Checking libraries"
+echo -e "${dim}Checking libraries"
 xcrun -sdk iphoneos lipo -info lib/*.a
 
 #reset trap

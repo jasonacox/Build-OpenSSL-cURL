@@ -450,28 +450,28 @@ rm -rf "/tmp/${OPENSSL_VERSION}-*.log"
 rm -rf "${OPENSSL_VERSION}"
 
 if [ ! -e ${OPENSSL_VERSION}.tar.gz ]; then
-	echo "Downloading ${OPENSSL_VERSION}.tar.gz"
+	echo -e "${dim}Downloading ${OPENSSL_VERSION}.tar.gz"
 	curl -LOs https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
 else
-	echo "Using ${OPENSSL_VERSION}.tar.gz"
+	echo -e "${dim}Using ${OPENSSL_VERSION}.tar.gz"
 fi
 
 if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* || "$OPENSSL_VERSION" = "openssl-3"* ]]; then
-	echo "** Building OpenSSL ${OPENSSL_VERSION} **"
+	echo -e "${dim}** Building OpenSSL ${OPENSSL_VERSION} **"
 else
 	if [[ "$OPENSSL_VERSION" = "openssl-1.0."* ]]; then
-		echo "** Building OpenSSL ${OPENSSL_VERSION} ** "
+		echo -e "${dim}** Building OpenSSL ${OPENSSL_VERSION} ** "
 		echo -e "${alert}** WARNING: End of Life Version - Upgrade to 1.1.1 **${dim}"
 	else
 		echo -e "${alert}** WARNING: This build script has not been tested with $OPENSSL_VERSION **${dim}"
 	fi
 fi
 
-echo "Unpacking openssl"
+echo -e "${dim}Unpacking openssl"
 tar xfz "${OPENSSL_VERSION}.tar.gz"
 
 if [ "$engine" == "1" ]; then
-	echo "+ Activate Static Engine"
+	echo -e "${dim}+ Activate Static Engine"
 	sed -ie 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
 fi
 
@@ -480,7 +480,7 @@ echo -e "${bold}Building Mac libraries${dim}"
 buildMac "x86_64"
 buildMac "arm64"
 
-echo "  Copying headers and libraries"
+echo -e "  ${dim}Copying headers and libraries"
 cp /tmp/${OPENSSL_VERSION}-x86_64/include/openssl/* Mac/include/openssl/
 
 lipo \
@@ -499,7 +499,7 @@ if [ $catalyst == "1" ]; then
 	buildCatalyst "x86_64"
 	buildCatalyst "arm64"
 
-	echo "  Copying headers and libraries"
+	echo -e "  ${dim}Copying headers and libraries"
 	cp /tmp/${OPENSSL_VERSION}-catalyst-x86_64/include/openssl/* Catalyst/include/openssl/
 
 	lipo \
@@ -517,7 +517,7 @@ fi
 echo -e "${bold}Building tvOS libraries${dim}"
 buildTVOS "arm64"
 
-echo "  Copying headers and libraries"
+echo -e "  ${dim}Copying headers and libraries"
 cp /tmp/${OPENSSL_VERSION}-tvOS-arm64/include/openssl/* tvOS/include/openssl/
 
 lipo \
@@ -543,7 +543,7 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-tvOS-Simulator-x86_64/lib/libssl.a" \
 	-create -output tvOS-fat/lib/libssl.a
 
-echo "  Copying headers and libraries"
+echo -e "  ${dim}Copying headers and libraries"
 cp /tmp/${OPENSSL_VERSION}-tvOS-Simulator-x86_64/include/openssl/* tvOS-simulator/include/openssl/
 
 lipo \

@@ -136,19 +136,19 @@ fi
 
 # Check to see if pkg-config is already installed
 if (type "pkg-config" > /dev/null 2>&1 ) ; then
-	echo "  pkg-config already installed"
+	echo -e "  ${dim}pkg-config already installed"
 else
 	echo -e "${alertdim}** WARNING: pkg-config not installed... attempting to install.${dim}"
 
 	# Check to see if Brew is installed
 	if (type "brew" > /dev/null 2>&1 ) ; then
-		echo "  brew installed - using to install pkg-config"
+		echo -e "  ${dim}brew installed - using to install pkg-config"
 		brew install pkg-config
 	else
 		# Build pkg-config from Source
-		echo "  Downloading pkg-config-0.29.2.tar.gz"
+		echo -e "  ${dim}Downloading pkg-config-0.29.2.tar.gz"
 		curl -LOs https://pkg-config.freedesktop.org/releases/pkg-config-0.29.2.tar.gz
-		echo "  Building pkg-config"
+		echo -e "  ${dim}Building pkg-config"
 		tar xfz pkg-config-0.29.2.tar.gz
 		pushd pkg-config-0.29.2 > /dev/null
 		./configure --prefix=/tmp/pkg_config --with-internal-glib >> "/tmp/${NGHTTP2_VERSION}.log" 2>&1
@@ -160,7 +160,7 @@ else
 
 	# Check to see if installation worked
 	if (type "pkg-config" > /dev/null 2>&1 ) ; then
-		echo "  SUCCESS: pkg-config installed"
+		echo -e "  ${dim}SUCCESS: pkg-config installed"
 	else
 		echo -e "${alert}** FATAL ERROR: pkg-config failed to install - exiting.${normal}"
 		exit 1
@@ -531,13 +531,13 @@ rm -rf "/tmp/${NGHTTP2_VERSION}-*.log"
 rm -rf "${NGHTTP2_VERSION}"
 
 if [ ! -e ${NGHTTP2_VERSION}.tar.gz ]; then
-	echo "Downloading ${NGHTTP2_VERSION}.tar.gz"
+	echo -e "${dim}Downloading ${NGHTTP2_VERSION}.tar.gz"
 	curl -LOs https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERNUM}/${NGHTTP2_VERSION}.tar.gz
 else
-	echo "Using ${NGHTTP2_VERSION}.tar.gz"
+	echo -e "${dim}Using ${NGHTTP2_VERSION}.tar.gz"
 fi
 
-echo "Unpacking nghttp2"
+echo -e "${dim}Unpacking nghttp2"
 tar xfz "${NGHTTP2_VERSION}.tar.gz"
 
 echo -e "${bold}Building Mac libraries${dim}"

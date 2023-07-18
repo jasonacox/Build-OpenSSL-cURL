@@ -295,28 +295,28 @@ rm -rf "/tmp/${OPENSSL_VERSION}-*.log"
 rm -rf "${OPENSSL_VERSION}"
 
 if [ ! -e ${OPENSSL_VERSION}.tar.gz ]; then
-	echo "Downloading ${OPENSSL_VERSION}.tar.gz"
+	echo -e "${dim}Downloading ${OPENSSL_VERSION}.tar.gz"
 	curl -LOs https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
 else
-	echo "Using ${OPENSSL_VERSION}.tar.gz"
+	echo -e "${dim}Using ${OPENSSL_VERSION}.tar.gz"
 fi
 
 if [[ "$OPENSSL_VERSION" = "openssl-1.1.1"* || "$OPENSSL_VERSION" = "openssl-3"* ]]; then
-	echo "** Building OpenSSL ${OPENSSL_VERSION} **"
+	echo -e "${dim}** Building OpenSSL ${OPENSSL_VERSION} **"
 else
 	if [[ "$OPENSSL_VERSION" = "openssl-1.0."* ]]; then
-		echo "** Building OpenSSL ${OPENSSL_VERSION} ** "
+		echo -e "${dim}** Building OpenSSL ${OPENSSL_VERSION} ** "
 		echo -e "${alert}** WARNING: End of Life Version - Upgrade to 1.1.1 **${dim}"
 	else
 		echo -e "${alert}** WARNING: This build script has not been tested with $OPENSSL_VERSION **${dim}"
 	fi
 fi
 
-echo "Unpacking openssl"
+echo -e "${dim}Unpacking openssl"
 tar xfz "${OPENSSL_VERSION}.tar.gz"
 
 if [ "$engine" == "1" ]; then
-	echo "+ Activate Static Engine"
+	echo -e "${dim}+ Activate Static Engine"
 	sed -ie 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
 fi
 
@@ -331,7 +331,7 @@ buildIOSsim "i386"
 buildIOSsim "x86_64"
 buildIOSsim "arm64"
 
-echo "  Copying headers and libraries"
+echo -e "  ${dim}Copying headers and libraries"
 cp /tmp/${OPENSSL_VERSION}-iOS-arm64/include/openssl/* iOS/include/openssl/
 
 lipo \
@@ -383,7 +383,7 @@ lipo \
 	"/tmp/${OPENSSL_VERSION}-iOS-Simulator-i386/lib/libssl.a" \
 	-create -output iOS-fat/lib/libssl.a
 
-echo "  Creating combined OpenSSL libraries for iOS"
+echo -e "  ${dim}Creating combined OpenSSL libraries for iOS"
 libtool -no_warning_for_no_symbols -static -o openssl-ios-armv7_armv7s_arm64_arm64e.a iOS/lib/libcrypto.a iOS/lib/libssl.a
 libtool -no_warning_for_no_symbols -static -o openssl-ios-i386_x86_64_arm64-simulator.a iOS-simulator/lib/libcrypto.a iOS-simulator/lib/libssl.a
 
