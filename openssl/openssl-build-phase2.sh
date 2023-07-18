@@ -38,7 +38,7 @@ IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
 catalyst="0"
-VERSION="1.1.1i"				# OpenSSL version default
+VERSION="3.0.9"					# OpenSSL version default
 
 CORES=$(sysctl -n hw.ncpu)
 OPENSSL_VERSION="openssl-${VERSION}"
@@ -150,10 +150,13 @@ buildIOS()
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
 	ADDCFLAG=""
+	DSO_LDFLAGS="DSO_LDFLAGS=-fembed-bitcode"
 	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+		# disable bitcode for openssl 3
 		export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
+		DSO_LDFLAGS=""
 		if [[ "${ARCH}" == "armv7" || "${ARCH}" == "armv7s" ]]; then
-		    # armv7 doesn't work with atomic
+		    # armv7 doesn't work with atomics
 			ADDCFLAG="-DBROKEN_CLANG_ATOMICS "
 		fi
 	else
@@ -162,24 +165,12 @@ buildIOS()
 
 	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim} (iOS ${IOS_MIN_SDK_VERSION})"
 
-	if [[ "${ARCH}" == "i386" || "${ARCH}" == "x86_64" ]]; then
-		TARGET="darwin-i386-cc"
-		if [[ $ARCH == "x86_64" ]]; then
-			TARGET="darwin64-x86_64-cc"
-		fi
-		if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
-			./Configure no-asm ${TARGET} -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
-		else
-			./Configure no-asm ${TARGET} -no-shared --prefix="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
-		fi
+	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
+		./Configure iphoneos-cross -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
 	else
-		if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
-			# export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
-			./Configure iphoneos-cross -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
-		else
-			./Configure iphoneos-cross DSO_LDFLAGS=-fembed-bitcode --prefix="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
-		fi
+		./Configure iphoneos-cross $DSO_LDFLAGS --prefix="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" -no-shared --openssldir="/tmp/${OPENSSL_VERSION}-iOS-${ARCH}" $CUSTOMCONFIG &> "/tmp/${OPENSSL_VERSION}-iOS-${ARCH}.log"
 	fi
+	
 	# add -isysroot to CC=
 	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
 		sed -ie "s!^CFLAG=!CFLAG=-isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -miphoneos-version-min=${IOS_MIN_SDK_VERSION} !" "Makefile"

@@ -30,7 +30,7 @@ alertdim="\033[0m${red}\033[2m"
 trap 'echo -e "${alert}** ERROR with Build - Check /tmp/openssl*.log${alertdim}"; tail -3 /tmp/openssl*.log' INT TERM EXIT
 
 # Set defaults
-VERSION="1.1.1i"				# OpenSSL version default
+VERSION="3.0.9"				# OpenSSL version default
 catalyst="0"
 
 # Set minimum OS versions for target

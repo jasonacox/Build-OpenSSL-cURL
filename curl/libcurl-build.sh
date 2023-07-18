@@ -407,6 +407,13 @@ buildIOSsim()
 buildTVOS()
 {
 	ARCH=$1
+	BITCODE=$2
+
+	if [[ "${BITCODE}" == "nobitcode" ]]; then
+		CC_BITCODE_FLAG=""
+	else
+		CC_BITCODE_FLAG="-fembed-bitcode"
+	fi
 
 	pushd . > /dev/null
 	cd "${CURL_VERSION}"
@@ -426,7 +433,7 @@ buildTVOS()
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${TVOS_SDK_VERSION}.sdk"
 	export CC="${DEVELOPER}/usr/bin/gcc"
-	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} -fembed-bitcode"
+	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} ${CC_BITCODE_FLAG}"
 	export LDFLAGS="-arch ${ARCH} -isysroot ${CROSS_TOP}/SDKs/${CROSS_SDK} -L${OPENSSL}/tvOS/lib ${NGHTTP2LIB}"
 #	export PKG_CONFIG_PATH
 
@@ -448,6 +455,13 @@ buildTVOS()
 buildTVOSsim()
 {
 	ARCH=$1
+	BITCODE=$2
+
+	if [[ "${BITCODE}" == "nobitcode" ]]; then
+		CC_BITCODE_FLAG=""
+	else
+		CC_BITCODE_FLAG="-fembed-bitcode"
+	fi
 
 	pushd . > /dev/null
 	cd "${CURL_VERSION}"
@@ -467,10 +481,9 @@ buildTVOSsim()
 	export SYSROOT=$(xcrun --sdk appletvsimulator --show-sdk-path)
 	export CC="${DEVELOPER}/usr/bin/gcc"
 	export CXX="${DEVELOPER}/usr/bin/gcc"
-	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} -fembed-bitcode ${RUNTARGET}"
+	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} ${CC_BITCODE_FLAG} ${RUNTARGET}"
 	export LDFLAGS="-arch ${ARCH} -isysroot ${SYSROOT} -L${OPENSSL}/${PLATFORMDIR}/lib ${NGHTTP2LIB}"
 	export CPPFLAGS=" -I.. -isysroot ${SYSROOT} "
-
 
 	echo -e "${subbold}Building ${CURL_VERSION} for ${PLATFORM} ${TVOS_SDK_VERSION} ${archbold}${ARCH}${dim} (tvOS SIM ${TVOS_MIN_SDK_VERSION})"
 
@@ -548,67 +561,73 @@ lipo \
 	-create -output lib/libcurl_Catalyst.a
 fi
 
-echo -e "${bold}Building iOS libraries (bitcode)${dim}"
-buildIOS "armv7" "bitcode"
-buildIOS "armv7s" "bitcode"
-buildIOS "arm64" "bitcode"
-buildIOS "arm64e" "bitcode"
+if ! [[ "${NOBITCODE}" == "yes" ]]; then
+    BITCODE="bitcode"
+else
+    BITCODE="nobitcode"
+fi
+
+echo -e "${bold}Building iOS libraries (${BITCODE})${dim}"
+buildIOS "armv7" "${BITCODE}"
+buildIOS "armv7s" "${BITCODE}"
+buildIOS "arm64" "${BITCODE}"
+buildIOS "arm64e" "${BITCODE}"
 
 lipo \
-	"/tmp/${CURL_VERSION}-iOS-armv7-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-armv7s-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64e-bitcode/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
 	-create -output lib/libcurl_iOS.a
 
-buildIOSsim "i386" "bitcode"
-buildIOSsim "x86_64" "bitcode"
-buildIOSsim "arm64" "bitcode"
+buildIOSsim "i386" "${BITCODE}"
+buildIOSsim "x86_64" "${BITCODE}"
+buildIOSsim "arm64" "${BITCODE}"
 
 lipo \
-	"/tmp/${CURL_VERSION}-iOS-simulator-i386-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-arm64-bitcode/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-simulator-arm64-${BITCODE}/lib/libcurl.a" \
 	-create -output lib/libcurl_iOS-simulator.a
 
 lipo \
-	"/tmp/${CURL_VERSION}-iOS-armv7-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-armv7s-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64e-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-i386-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-bitcode/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
+	"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
 	-create -output lib/libcurl_iOS-fat.a
 
-if [[ "${NOBITCODE}" == "yes" ]]; then
-	echo -e "${bold}Building iOS libraries (nobitcode)${dim}"
-	buildIOS "armv7" "nobitcode"
-	buildIOS "armv7s" "nobitcode"
-	buildIOS "arm64" "nobitcode"
-	buildIOS "arm64e" "nobitcode"
-	buildIOSsim "x86_64" "nobitcode"
-	buildIOSsim "i386" "nobitcode"
 
-	lipo \
-		"/tmp/${CURL_VERSION}-iOS-armv7-nobitcode/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-armv7s-nobitcode/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-simulator-i386-nobitcode/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-arm64-nobitcode/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-arm64e-nobitcode/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-nobitcode/lib/libcurl.a" \
-		-create -output lib/libcurl_iOS_nobitcode.a
+# if [[ "${NOBITCODE}" == "yes" ]]; then
+# 	echo -e "${bold}Building iOS libraries (nobitcode)${dim}"
+# 	buildIOS "armv7" "nobitcode"
+# 	buildIOS "armv7s" "nobitcode"
+# 	buildIOS "arm64" "nobitcode"
+# 	buildIOS "arm64e" "nobitcode"
+# 	buildIOSsim "x86_64" "nobitcode"
+# 	buildIOSsim "i386" "nobitcode"
 
-fi
+# 	lipo \
+# 		"/tmp/${CURL_VERSION}-iOS-armv7-nobitcode/lib/libcurl.a" \
+# 		"/tmp/${CURL_VERSION}-iOS-armv7s-nobitcode/lib/libcurl.a" \
+# 		"/tmp/${CURL_VERSION}-iOS-simulator-i386-nobitcode/lib/libcurl.a" \
+# 		"/tmp/${CURL_VERSION}-iOS-arm64-nobitcode/lib/libcurl.a" \
+# 		"/tmp/${CURL_VERSION}-iOS-arm64e-nobitcode/lib/libcurl.a" \
+# 		"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-nobitcode/lib/libcurl.a" \
+# 		-create -output lib/libcurl_iOS_nobitcode.a
+# fi
 
 echo -e "${bold}Building tvOS libraries${dim}"
-buildTVOS "arm64"
+buildTVOS "arm64" "${BITCODE}"
 
 lipo \
 	"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \
 	-create -output lib/libcurl_tvOS.a
 
-buildTVOSsim "x86_64"
-buildTVOSsim "arm64"
+buildTVOSsim "x86_64" "${BITCODE}"
+buildTVOSsim "arm64" "${BITCODE}"
 
 lipo \
 	"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \

@@ -169,6 +169,11 @@ echo "Targets: x86_64, armv7, armv7s, arm64 and arm64e"
 ## Start Counter
 START=$(date +%s)
 
+# Starting with OpenSSL 3.0 force nobitcode
+if [[ "$OPENSSL" = "3.0"* ]]; then
+	disablebitcode="-b"
+fi
+
 ## OpenSSL Build
 echo
 cd openssl
