@@ -102,7 +102,7 @@ The tvOS build has fork() disable as the AppleTV tvOS does not support fork().
 	   |____libcrypto.a
 	   |____libssl.a
 
-NOTE: This script allows building the OpenSSL 1.1.1 and 1.0.2 series libraries.  The 1.0.2 series will be end of life soon so it is recommended that you use the new long term support (LTS) 1.1.1 version.
+NOTE: This script allows building the OpenSSL 3.0.x and 1.1.1 series libraries.  The OpenSSL 1.1.1 series is supported until 11th September 2023. All older versions (including 1.1.0, 1.0.2, 1.0.0 and 0.9.8) are now out of support and should not be used. Users of these older versions are encouraged to upgrade to 3.0 as soon as possible.
 
 ### HTTP2 / nghttp2
 The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
