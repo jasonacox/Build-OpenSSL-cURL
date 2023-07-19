@@ -21,9 +21,9 @@ The build script accepts several arguments to adjust versions and toggle feature
 ```
   ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-3] [-x] [-h] [...]
 
-         -o <version>   Build OpenSSL version (default 1.1.1o)
-         -c <version>   Build curl version (default 7.83.1)
-         -n <version>   Build nghttp2 version (default 1.47.0)
+         -o <version>   Build OpenSSL version (default 3.0.9)
+         -c <version>   Build curl version (default 8.1.2)
+         -n <version>   Build nghttp2 version (default 1.55.1)
          -d             Compile without HTTP2 support
          -e             Compile with OpenSSL engine support
          -b             Compile without bitcode
@@ -72,9 +72,9 @@ You can update the default version by editing this section in the `build.sh` scr
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="1.1.1o"        # https://www.openssl.org/source/
-LIBCURL="7.83.1"        # https://curl.haxx.se/download.html
-NGHTTP2="1.47.0"        # https://nghttp2.org/
+OPENSSL="3.0.9"         # https://www.openssl.org/source/
+LIBCURL="8.1.2"        # https://curl.haxx.se/download.html
+NGHTTP2="1.55.1"        # https://nghttp2.org/
 
 ################################################
 ```
