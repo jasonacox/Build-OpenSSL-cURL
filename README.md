@@ -7,6 +7,7 @@ This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), 
 
 ## News
 
+* 19-Jul-2023: Added OpenSSL 3.0.x (LTS) Support and removed EOL bitcode for builds going forward.
 * 13-Feb-2021: Update now builds XCFrameworks which supports all platforms and targets for easy import into your projects.
 * 16-Jan-2021: Updated build scripts to allow user defined minimum macOS, iOS, tvOS and catalyst target build versions. 
 * 02-Jan-2021: Apple Silicon [Beta]: The script now builds OpenSSL, nghttp2 and libcurl libraries for MacOS arm64 targets, including iOS Simulator and Mac Catalyst. Script runs on Apple Silicon arm64 and Intel x86_64 build hosts. Not complete: tvOS Simulator.
