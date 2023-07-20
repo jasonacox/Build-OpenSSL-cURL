@@ -533,7 +533,7 @@ if [ ${FORCE_SSLV3} == 'yes' ]; then
 		echo -e "${dim}SSLv3 Requested: This requires a patch for 7.77.0 and above - mileage may vary."
 		# for library
 		sed -i '' '/version == CURL_SSLVERSION_SSLv3/d' "${CURL_VERSION}/lib/setopt.c"
-		patch -N "${CURL_VERSION}/lib/vtls/openssl.c" sslv3.patch || true
+		patch --ignore-whitespace -N "${CURL_VERSION}/lib/vtls/openssl.c" sslv3.patch || true
 		# for command line
 		sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\\n\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
 	fi
