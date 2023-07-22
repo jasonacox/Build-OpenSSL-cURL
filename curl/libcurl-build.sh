@@ -200,6 +200,9 @@ buildMac()
 	if [ $nohttp2 == "1" ]; then
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/Mac/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/Mac/${ARCH}/lib"
+	else 
+		NGHTTP2CFG="--without-nghttp2"
+		NGHTTP2LIB=""
 	fi
 
 	TARGET="darwin-i386-cc"
@@ -283,6 +286,9 @@ buildCatalyst()
 	if [ $nohttp2 == "1" ]; then
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/Catalyst/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/Catalyst/${ARCH}/lib"
+	else 
+		NGHTTP2CFG="--without-nghttp2"
+		NGHTTP2LIB=""
 	fi
 
 	export $PLATFORM
@@ -327,6 +333,9 @@ buildIOS()
 	if [ $nohttp2 == "1" ]; then
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/${PLATFORMDIR}/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/${PLATFORMDIR}/${ARCH}/lib"
+	else 
+		NGHTTP2CFG="--without-nghttp2"
+		NGHTTP2LIB=""
 	fi
 
 	export $PLATFORM
@@ -371,6 +380,9 @@ buildIOSsim()
 	if [ $nohttp2 == "1" ]; then
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/${PLATFORMDIR}/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/${PLATFORMDIR}/${ARCH}/lib"
+	else 
+		NGHTTP2CFG="--without-nghttp2"
+		NGHTTP2LIB=""
 	fi
 
 	TARGET="darwin-i386-cc"
@@ -428,6 +440,9 @@ buildTVOS()
 	if [ $nohttp2 == "1" ]; then
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/tvOS/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/tvOS/${ARCH}/lib"
+	else 
+		NGHTTP2CFG="--without-nghttp2"
+		NGHTTP2LIB=""
 	fi
 
 	export $PLATFORM
@@ -473,6 +488,9 @@ buildTVOSsim()
 	if [ $nohttp2 == "1" ]; then
 		NGHTTP2CFG="--with-nghttp2=${NGHTTP2}/${PLATFORMDIR}/${ARCH}"
 		NGHTTP2LIB="-L${NGHTTP2}/${PLATFORMDIR}/${ARCH}/lib"
+	else 
+		NGHTTP2CFG="--without-nghttp2"
+		NGHTTP2LIB=""
 	fi
 
 	TARGET="darwin64-${ARCH}-cc"
