@@ -7,6 +7,7 @@ This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), 
 
 ## News
 
+* 17-Mar-2024: Updated tvOS build script to work with XCode 15.3 and added `--without-libpsl` for cURL due to on-by-default policy (see [cURL blog](https://daniel.haxx.se/blog/2024/01/10/psl-in-curl/)). TODO: Get a static build of libpsl for cross-compile.
 * 19-Jul-2023: Added OpenSSL 3.0.x (LTS) Support and removed EOL bitcode for builds going forward.
 * 13-Feb-2021: Update now builds XCFrameworks which supports all platforms and targets for easy import into your projects.
 * 16-Jan-2021: Updated build scripts to allow user defined minimum macOS, iOS, tvOS and catalyst target build versions. 

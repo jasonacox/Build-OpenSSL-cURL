@@ -97,6 +97,12 @@ extern "C" {
 # ifndef OPENSSL_NO_SCTP
 #  define OPENSSL_NO_SCTP
 # endif
+# ifndef OPENSSL_NO_SSL3
+#  define OPENSSL_NO_SSL3
+# endif
+# ifndef OPENSSL_NO_SSL3_METHOD
+#  define OPENSSL_NO_SSL3_METHOD
+# endif
 # ifndef OPENSSL_NO_TRACE
 #  define OPENSSL_NO_TRACE
 # endif

@@ -38,7 +38,7 @@ CURL_VERSION="curl-7.74.0"
 nohttp2="0"
 catalyst="0"
 FORCE_SSLV3="no"
-CONF_FLAGS="--without-libidn2 --disable-shared --enable-static -with-random=/dev/urandom"
+CONF_FLAGS="--without-libidn2 --disable-shared --enable-static -with-random=/dev/urandom --without-libpsl"
 
 # Set minimum OS versions for target
 MACOS_X86_64_VERSION=""			# Empty = use host version
