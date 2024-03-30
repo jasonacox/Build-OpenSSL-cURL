@@ -7,7 +7,7 @@
 -    failf(data, "No SSLv3 support");
 -    return CURLE_NOT_BUILT_IN;
 +    req_method = SSLv3_client_method();
-+    use_sni(FALSE);
++    /* use_sni(FALSE); */
 +    break;
    default:
      failf(data, "Unrecognized parameter passed via CURLOPT_SSLVERSION");

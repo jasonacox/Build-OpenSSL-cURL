@@ -65,16 +65,20 @@ This directory contains the curl and openssl headers (in the `include` folder), 
 
 ## Usage
 
+## Usage
+
  1. Copy headers to your project.
- 2. Import appropriate libraries: "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a" *or*
-    **XCFrameworks Alternative**: Import appropriate *xcframework* folders into your project in Xcode.
+ 2.   Import **XCFrameworks**: Import appropriate *xcframework* folders into your project in Xcode.
+       Alternative: Import appropriate libraries: "libssl.a", "libcrypto.a", "libcurl.a", "libnghttp2.a"
  3. Reference Headers.
- 4. Specifying the flag  "-lz" in "Other Linker Flags" (OTHER_LDFLAGS) setting in the "Linking" section in the Build settings of the target.
+ 4. If required, specify the flag  "-lz" in "Other Linker Flags" (OTHER_LDFLAGS) setting in the "Linking" section in the Build settings of the target.
  5. Initialize curl in your code:
 
+```cpp
         #include <curl/curl.h>
 
-        - (void)foo {    
+        (void)foo {    
             CURL* cURL = curl_easy_init();  
-            ...  
+            // ...  
         }
+```

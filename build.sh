@@ -15,7 +15,7 @@ set -e
 
 #OPENSSL="1.1.1u"	# https://www.openssl.org/source/ 
 OPENSSL="3.0.13"	# https://www.openssl.org/source/ 
-LIBCURL="8.6.0"		# https://curl.haxx.se/download.html
+LIBCURL="8.7.1"		# https://curl.haxx.se/download.html
 NGHTTP2="1.60.0"	# https://nghttp2.org/
 
 ################################################
@@ -124,7 +124,14 @@ while getopts "o:c:n:u:s:t:i:a:debm3xh\?" o; do
 			CATALYST_IOS="${OPTARG}"
 			;;
 		3)
-       		sslv3="-3"
+       		echo "WARNING: SSLv3 is requested. SSLv3 is not secure and has been deprecated."
+			echo "If you proceed, builds may fail as SSLv3 is not supported by recent curl version."
+			read -p "Do you want to continue (y/N)? " choice
+			case "$choice" in 
+				y|Y ) echo "Continuing with SSLv3 build"; echo "";;
+				* ) echo "Exiting"; exit 1;;
+			esac
+			sslv3="-3"
 			;;
 		s)
 			IOS_MIN_SDK_VERSION="${OPTARG}"

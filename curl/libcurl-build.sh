@@ -538,7 +538,7 @@ if [ ! -e ${CURL_VERSION}.tar.gz ]; then
 	echo -e "${dim}Downloading ${CURL_VERSION}.tar.gz"
 	curl -LOs https://curl.haxx.se/download/${CURL_VERSION}.tar.gz
 else
-	echo -e"${dim}Using ${CURL_VERSION}.tar.gz"
+	echo -e "${dim}Using ${CURL_VERSION}.tar.gz"
 fi
 
 echo -e "${dim}Unpacking curl"
@@ -553,6 +553,7 @@ if [ ${FORCE_SSLV3} == 'yes' ]; then
 		sed -i '' '/version == CURL_SSLVERSION_SSLv3/d' "${CURL_VERSION}/lib/setopt.c"
 		patch --ignore-whitespace -N "${CURL_VERSION}/lib/vtls/openssl.c" sslv3.patch || true
 		# for command line
+		sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
 		sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\\n\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
 	fi
 fi
