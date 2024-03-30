@@ -125,7 +125,7 @@ while getopts "o:c:n:u:s:t:i:a:debm3xh\?" o; do
 			;;
 		3)
        		echo "WARNING: SSLv3 is requested. SSLv3 is not secure and has been deprecated."
-			echo "If you proceed, builds may fail as SSLv3 is not supported by recent curl version."
+			echo "If you proceed, builds may fail as SSLv3 is no longer supported by curl."
 			read -p "Do you want to continue (y/N)? " choice
 			case "$choice" in 
 				y|Y ) echo "Continuing with SSLv3 build"; echo "";;
