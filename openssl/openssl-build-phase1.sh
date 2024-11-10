@@ -207,7 +207,7 @@ buildCatalyst()
 	ARCH=$1
 
 	# disabe bitcode for openssl 3
-	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+	if [[ "$OPENSSL_VERSION" = "openssl-3"* ]]; then
 		CC_BITCODE_FLAG=""
 	else
 		CC_BITCODE_FLAG="-fembed-bitcode"
@@ -312,7 +312,7 @@ buildTVOS()
 		LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
 		LANG=C sed -i -- 's/!defined(OPENSSL_NO_ASYNC)/defined(HAVE_FORK)/' "./crypto/async/arch/async_posix.h"
 	fi
-	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+	if [[ "$OPENSSL_VERSION" = "openssl-3"* ]]; then
 		# LANG=C sed -i -- 's/!defined(OPENSSL_NO_POSIX_IO)/defined(HAVE_FORK)/' "./apps/ocsp.c"
 		LANG=C sed -i -- 's/fork()/-1/' "./apps/speed.c"
 		LANG=C sed -i -- 's/fork()/-1/' "./apps/lib/http_server.c"
@@ -393,7 +393,7 @@ buildTVOSsim()
 		LANG=C sed -i -- 's/fork()/-1/' "./test/drbgtest.c"
 		LANG=C sed -i -- 's/!defined(OPENSSL_NO_ASYNC)/defined(HAVE_FORK)/' "./crypto/async/arch/async_posix.h"
 	fi
-	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+	if [[ "$OPENSSL_VERSION" = "openssl-3"* ]]; then
 		# LANG=C sed -i -- 's/!defined(OPENSSL_NO_POSIX_IO)/defined(HAVE_FORK)/' "./apps/ocsp.c"
 		LANG=C sed -i -- 's/fork()/-1/' "./apps/speed.c"
 		LANG=C sed -i -- 's/fork()/-1/' "./apps/lib/http_server.c"

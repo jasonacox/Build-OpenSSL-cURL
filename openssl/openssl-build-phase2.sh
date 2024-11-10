@@ -151,7 +151,7 @@ buildIOS()
 	export BUILD_TOOLS="${DEVELOPER}"
 	ADDCFLAG=""
 	DSO_LDFLAGS="DSO_LDFLAGS=-fembed-bitcode"
-	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+	if [[ "$OPENSSL_VERSION" = "openssl-3"* ]]; then
 		# disable bitcode for openssl 3
 		export CC="${BUILD_TOOLS}/usr/bin/gcc -arch ${ARCH}"
 		DSO_LDFLAGS=""
@@ -220,7 +220,7 @@ buildIOSsim()
 	fi
 
 	# set up exports for build 
-	if [[ "$OPENSSL_VERSION" = "openssl-3.0"* ]]; then
+	if [[ "$OPENSSL_VERSION" = "openssl-3"* ]]; then
 		if [[ "${ARCH}" == "armv7" || "${ARCH}" == "armv7s" || "${ARCH}" == "i386" ]]; then
 		    # armv7 and i386 doesn't work with atomic
 			export CFLAGS=" -Os -miphoneos-version-min=${MIPHONEOS} -DBROKEN_CLANG_ATOMICS -arch ${ARCH} ${RUNTARGET} "
