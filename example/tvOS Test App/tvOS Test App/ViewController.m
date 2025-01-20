@@ -1,40 +1,11 @@
 //
 //  ViewController.m
-//  iOS Test App
+//  tvOS Test App
 //
-//  Created by Jason A. Cox on 11/19/16.
-//
-//  COPYRIGHT AND PERMISSION NOTICE
-//
-//  Copyright (c) 2014-2022 Jason A. Cox, jasonacox@me.com, and many contributors,
-//  see the THANKS file.
-//
-//  All rights reserved.
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in all
-//  copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//  SOFTWARE.
+//  Created by Jason Cox on 1/19/25.
 //
 
 #import "ViewController.h"
-
-//
-// CURL Private Interface and Methods
-//
 
 // Create private interface
 @interface ViewController (Private)
@@ -43,14 +14,15 @@
 - (void)receivedData:(NSData *)data;
 @end
 
+
 // Function called by libcurl to deliver info/debug and payload data
-int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t infoLen, void *contextInfo) {
+int tvOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t infoLen, void *contextInfo) {
     ViewController *vc = (__bridge ViewController *)contextInfo;
     NSData *infoData = [NSData dataWithBytes:info length:infoLen];
     NSString *infoStr = [[NSString alloc] initWithData:infoData encoding:NSUTF8StringEncoding];
     if (infoStr) {
-        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r\n" withString:@"\n"];	// convert CR/LF to LF
-        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];	// convert CR to LF
+        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r\n" withString:@"\n"];    // convert CR/LF to LF
+        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];    // convert CR to LF
         switch (infotype) {
             case CURLINFO_DATA_IN:
                 [vc displayText:infoStr];
@@ -68,7 +40,7 @@ int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t 
             case CURLINFO_TEXT:
                 [vc displayText:[@"-- " stringByAppendingString:infoStr]];
                 break;
-            default:	// ignore the other CURLINFOs
+            default:    // ignore the other CURLINFOs
                 break;
         }
     }
@@ -76,7 +48,7 @@ int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t 
 }
 
 // Function called by libcurl to get data for uploads to web server
-size_t iOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata) {
+size_t tvOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata) {
     const size_t sizeInBytes = size*nmemb;
     ViewController *vc = (__bridge ViewController *)userdata;
     
@@ -84,7 +56,7 @@ size_t iOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata)
 }
 
 // Function called by libcurl to deliver packets from web response
-size_t iOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
+size_t tvOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
     const size_t sizeInBytes = size*nmemb;
     ViewController *vc = (__bridge ViewController *)userdata;
     NSData *data = [[NSData alloc] initWithBytes:ptr length:sizeInBytes];
@@ -94,9 +66,9 @@ size_t iOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata
 }
 
 // Function called by libcurl to update progress
-int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
+int tvOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
     // Placeholder - add progress bar?
-    // NSLog(@"iOSCurlProgressCallback %f of %f", dlnow, dltotal);
+    // NSLog(@"tvOSCurlProgressCallback %f of %f", dlnow, dltotal);
     return 0;
 }
 
@@ -163,13 +135,18 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
     }
     
     // Update Title
-    _appTitle.text = [@"iOS cURL Test App v" stringByAppendingFormat:@"%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]];
+    _appTitle.text = [@"tvOS cURL Test App v" stringByAppendingFormat:@"%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]];
     
     // Display version and library info in view
-    _resultText.text = [@"" stringByAppendingFormat:@"iOS cURL Test App v%@\n@jasonacox/Build-OpenSSL-cURL\n\nUsing: %s\n\n\n\n",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], curl_version()];
+    _resultText.text = [@"" stringByAppendingFormat:@"tvOS cURL Test App v%@\n@jasonacox/Build-OpenSSL-cURL\n\nUsing: %s\n\n\n\n",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], curl_version()];
     
-    _resultText.scrollEnabled = true;
-    
+    // Set up display to allow user to scroll contents
+    _resultText.showsVerticalScrollIndicator = YES;
+    _resultText.panGestureRecognizer.allowedTouchTypes = @[@(UITouchTypeIndirect)];
+    _resultText.selectable = YES;
+    _resultText.scrollEnabled = YES;
+    _resultText.userInteractionEnabled = YES;
+
 }
 
 // GET URL - display results interactively via textview
@@ -192,18 +169,18 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
         _dataToSendBookmark = 0U;
         
         // Set CURL callback functions
-        curl_easy_setopt(_curl, CURLOPT_DEBUGFUNCTION, iOSCurlDebugCallback);  // function to get debug data to view
+        curl_easy_setopt(_curl, CURLOPT_DEBUGFUNCTION, tvOSCurlDebugCallback);  // function to get debug data to view
         curl_easy_setopt(_curl, CURLOPT_DEBUGDATA, self);
-        curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, iOSCurlWriteCallback);  // function to get write data to view
-        curl_easy_setopt(_curl, CURLOPT_WRITEDATA, self);	// prevent libcurl from writing the data to stdout
+        curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, tvOSCurlWriteCallback);  // function to get write data to view
+        curl_easy_setopt(_curl, CURLOPT_WRITEDATA, self);    // prevent libcurl from writing the data to stdout
         curl_easy_setopt(_curl, CURLOPT_NOPROGRESS, 0L);
-        curl_easy_setopt(_curl, CURLOPT_XFERINFOFUNCTION, iOSCurlProgressCallback);
+        curl_easy_setopt(_curl, CURLOPT_XFERINFOFUNCTION, tvOSCurlProgressCallback);
         curl_easy_setopt(_curl, CURLOPT_PROGRESSDATA, self);  // libcurl will pass back dl data progress
         
         // Set some CURL options
-        curl_easy_setopt(_curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);	// user/pass may be in URL
-        curl_easy_setopt(_curl, CURLOPT_USERAGENT, curl_version());	// set a default user agent
-        curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);	// turn on verbose
+        curl_easy_setopt(_curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);    // user/pass may be in URL
+        curl_easy_setopt(_curl, CURLOPT_USERAGENT, curl_version());    // set a default user agent
+        curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);    // turn on verbose
         curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 60L); // seconds
         curl_easy_setopt(_curl, CURLOPT_MAXCONNECTS, 0L); // this should disallow connection sharing
         curl_easy_setopt(_curl, CURLOPT_FORBID_REUSE, 1L); // enforce connection to be closed
@@ -275,11 +252,9 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
     }
 }
 
-
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
 
 @end

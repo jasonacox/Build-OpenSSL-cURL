@@ -24,3 +24,12 @@ Mac Catalyst Build
 
 <img width="400" alt="image" src="https://github.com/jasonacox/Build-OpenSSL-cURL/assets/836718/c5ee7356-ea03-4091-a362-c79b123829fd">
 <img width="400" alt="image" src="https://github.com/jasonacox/Build-OpenSSL-cURL/assets/836718/0369f35c-7c80-4cbe-92fb-c6008b115fa9">
+
+
+## New Project Setup Details
+
+If you are setting up a new Xcode project, there are few things you will need to set up. These are all set up for you already in the xcodeproj file:
+
+* You will also need to add the xcframework files (libs) and header files (include). You will also need to add libz.tbd to the Xcode project ("General"). 
+ <img width="495" alt="Image" src="https://github.com/user-attachments/assets/a1f194e4-2947-48e9-aa57-01458a79f623" />
+

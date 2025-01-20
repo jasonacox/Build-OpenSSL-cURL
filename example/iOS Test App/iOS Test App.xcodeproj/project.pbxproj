@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -336,6 +336,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/include/**",
 				);
+				IDEPreferLogStreaming = YES;
 				INFOPLIST_FILE = "iOS Test App/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -366,6 +367,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/include/**",
 				);
+				IDEPreferLogStreaming = YES;
 				INFOPLIST_FILE = "iOS Test App/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

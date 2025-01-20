@@ -42,7 +42,7 @@ cURLtv.sh
 *.orig
 test.sh
 
-# Library Archives 
+# Build Artifacts
 ######################
 archive/
 libcrypto.a
@@ -55,3 +55,9 @@ openssl-ios-x86_64-maccatalyst.a
 releases
 sandbox/
 example/iOS\ Test\ App/libs/
+example/tvOS\ Test\ App/libs/
+example/macOS\ Test\ App/libs/
+example/iOS\ Test\ App/include/
+example/tvOS\ Test\ App/include/
+example/macOS\ Test\ App/include/
+cacert.pem
