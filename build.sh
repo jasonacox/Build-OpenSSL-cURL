@@ -23,6 +23,9 @@ NGHTTP2="1.64.0"	# https://nghttp2.org/
 BUILD_MACHINE=`uname -m`
 BUILD_CMD=$*
 
+# Script Version
+SCRIPT_VERSION="1.0.0"
+
 # Compile Cache - Optional
 # export CMAKE_CXX_COMPILER_LAUNCHER="ccache"
 
@@ -81,6 +84,7 @@ trap 'echo -e "\n${alertdim}Cancelled by User${normal}"; exit 1' INT
 
 # Show Usage
 usage () {
+	echo -e "${bold}Build-OpenSSL-cURL${dim} - v$SCRIPT_VERSION"
     echo
 	echo -e "${bold}Usage:${normal}"
 	echo
@@ -158,7 +162,7 @@ shift $((OPTIND-1))
 OSARGS="-s ${IOS_MIN_SDK_VERSION} -t ${TVOS_MIN_SDK_VERSION} -i ${MACOS_X86_64_VERSION} -a ${MACOS_ARM64_VERSION}"
 
 ## Welcome
-echo -e "${bold}Build-OpenSSL-cURL${dim}"
+echo -e "${bold}Build-OpenSSL-cURL${dim} - v$SCRIPT_VERSION"
 echo
 echo -e " - OpenSSL version: ${subbold}${OPENSSL}${dim}"
 echo -e " - cURL version:    ${subbold}${LIBCURL}${dim}"
