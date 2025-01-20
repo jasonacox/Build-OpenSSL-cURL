@@ -1,6 +1,6 @@
 # RELEASE NOTES
 
-## v1.0.0 - Platform Builds
+## 1.0.0 - Platform Builds
 
 * Updated build script to allow building for single platform targets: macOS, iOS or tvOS. Specify with `-p <platform>` switch. Default build is for "all" as it has been. 
     ```bash
