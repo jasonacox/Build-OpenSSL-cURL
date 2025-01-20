@@ -29,7 +29,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run build script
-        run: bash build.sh
+        run: bash build.sh -y
 
       # Build test iOS App - Clean
       - name: Prep Test iOS App
