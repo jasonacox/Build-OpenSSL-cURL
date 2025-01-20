@@ -10,10 +10,10 @@ macOS Test Build
 
 ## Build Instructions
 
-Build the libraries with macOS support:
+The `libs` and `include` folders will be created during the build. These are required to build and run the Test application in Xcode. Build the libraries with this command:
 
 ```bash
-# Standard Build
+# Build for all platforms
 ./build.sh
 
 # Option: Build only macOS
