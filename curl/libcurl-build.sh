@@ -31,7 +31,8 @@ alert="\033[0m${red}\033[1m"
 alertdim="\033[0m${red}\033[2m"
 
 # Set trap to help debug any build errors
-trap 'echo -e "${alert}** ERROR with Build - Check /tmp/curl*.log${alertdim}"; tail -30 /tmp/curl*.log' INT TERM EXIT
+trap 'echo -e "${alert}** ERROR with Build on line $LINENO ($0) - Check /tmp/curl*.log${alertdim}"; tail -30 /tmp/curl*.log' ERR TERM EXIT
+trap 'exit 1' INT
 
 # Set defaults
 CURL_VERSION="curl-7.74.0"
@@ -39,6 +40,7 @@ nohttp2="0"
 catalyst="0"
 FORCE_SSLV3="no"
 CONF_FLAGS="--without-libidn2 --disable-shared --enable-static -with-random=/dev/urandom --without-libpsl"
+BUILDFOR="all"
 
 # Set minimum OS versions for target
 MACOS_X86_64_VERSION=""			# Empty = use host version
@@ -82,13 +84,14 @@ usage ()
 	echo "         -m   compile Mac Catalyst library [beta]"
 	echo "         -x   disable color output"
 	echo "         -3   enable SSLv3 support"
+	echo "         -p   build only for specified platform (iOS, tvOS, macOS)" 
 	echo "         -h   show usage"
 	echo
 	trap - INT TERM EXIT
 	exit 127
 }
 
-while getopts "v:s:t:i:a:u:nmb3xh\?" o; do
+while getopts "v:s:t:i:a:u:p:nmb3xh\?" o; do
     case "${o}" in
         v)
 			CURL_VERSION="curl-${OPTARG}"
@@ -129,6 +132,15 @@ while getopts "v:s:t:i:a:u:nmb3xh\?" o; do
 			;;
 		3)
 			FORCE_SSLV3="yes"
+			;;
+		p)
+			BUILDFOR=$(echo "${OPTARG}" | tr '[:upper:]' '[:lower:]')
+			# Check for valid platform
+			if [ "$BUILDFOR" != "ios" ] && [ "$BUILDFOR" != "tvos" ] && [ "$BUILDFOR" != "macos" ]; then
+				echo -e "${alert}Invalid platform requested${normal}: $BUILDFOR"
+				echo "Please specify iOS, tvOS or macOS"
+				exit 127
+			fi
 			;;
         *)
             usage
@@ -558,67 +570,73 @@ if [ ${FORCE_SSLV3} == 'yes' ]; then
 	fi
 fi
 
-echo -e "${bold}Building Mac libraries${dim}"
-buildMac "x86_64"
-buildMac "arm64"
-
-echo -e "  ${dim}Copying headers"
-cp /tmp/${CURL_VERSION}-x86_64/include/curl/* include/curl/
-
-lipo \
-	"/tmp/${CURL_VERSION}-x86_64/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-arm64/lib/libcurl.a" \
-	-create -output lib/libcurl_Mac.a
-
-if [ $catalyst == "1" ]; then
-echo -e "${bold}Building Catalyst libraries${dim}"
-buildCatalyst "x86_64" "bitcode"
-buildCatalyst "arm64" "bitcode"
-
-lipo \
-	"/tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-catalyst-arm64-bitcode/lib/libcurl.a" \
-	-create -output lib/libcurl_Catalyst.a
-fi
-
 if ! [[ "${NOBITCODE}" == "yes" ]]; then
-    BITCODE="bitcode"
+	BITCODE="bitcode"
 else
-    BITCODE="nobitcode"
+	BITCODE="nobitcode"
 fi
 
-echo -e "${bold}Building iOS libraries (${BITCODE})${dim}"
-buildIOS "armv7" "${BITCODE}"
-buildIOS "armv7s" "${BITCODE}"
-buildIOS "arm64" "${BITCODE}"
-buildIOS "arm64e" "${BITCODE}"
+if [ $BUILDFOR == "macos" ] || [ $BUILDFOR == "all" ]; then
+	echo -e "${bold}Building Mac libraries${dim}"
+	buildMac "x86_64"
+	buildMac "arm64"
 
-lipo \
-	"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
-	-create -output lib/libcurl_iOS.a
+	echo -e "  ${dim}Copying headers"
+	cp /tmp/${CURL_VERSION}-x86_64/include/curl/* include/curl/
 
-buildIOSsim "i386" "${BITCODE}"
-buildIOSsim "x86_64" "${BITCODE}"
-buildIOSsim "arm64" "${BITCODE}"
+	lipo \
+		"/tmp/${CURL_VERSION}-x86_64/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-arm64/lib/libcurl.a" \
+		-create -output lib/libcurl_Mac.a
 
-lipo \
-	"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-arm64-${BITCODE}/lib/libcurl.a" \
-	-create -output lib/libcurl_iOS-simulator.a
+	if [ $catalyst == "1" ]; then
+	echo -e "${bold}Building Catalyst libraries${dim}"
+	buildCatalyst "x86_64" "bitcode"
+	buildCatalyst "arm64" "bitcode"
 
-lipo \
-	"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
-	-create -output lib/libcurl_iOS-fat.a
+	lipo \
+		"/tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-catalyst-arm64-bitcode/lib/libcurl.a" \
+		-create -output lib/libcurl_Catalyst.a
+	fi
+fi
 
+if [ $BUILDFOR == "ios" ] || [ $BUILDFOR == "all" ]; then
+	echo -e "${bold}Building iOS libraries (${BITCODE})${dim}"
+	buildIOS "armv7" "${BITCODE}"
+	buildIOS "armv7s" "${BITCODE}"
+	buildIOS "arm64" "${BITCODE}"
+	buildIOS "arm64e" "${BITCODE}"
+
+	echo -e "  ${dim}Copying headers"
+	cp /tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/include/curl/* include/curl/
+
+	lipo \
+		"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
+		-create -output lib/libcurl_iOS.a
+
+	buildIOSsim "i386" "${BITCODE}"
+	buildIOSsim "x86_64" "${BITCODE}"
+	buildIOSsim "arm64" "${BITCODE}"
+
+	lipo \
+		"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-simulator-arm64-${BITCODE}/lib/libcurl.a" \
+		-create -output lib/libcurl_iOS-simulator.a
+
+	lipo \
+		"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
+		-create -output lib/libcurl_iOS-fat.a
+fi
 
 # if [[ "${NOBITCODE}" == "yes" ]]; then
 # 	echo -e "${bold}Building iOS libraries (nobitcode)${dim}"
@@ -639,25 +657,30 @@ lipo \
 # 		-create -output lib/libcurl_iOS_nobitcode.a
 # fi
 
-echo -e "${bold}Building tvOS libraries${dim}"
-buildTVOS "arm64" "${BITCODE}"
+if [ $BUILDFOR == "tvos" ] || [ $BUILDFOR == "all" ]; then
+	echo -e "${bold}Building tvOS libraries${dim}"
+	buildTVOS "arm64" "${BITCODE}"
 
-lipo \
-	"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \
-	-create -output lib/libcurl_tvOS.a
+	echo -e "  ${dim}Copying headers"
+	cp /tmp/${CURL_VERSION}-tvOS-arm64/include/curl/* include/curl/
 
-buildTVOSsim "x86_64" "${BITCODE}"
-buildTVOSsim "arm64" "${BITCODE}"
+	lipo \
+		"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \
+		-create -output lib/libcurl_tvOS.a
 
-lipo \
-	"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-tvOS-simulator-x86_64/lib/libcurl.a" \
-	-create -output lib/libcurl_tvOS-fat.a
+	buildTVOSsim "x86_64" "${BITCODE}"
+	buildTVOSsim "arm64" "${BITCODE}"
 
-lipo \
-	"/tmp/${CURL_VERSION}-tvOS-simulator-x86_64/lib/libcurl.a" \
-	"/tmp/${CURL_VERSION}-tvOS-simulator-arm64/lib/libcurl.a" \
-	-create -output lib/libcurl_tvOS-simulator.a
+	lipo \
+		"/tmp/${CURL_VERSION}-tvOS-arm64/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-tvOS-simulator-x86_64/lib/libcurl.a" \
+		-create -output lib/libcurl_tvOS-fat.a
+
+	lipo \
+		"/tmp/${CURL_VERSION}-tvOS-simulator-x86_64/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-tvOS-simulator-arm64/lib/libcurl.a" \
+		-create -output lib/libcurl_tvOS-simulator.a
+fi
 
 echo -e "${bold}Cleaning up${dim}"
 rm -rf /tmp/${CURL_VERSION}-*

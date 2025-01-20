@@ -1,40 +1,11 @@
 //
 //  ViewController.m
-//  iOS Test App
+//  macOS Test App
 //
-//  Created by Jason A. Cox on 11/19/16.
-//
-//  COPYRIGHT AND PERMISSION NOTICE
-//
-//  Copyright (c) 2014-2022 Jason A. Cox, jasonacox@me.com, and many contributors,
-//  see the THANKS file.
-//
-//  All rights reserved.
-//
-//  Permission is hereby granted, free of charge, to any person obtaining a copy
-//  of this software and associated documentation files (the "Software"), to deal
-//  in the Software without restriction, including without limitation the rights
-//  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-//  copies of the Software, and to permit persons to whom the Software is
-//  furnished to do so, subject to the following conditions:
-//
-//  The above copyright notice and this permission notice shall be included in all
-//  copies or substantial portions of the Software.
-//
-//  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-//  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-//  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-//  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-//  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-//  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-//  SOFTWARE.
+//  Created by Jason Cox on 1/19/25.
 //
 
 #import "ViewController.h"
-
-//
-// CURL Private Interface and Methods
-//
 
 // Create private interface
 @interface ViewController (Private)
@@ -44,13 +15,13 @@
 @end
 
 // Function called by libcurl to deliver info/debug and payload data
-int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t infoLen, void *contextInfo) {
+int macOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t infoLen, void *contextInfo) {
     ViewController *vc = (__bridge ViewController *)contextInfo;
     NSData *infoData = [NSData dataWithBytes:info length:infoLen];
     NSString *infoStr = [[NSString alloc] initWithData:infoData encoding:NSUTF8StringEncoding];
     if (infoStr) {
-        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r\n" withString:@"\n"];	// convert CR/LF to LF
-        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];	// convert CR to LF
+        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r\n" withString:@"\n"];    // convert CR/LF to LF
+        infoStr = [infoStr stringByReplacingOccurrencesOfString:@"\r" withString:@"\n"];    // convert CR to LF
         switch (infotype) {
             case CURLINFO_DATA_IN:
                 [vc displayText:infoStr];
@@ -68,7 +39,7 @@ int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t 
             case CURLINFO_TEXT:
                 [vc displayText:[@"-- " stringByAppendingString:infoStr]];
                 break;
-            default:	// ignore the other CURLINFOs
+            default:    // ignore the other CURLINFOs
                 break;
         }
     }
@@ -76,7 +47,7 @@ int iOSCurlDebugCallback(CURL *curl, curl_infotype infotype, char *info, size_t 
 }
 
 // Function called by libcurl to get data for uploads to web server
-size_t iOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata) {
+size_t macOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata) {
     const size_t sizeInBytes = size*nmemb;
     ViewController *vc = (__bridge ViewController *)userdata;
     
@@ -84,7 +55,7 @@ size_t iOSCurlReadCallback(void *ptr, size_t size, size_t nmemb, void *userdata)
 }
 
 // Function called by libcurl to deliver packets from web response
-size_t iOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
+size_t macOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata) {
     const size_t sizeInBytes = size*nmemb;
     ViewController *vc = (__bridge ViewController *)userdata;
     NSData *data = [[NSData alloc] initWithBytes:ptr length:sizeInBytes];
@@ -94,9 +65,9 @@ size_t iOSCurlWriteCallback(char *ptr, size_t size, size_t nmemb, void *userdata
 }
 
 // Function called by libcurl to update progress
-int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
+int macOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double ultotal, double ulnow) {
     // Placeholder - add progress bar?
-    // NSLog(@"iOSCurlProgressCallback %f of %f", dlnow, dltotal);
+    // NSLog(@"macOSCurlProgressCallback %f of %f", dlnow, dltotal);
     return 0;
 }
 
@@ -124,7 +95,7 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
 {
     @autoreleasepool
     {
-        _resultText.text = [_resultText.text stringByAppendingString:text];
+        _resultText.string = [_resultText.string stringByAppendingString:text];
         // allow run loop to run and do rendering while curl_easy_perform() hasn't returned yet
         [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     }
@@ -134,14 +105,6 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
 {
     [_dataReceived appendData:data];
 }
-
-@end
-
-//
-// Main Interface and Methods
-//
-
-@interface ViewController ()
 
 @end
 
@@ -162,48 +125,46 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
         _curl = curl_easy_init();
     }
     
-    // Update Title
-    _appTitle.text = [@"iOS cURL Test App v" stringByAppendingFormat:@"%@",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"]];
-    
     // Display version and library info in view
-    _resultText.text = [@"" stringByAppendingFormat:@"iOS cURL Test App v%@\n@jasonacox/Build-OpenSSL-cURL\n\nUsing: %s\n\n\n\n",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], curl_version()];
+    _resultText.string = [@"" stringByAppendingFormat:@"macOS cURL Test App v%@\n@jasonacox/Build-OpenSSL-cURL\n\nUsing: %s\n\n\n\n",[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleShortVersionString"], curl_version()];
     
-    _resultText.scrollEnabled = true;
+    // Set up display to allow user to scroll contents
+    _resultText.selectable = YES;
     
 }
 
 // GET URL - display results interactively via textview
 - (IBAction)Get:(id)sender
 {
-    _resultText.text = @""; // clear viewer
+    _resultText.string = @""; // clear viewer
 
     // Give some render time to show response before we hit the network
     [[NSRunLoop mainRunLoop] runUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.1]];
     
     // Verify URL
-    if (!_urlText.text || [_urlText.text isEqualToString:@""]) {
-        _urlText.text = @"http://www.apple.com";  // no address provided, fill in default
+    if (!_urlText.stringValue || [_urlText.stringValue isEqualToString:@""]) {
+        _urlText.stringValue = @"http://www.apple.com";  // no address provided, fill in default
     }
     
-    if (_urlText.text && ![_urlText.text isEqualToString:@""]) {
+    if (_urlText.stringValue && ![_urlText.stringValue isEqualToString:@""]) {
         CURLcode theResult;
-        NSURL *url = [NSURL URLWithString:_urlText.text];
+        NSURL *url = [NSURL URLWithString:_urlText.stringValue];
          [_dataReceived setLength:0U];
         _dataToSendBookmark = 0U;
         
         // Set CURL callback functions
-        curl_easy_setopt(_curl, CURLOPT_DEBUGFUNCTION, iOSCurlDebugCallback);  // function to get debug data to view
+        curl_easy_setopt(_curl, CURLOPT_DEBUGFUNCTION, macOSCurlDebugCallback);  // function to get debug data to view
         curl_easy_setopt(_curl, CURLOPT_DEBUGDATA, self);
-        curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, iOSCurlWriteCallback);  // function to get write data to view
-        curl_easy_setopt(_curl, CURLOPT_WRITEDATA, self);	// prevent libcurl from writing the data to stdout
+        curl_easy_setopt(_curl, CURLOPT_WRITEFUNCTION, macOSCurlWriteCallback);  // function to get write data to view
+        curl_easy_setopt(_curl, CURLOPT_WRITEDATA, self);    // prevent libcurl from writing the data to stdout
         curl_easy_setopt(_curl, CURLOPT_NOPROGRESS, 0L);
-        curl_easy_setopt(_curl, CURLOPT_XFERINFOFUNCTION, iOSCurlProgressCallback);
+        curl_easy_setopt(_curl, CURLOPT_XFERINFOFUNCTION, macOSCurlProgressCallback);
         curl_easy_setopt(_curl, CURLOPT_PROGRESSDATA, self);  // libcurl will pass back dl data progress
         
         // Set some CURL options
-        curl_easy_setopt(_curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);	// user/pass may be in URL
-        curl_easy_setopt(_curl, CURLOPT_USERAGENT, curl_version());	// set a default user agent
-        curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);	// turn on verbose
+        curl_easy_setopt(_curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);    // user/pass may be in URL
+        curl_easy_setopt(_curl, CURLOPT_USERAGENT, curl_version());    // set a default user agent
+        curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);    // turn on verbose
         curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 60L); // seconds
         curl_easy_setopt(_curl, CURLOPT_MAXCONNECTS, 0L); // this should disallow connection sharing
         curl_easy_setopt(_curl, CURLOPT_FORBID_REUSE, 1L); // enforce connection to be closed
@@ -256,16 +217,16 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
             }
             
             // timings
-            _resultText.text = [_resultText.text stringByAppendingFormat:@"\n** Timing Details **\n-- \tName Lookup:\t%0.2fs\n-- \tTCP Connect: \t%0.2fs\n-- \tSSL Handshake: \t%0.2fs\n-- \tFirst Byte: \t\t%0.2fs\n-- \tTotal Download: \t%0.2fs\n-- Size: %0.0f bytes\n-- Speed: %0.0f bytes/sec\n-- Using: %@\n** RESULT CODE: %ld**",
+            _resultText.string = [_resultText.string stringByAppendingFormat:@"\n** Timing Details **\n-- \tName Lookup:\t%0.2fs\n-- \tTCP Connect: \t%0.2fs\n-- \tSSL Handshake: \t%0.2fs\n-- \tFirst Byte: \t\t%0.2fs\n-- \tTotal Download: \t%0.2fs\n-- Size: %0.0f bytes\n-- Speed: %0.0f bytes/sec\n-- Using: %@\n** RESULT CODE: %ld**",
                                 timing_ns,timing_tcp,timing_ssl,timing_fb,
                                 total_time,total_size, total_speed, http_ver_s, http_code];
         
         }
         else {
-            _resultText.text = [_resultText.text stringByAppendingFormat:@"\n** TRANSFER INTERRUPTED - ERROR [%d]\n", theResult];
+            _resultText.string = [_resultText.string stringByAppendingFormat:@"\n** TRANSFER INTERRUPTED - ERROR [%d]\n", theResult];
 
             if (theResult == 6) {
-                _resultText.text = [_resultText.text stringByAppendingString:@"\n** Host Not Found - Check URL or Network\n"];
+                _resultText.string = [_resultText.string stringByAppendingString:@"\n** Host Not Found - Check URL or Network\n"];
                 
             }
         }
@@ -274,12 +235,5 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
         NSLog(@"ERROR: Invalid _urlText passed.");
     }
 }
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 
 @end

@@ -7,6 +7,7 @@ This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), 
 
 ## News
 
+* 19-Jan-2025: Updated build script to allow building for single platform targets: macOS, iOS or tvOS. Specify with `-p macOS`. Default build is for "all" as it has been. Added examples apps for tvOS and macOS.
 * 17-Mar-2024: Updated tvOS build script to work with XCode 15.3 and added `--without-libpsl` for cURL due to on-by-default policy (see [cURL blog](https://daniel.haxx.se/blog/2024/01/10/psl-in-curl/)). TODO: Get a static build of libpsl for cross-compile.
 * 19-Jul-2023: Added OpenSSL 3.0.x (LTS) Support and removed EOL bitcode for builds going forward.
 * 13-Feb-2021: Update now builds XCFrameworks which supports all platforms and targets for easy import into your projects.
@@ -23,9 +24,9 @@ The build script accepts several arguments to adjust versions and toggle feature
 ```
   ./build.sh [-o <OpenSSL version>] [-c <curl version>] [-n <nghttp2 version>] [-d] [-e] [-3] [-x] [-h] [...]
 
-         -o <version>   Build OpenSSL version (default 3.0.9)
-         -c <version>   Build curl version (default 8.1.2)
-         -n <version>   Build nghttp2 version (default 1.55.1)
+         -o <version>   Build OpenSSL version (default 3.0.15)
+         -c <version>   Build curl version (default 8.11.1)
+         -n <version>   Build nghttp2 version (default 1.64.0)
          -d             Compile without HTTP2 support
          -e             Compile with OpenSSL engine support
          -b             Compile without bitcode
@@ -34,9 +35,11 @@ The build script accepts several arguments to adjust versions and toggle feature
          -3             Compile with SSLv3
          -s <version>   iOS min target version (default 8.0)
          -t <version>   tvOS min target version (default 9.0)
-         -i <version>   macOS 86_64 min target version (default 11.6.6)
-         -a <version>   macOS arm64 min target version (default 11.6.6)
+         -i <version>   macOS 86_64 min target version (default 14.6.1)
+         -a <version>   macOS arm64 min target version (default 14.6.1)
          -x             No color output
+         -p <platform>  Build only for specified platform (iOS, tvOS, macOS, or all [default])
+         -y             Skip build confirmation
          -h             Show usage
 ```
 
@@ -55,7 +58,15 @@ Minimum macOS, iOS and tvOS target build versions are set by default in the buil
 ```bash
 git clone https://github.com/jasonacox/Build-OpenSSL-cURL.git
 cd Build-OpenSSL-cURL
+
+# Build for all: macOS, iOS, and tvOS
 ./build.sh
+
+# Build for macOS only
+./build.sh -p macos
+
+# build for iOS only
+./build.sh -p ios
 ```
 
 Default versions are specified in the `build.sh` script but you can specify the version you want to build via the command line, e.g.:
@@ -74,9 +85,9 @@ You can update the default version by editing this section in the `build.sh` scr
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="3.0.9"         # https://www.openssl.org/source/
-LIBCURL="8.1.2"        # https://curl.haxx.se/download.html
-NGHTTP2="1.55.1"        # https://nghttp2.org/
+OPENSSL="3.0.15"	# https://www.openssl.org/source/ - LTS Version
+LIBCURL="8.11.1"	# https://curl.haxx.se/download.html
+NGHTTP2="1.64.0"	# https://nghttp2.org/
 
 ################################################
 ```
@@ -402,3 +413,5 @@ If you see "FATAL ERROR" during the nghttp2 build phase, this is likely due to n
 If you are on a new macOS installation and wonder why the build is failing, you might need to set the correct path for the command line tools:
 
     xcode-select --switch /Applications/Xcode.app
+
+If the build fails for a newer version of one of the libraries, submit a ticket. Please note, the project focuses on supporting long term support (LTS) versions of libraries. OpenSSL in particular, has many dev or short term support versions. These change too freuqently to adequately support. Switch to a LTS version. Submit any errors you get with LTS versions.
