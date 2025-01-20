@@ -60,6 +60,4 @@ example/tvOS\ Test\ App/libs/
 example/tvOS\ Test\ App/include/
 example/macOS\ Test\ App/include/
 example/macOS\ Test\ App/libs/
-example/macOS\ Test\ App\ copy/include/
-example/macOS\ Test\ App\ copy/libs/
 cacert.pem
