@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## 1.0.1 - Catalyst Fix
+
+* Fix build issue where bitcode compile was happening for Catalyst target. 
+* Bitcode compile is now deprecated. The build script disables it. This is in prep to remove all bitcode logic from the script in the next release.
+
 ## 1.0.0 - Platform Builds
 
 * Updated build script to allow building for single platform targets: macOS, iOS or tvOS. Specify with `-p <platform>` switch. Default build is for "all" as it has been. 

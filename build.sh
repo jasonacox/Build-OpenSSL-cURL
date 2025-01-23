@@ -24,7 +24,7 @@ BUILD_MACHINE=`uname -m`
 BUILD_CMD=$*
 
 # Script Version
-SCRIPT_VERSION="1.0.0"
+SCRIPT_VERSION="1.0.1"
 
 # Compile Cache - Optional
 # export CMAKE_CXX_COMPILER_LAUNCHER="ccache"
@@ -57,7 +57,7 @@ BUILDFOR="all"
 # Global flags
 engine=""
 buildnghttp2="-n"
-disablebitcode=""
+disablebitcode="-b"
 colorflag=""
 catalyst=""
 sslv3=""
@@ -95,7 +95,7 @@ usage () {
 	echo "         -n <version>   Build nghttp2 version (default $NGHTTP2)"
 	echo "         -d             Compile without HTTP2 support"
 	echo "         -e             Compile with OpenSSL engine support"
-	echo "         -b             Compile without bitcode"
+	echo "         -b             Compile without bitcode (deprecated)"
 	echo "         -m             Compile Mac Catalyst library"
 	echo "         -u <version>   Mac Catalyst iOS min target version (default $CATALYST_IOS)"
 	echo "         -3             Compile with SSLv3"

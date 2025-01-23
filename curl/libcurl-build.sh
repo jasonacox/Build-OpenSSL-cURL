@@ -591,8 +591,8 @@ if [ $BUILDFOR == "macos" ] || [ $BUILDFOR == "all" ]; then
 
 	if [ $catalyst == "1" ]; then
 	echo -e "${bold}Building Catalyst libraries${dim}"
-	buildCatalyst "x86_64" "bitcode"
-	buildCatalyst "arm64" "bitcode"
+	buildCatalyst "x86_64" "${BITCODE}"
+	buildCatalyst "arm64" "${BITCODE}"
 
 	lipo \
 		"/tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/lib/libcurl.a" \
