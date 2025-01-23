@@ -29,7 +29,7 @@ The build script accepts several arguments to adjust versions and toggle feature
          -n <version>   Build nghttp2 version (default 1.64.0)
          -d             Compile without HTTP2 support
          -e             Compile with OpenSSL engine support
-         -b             Compile without bitcode
+         -b             Compile without bitcode (depreciated)
          -m             Compile Mac Catalyst library
          -u <version>   Mac Catalyst iOS min target version (default 15.0)
          -3             Compile with SSLv3
