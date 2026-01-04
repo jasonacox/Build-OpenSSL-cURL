@@ -595,67 +595,39 @@ if [ $BUILDFOR == "macos" ] || [ $BUILDFOR == "all" ]; then
 	buildCatalyst "arm64" "${BITCODE}"
 
 	lipo \
-		"/tmp/${CURL_VERSION}-catalyst-x86_64-bitcode/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-catalyst-arm64-bitcode/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-catalyst-x86_64-${BITCODE}/lib/libcurl.a" \
+		"/tmp/${CURL_VERSION}-catalyst-arm64-${BITCODE}/lib/libcurl.a" \
 		-create -output lib/libcurl_Catalyst.a
 	fi
 fi
 
 if [ $BUILDFOR == "ios" ] || [ $BUILDFOR == "all" ]; then
 	echo -e "${bold}Building iOS libraries (${BITCODE})${dim}"
-	buildIOS "armv7" "${BITCODE}"
-	buildIOS "armv7s" "${BITCODE}"
 	buildIOS "arm64" "${BITCODE}"
 	buildIOS "arm64e" "${BITCODE}"
 
 	echo -e "  ${dim}Copying headers"
-	cp /tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/include/curl/* include/curl/
+	cp /tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/include/curl/* include/curl/
 
 	lipo \
-		"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
 		-create -output lib/libcurl_iOS.a
 
-	buildIOSsim "i386" "${BITCODE}"
 	buildIOSsim "x86_64" "${BITCODE}"
 	buildIOSsim "arm64" "${BITCODE}"
 
 	lipo \
-		"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-simulator-arm64-${BITCODE}/lib/libcurl.a" \
 		-create -output lib/libcurl_iOS-simulator.a
 
 	lipo \
-		"/tmp/${CURL_VERSION}-iOS-armv7-${BITCODE}/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-armv7s-${BITCODE}/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-arm64-${BITCODE}/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-arm64e-${BITCODE}/lib/libcurl.a" \
-		"/tmp/${CURL_VERSION}-iOS-simulator-i386-${BITCODE}/lib/libcurl.a" \
 		"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-${BITCODE}/lib/libcurl.a" \
 		-create -output lib/libcurl_iOS-fat.a
 fi
-
-# if [[ "${NOBITCODE}" == "yes" ]]; then
-# 	echo -e "${bold}Building iOS libraries (nobitcode)${dim}"
-# 	buildIOS "armv7" "nobitcode"
-# 	buildIOS "armv7s" "nobitcode"
-# 	buildIOS "arm64" "nobitcode"
-# 	buildIOS "arm64e" "nobitcode"
-# 	buildIOSsim "x86_64" "nobitcode"
-# 	buildIOSsim "i386" "nobitcode"
-
-# 	lipo \
-# 		"/tmp/${CURL_VERSION}-iOS-armv7-nobitcode/lib/libcurl.a" \
-# 		"/tmp/${CURL_VERSION}-iOS-armv7s-nobitcode/lib/libcurl.a" \
-# 		"/tmp/${CURL_VERSION}-iOS-simulator-i386-nobitcode/lib/libcurl.a" \
-# 		"/tmp/${CURL_VERSION}-iOS-arm64-nobitcode/lib/libcurl.a" \
-# 		"/tmp/${CURL_VERSION}-iOS-arm64e-nobitcode/lib/libcurl.a" \
-# 		"/tmp/${CURL_VERSION}-iOS-simulator-x86_64-nobitcode/lib/libcurl.a" \
-# 		-create -output lib/libcurl_iOS_nobitcode.a
-# fi
 
 if [ $BUILDFOR == "tvos" ] || [ $BUILDFOR == "all" ]; then
 	echo -e "${bold}Building tvOS libraries${dim}"

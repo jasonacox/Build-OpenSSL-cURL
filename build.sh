@@ -13,9 +13,9 @@ set -e
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="3.0.15"	# https://www.openssl.org/source/ - LTS Version
-LIBCURL="8.11.1"	# https://curl.haxx.se/download.html
-NGHTTP2="1.64.0"	# https://nghttp2.org/
+OPENSSL="3.0.18"	# https://www.openssl.org/source/ - LTS Version
+LIBCURL="8.17.0"	# https://curl.haxx.se/download.html
+NGHTTP2="1.68.0"	# https://nghttp2.org/
 
 ################################################
 
@@ -24,7 +24,7 @@ BUILD_MACHINE=`uname -m`
 BUILD_CMD=$*
 
 # Script Version
-SCRIPT_VERSION="1.0.1"
+SCRIPT_VERSION="1.0.2"
 
 # Compile Cache - Optional
 # export CMAKE_CXX_COMPILER_LAUNCHER="ccache"
@@ -57,7 +57,7 @@ BUILDFOR="all"
 # Global flags
 engine=""
 buildnghttp2="-n"
-disablebitcode="-b"
+disablebitcode="-b" # Default disable bitcode
 colorflag=""
 catalyst=""
 sslv3=""
@@ -371,8 +371,8 @@ elif [ "$BUILDFOR" == "all" ]; then
 		-library $ARCHIVE/lib/tvOS-simulator/libssl.a \
         -library $ARCHIVE/lib/MacOS/libssl.a \
 		-output $ARCHIVE/xcframework/libssl.xcframework
-	# openssl/openssl-ios-armv7_armv7s_arm64_arm64e.a   
-	# openssl/openssl-ios-i386_x86_64_arm64-simulator.a
+	# openssl/openssl-ios-arm64_arm64e.a   
+	# openssl/openssl-ios-x86_64_arm64-simulator.a
 	cp openssl/*.a $ARCHIVE/framework
 elif [ "$BUILDFOR" == "ios" ]; then
 	# Build XCFrameworks
@@ -392,8 +392,8 @@ elif [ "$BUILDFOR" == "ios" ]; then
 		-library $ARCHIVE/lib/iOS/libssl.a \
 		-library $ARCHIVE/lib/iOS-simulator/libssl.a \
 		-output $ARCHIVE/xcframework/libssl.xcframework
-	# openssl/openssl-ios-armv7_armv7s_arm64_arm64e.a   
-	# openssl/openssl-ios-i386_x86_64_arm64-simulator.a
+	# openssl/openssl-ios-arm64_arm64e.a   
+	# openssl/openssl-ios-x86_64_arm64-simulator.a
 	cp openssl/*.a $ARCHIVE/framework
 elif [ "$BUILDFOR" == "tvos" ]; then
 	# Build XCFrameworks

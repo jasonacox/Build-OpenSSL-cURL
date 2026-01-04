@@ -3,7 +3,7 @@
 <!--  [![Build Status](https://app.travis-ci.com/jasonacox/Build-OpenSSL-cURL.svg?branch=master)](https://app.travis-ci.com/jasonacox/Build-OpenSSL-cURL) -->
 [![Build Status](https://github.com/jasonacox/Build-OpenSSL-cURL/actions/workflows/build.yml/badge.svg)](https://github.com/jasonacox/Build-OpenSSL-cURL/actions/workflows/build.yml)
 
-This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), Mac Catalyst (x86_64, arm64), iOS (armv7, armv7s, arm64 and arm64e), iOS Simulator (x86_64, arm64), tvOS (arm64) and tvOS Simulator (x86_64).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
+This Script builds OpenSSL, nghttp2 and cURL/libcurl for MacOS (x86_64, arm64), Mac Catalyst (x86_64, arm64), iOS (arm64 and arm64e), iOS Simulator (x86_64, arm64), tvOS (arm64) and tvOS Simulator (x86_64).  It includes patching for tvOS to not use fork() and adds HTTP2 support via nghttp2.
 
 ## News
 
@@ -103,7 +103,7 @@ The build script requires:
 ### OpenSSL
 The `openssl-build.sh` script creates separate bitcode enabled target libraries for:
 * MacOS - OS X (x86-64, arm64)
-* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64, arm64)
+* iOS - iPhone (arm64 and arm64e) and iPhoneSimulator (x86_64, arm64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
 By default, the OpenSSL source disables ENGINE support for iOS builds.  To force this active use `build.sh -e`
@@ -119,7 +119,7 @@ NOTE: This script allows building the OpenSSL 3.0.x and 1.1.1 series libraries. 
 ### HTTP2 / nghttp2
 The `nghttp2-build.sh` script builds the nghttp2 libraries used by libcurl for the HTTP2 protocol.
 * MacOS - OS X (x86-64, arm64)
-* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64, arm64)
+* iOS - iPhone (arm64 and arm64e) and iPhoneSimulator (x86_64, arm64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
 Edit `build.sh` to change the default version of nghttp2 that will be downloaded and built or specify the version on the command line.
@@ -143,7 +143,7 @@ DISABLE HTTP2: The nghttp2 build can be disabled by using:
 ### cURL / libcurl
 The `libcurl-build.sh` script create separate bitcode enabled targets libraries for:
 * MacOS - OS X (x86-64, arm64)
-* iOS - iPhone (armv7, armv7s, arm64 and arm64e) and iPhoneSimulator (i386, x86-64, arm64)
+* iOS - iPhone (arm64 and arm64e) and iPhoneSimulator (x86_64, arm64)
 * tvOS - AppleTVOS (arm64) and AppleTVSimulator (x86-64)
 
 The curl build uses `--with-ssl` pointing to the above OpenSSL builds and `--with-nghttp2` pointing to the above nghttp2 builds..
@@ -154,7 +154,7 @@ Edit `build.sh` to change the version of cURL that will be downloaded and built 
 Include the relevant library into your project.  Rename the appropriate file to libcurl.a:
 
 	|____lib
-	   |____libcurl_iOS.a            <-- Contains iOS (armv7, armv7s, arm64 and arm64e) libraries
+	   |____libcurl_iOS.a            <-- Contains iOS (arm64 and arm64e) libraries
 	   |____libcurl_iOS-simulator.a  <-- Contains iOS-simulator (x86_64, arm64) libraries
 	   |____libcurl_iOS-fat.a        <-- Contains iOS and iOS-simulator (x86_64) libraries
 	   |____libcurl_Mac.a            <-- Contains MacOS (x86_64, arm64) libraries
@@ -261,22 +261,22 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 	* curl/lib/libcurl_Mac.a are: x86_64 arm64 
 
 * iOS Only
-	* openssl/iOS/lib/libcrypto.a are: armv7 armv7s arm64 arm64e 
-	* openssl/iOS/lib/libssl.a are: armv7 armv7s arm64 arm64e 
-	* nghttp2/lib/libnghttp2_iOS.a are: armv7 armv7s arm64 arm64e 
-	* curl/lib/libcurl_iOS.a are: armv7 armv7s arm64 arm64e 
+	* openssl/iOS/lib/libcrypto.a are: arm64 arm64e 
+	* openssl/iOS/lib/libssl.a are: arm64 arm64e 
+	* nghttp2/lib/libnghttp2_iOS.a are: arm64 arm64e 
+	* curl/lib/libcurl_iOS.a are: arm64 arm64e 
 
 * iOS Simulator (Intel + Apple Silicon)
-	* openssl/iOS-simulator/lib/libcrypto.a are: i386 x86_64 arm64 
-	* openssl/iOS-simulator/lib/libssl.a are: i386 x86_64 arm64 
-	* nghttp2/lib/libnghttp2_iOS-simulator.a are: i386 x86_64 arm64 
-	* curl/lib/libcurl_iOS-simulator.a are: i386 x86_64 arm64 
+	* openssl/iOS-simulator/lib/libcrypto.a are: x86_64 arm64 
+	* openssl/iOS-simulator/lib/libssl.a are: x86_64 arm64 
+	* nghttp2/lib/libnghttp2_iOS-simulator.a are: x86_64 arm64 
+	* curl/lib/libcurl_iOS-simulator.a are: x86_64 arm64 
 
 * iOS + Intel Mac Simulator 
-	* openssl/iOS-fat/lib/libcrypto.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
-	* openssl/iOS-fat/lib/libssl.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
-	* nghttp2/lib/libnghttp2_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
-	* curl/lib/libcurl_iOS-fat.a are: armv7 armv7s i386 x86_64 arm64 arm64e 
+	* openssl/iOS-fat/lib/libcrypto.a are: x86_64 arm64 arm64e 
+	* openssl/iOS-fat/lib/libssl.a are: x86_64 arm64 arm64e 
+	* nghttp2/lib/libnghttp2_iOS-fat.a are: x86_64 arm64 arm64e 
+	* curl/lib/libcurl_iOS-fat.a are: x86_64 arm64 arm64e 
 
 * tvOS + Intel Mac Simulator
 	* openssl/tvOS/lib/libcrypto.a are: x86_64 arm64 
@@ -293,33 +293,33 @@ The Example app project builds an iOS, iOS Simulator and Mac Catalyst target.
 		* (for architecture arm64):  Mach-O 64-bit executable arm64
 
 * Consolidated OpenSSL Libraries for iOS
-	* openssl/openssl-ios-armv7_armv7s_arm64_arm64e.a are: armv7 armv7s arm64 arm64e 
-	* openssl/openssl-ios-x86_64-simulator.a are: i386 x86_64 
+	* openssl/openssl-ios-arm64_arm64e.a are: arm64 arm64e 
+	* openssl/openssl-ios-x86_64_arm64-simulator.a are: x86_64 arm64 
 	* openssl/openssl-ios-x86_64-maccatalyst.a is architecture: x86_64
 
 * XCFrameworks
 
         |__ libcrypto.xcframework
-        │   |__ ios-arm64_arm64e_armv7_armv7s
-        │   |__ ios-arm64_i386_x86_64-simulator
+        │   |__ ios-arm64_arm64e
+        │   |__ ios-x86_64_arm64-simulator
         │   |__ tvos-arm64
         │   |__ tvos-arm64_x86_64-simulator
         |
         |__ libcurl.xcframework
-        │   |__ ios-arm64_arm64e_armv7_armv7s
-        │   |__ ios-arm64_i386_x86_64-simulator
+        │   |__ ios-arm64_arm64e
+        │   |__ ios-x86_64_arm64-simulator
         │   |__ tvos-arm64
         │   |__ tvos-arm64_x86_64-simulator
         |
         |__ libnghttp2.xcframework
-        │   |__ ios-arm64_arm64e_armv7_armv7s
-        │   |__ ios-arm64_i386_x86_64-simulator
+        │   |__ ios-arm64_arm64e
+        │   |__ ios-x86_64_arm64-simulator
         │   |__ tvos-arm64
         │   |__ tvos-arm64_x86_64-simulator
         |
         |__ libssl.xcframework
-            |__ ios-arm64_arm64e_armv7_armv7s
-            |__ ios-arm64_i386_x86_64-simulator
+            |__ ios-arm64_arm64e
+            |__ ios-x86_64_arm64-simulator
             |__ tvos-arm64
             |__ tvos-arm64_x86_64-simulator
 
@@ -352,6 +352,13 @@ The `build.sh` script will create an ./archive folder and store all the *.a libr
 ## Download Compressed Archives
 
 Previous builds can be downloaded form the Github releases for this project: https://github.com/jasonacox/Build-OpenSSL-cURL/releases
+
+## i386 and armv7 Architectures
+
+As of build 1.0.2, the build script no longer supports i386 and armv7/armv7s targets. New Xcode installations do not have the libraries to support these platform so the build script would fail. 
+
+* Apple officially stopped supporting the i386 architecture for new development in Xcode 10 (released in 2018), marking the end of 32-bit Intel support for both macOS and iOS simulators.
+* Apple officially stopped supporting the creation of binaries for armv7/armv7s architectures with the release of Xcode 14 in June 2022.
 
 ## License
 

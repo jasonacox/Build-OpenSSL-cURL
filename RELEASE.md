@@ -1,5 +1,10 @@
 # RELEASE NOTES
 
+## 1.0.2 - Removal of armv7
+
+* Removal of armv7/armv7s architecture support: Apple officially stopped supporting the creation of binaries for armv7/armv7s architectures with the release of Xcode 14 in June 2022. This means that new installations of Xcode will not be able to compile armv7 targets, which will break the build script.
+* Removal of i386 architecture support: Apple officially stopped supporting the i386 architecture for new development in Xcode 10 (released in 2018), marking the end of 32-bit Intel support for both macOS and iOS simulators.
+
 ## 1.0.1 - Catalyst Fix
 
 * Fix build issue where bitcode compile was happening for Catalyst target. 

@@ -578,33 +578,24 @@ fi
 if [ "$BUILDFOR" == "ios" ] || [ "$BUILDFOR" == "all" ]; then
 	# iOS
 	echo -e "${bold}Building iOS libraries (bitcode)${dim}"
-	buildIOS "armv7" "bitcode"
-	buildIOS "armv7s" "bitcode"
 	buildIOS "arm64" "bitcode"
 	buildIOS "arm64e" "bitcode"
 
 	buildIOSsim "x86_64" "bitcode"
 	buildIOSsim "arm64" "bitcode"
-	buildIOSsim "i386" "bitcode"
 
 	lipo \
-		"${NGHTTP2}/iOS/armv7/lib/libnghttp2.a" \
-		"${NGHTTP2}/iOS/armv7s/lib/libnghttp2.a" \
-		"${NGHTTP2}/iOS-simulator/i386/lib/libnghttp2.a" \
 		"${NGHTTP2}/iOS/arm64/lib/libnghttp2.a" \
 		"${NGHTTP2}/iOS/arm64e/lib/libnghttp2.a" \
 		"${NGHTTP2}/iOS-simulator/x86_64/lib/libnghttp2.a" \
 		-create -output "${NGHTTP2}/lib/libnghttp2_iOS-fat.a"
 
 	lipo \
-		"${NGHTTP2}/iOS/armv7/lib/libnghttp2.a" \
-		"${NGHTTP2}/iOS/armv7s/lib/libnghttp2.a" \
 		"${NGHTTP2}/iOS/arm64/lib/libnghttp2.a" \
 		"${NGHTTP2}/iOS/arm64e/lib/libnghttp2.a" \
 		-create -output "${NGHTTP2}/lib/libnghttp2_iOS.a"
 
 	lipo \
-		"${NGHTTP2}/iOS-simulator/i386/lib/libnghttp2.a" \
 		"${NGHTTP2}/iOS-simulator/x86_64/lib/libnghttp2.a" \
 		"${NGHTTP2}/iOS-simulator/arm64/lib/libnghttp2.a" \
 		-create -output "${NGHTTP2}/lib/libnghttp2_iOS-simulator.a"
