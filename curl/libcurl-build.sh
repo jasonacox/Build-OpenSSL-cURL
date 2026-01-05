@@ -677,8 +677,8 @@ if [ $BUILDFOR == "tvos" ] || [ $BUILDFOR == "all" ]; then
 fi
 
 echo -e "${bold}Cleaning up${dim}"
-#rm -rf /tmp/${CURL_VERSION}-*
-#rm -rf ${CURL_VERSION}
+rm -rf /tmp/${CURL_VERSION}-*
+rm -rf ${CURL_VERSION}
 
 echo -e "${dim}Checking libraries"
 xcrun -sdk iphoneos lipo -info lib/*.a
