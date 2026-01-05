@@ -1,5 +1,14 @@
 # RELEASE NOTES
 
+## 1.0.3 - SSLv3 Support and Enhancements
+
+* Added SSLv3 support for security testing with `-3` flag. This allows verification that servers properly reject SSLv3 connections. Includes compatibility updates for OpenSSL 3.x which removed the `SSLv3_client_method()` function.
+* Enhanced SSLv3 patch (`sslv3.patch`) to work with OpenSSL 3.x using `SSL_CTX_set_min_proto_version()` and `SSL_CTX_set_max_proto_version()` APIs.
+* Added automatic SSLv3 support verification in build script when `-3` flag is used.
+* Updated `iCurlHTTP.sh` script to copy all `.xcframework` folders from `archive/latest/xcframework` to support modern Xcode projects.
+* Fixed libcurl-build.sh SSLv3 patching for curl 8.17.0+ to properly handle the new command-line argument processing in tool_getparam.c.
+* Improved documentation with detailed patch file comments.
+
 ## 1.0.2 - Removal of armv7
 
 * Removal of armv7/armv7s architecture support: Apple officially stopped supporting the creation of binaries for armv7/armv7s architectures with the release of Xcode 14 in June 2022. This means that new installations of Xcode will not be able to compile armv7 targets, which will break the build script.
