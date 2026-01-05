@@ -205,7 +205,7 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
         curl_easy_setopt(_curl, CURLOPT_USERAGENT, curl_version());	// set a default user agent
         curl_easy_setopt(_curl, CURLOPT_VERBOSE, 1L);	// turn on verbose
         curl_easy_setopt(_curl, CURLOPT_TIMEOUT, 60L); // seconds
-        curl_easy_setopt(_curl, CURLOPT_MAXCONNECTS, 0L); // this should disallow connection sharing
+        // curl_easy_setopt(_curl, CURLOPT_MAXCONNECTS, 0L); // REMOVED - 0 is invalid in curl 8.x
         curl_easy_setopt(_curl, CURLOPT_FORBID_REUSE, 1L); // enforce connection to be closed
         curl_easy_setopt(_curl, CURLOPT_DNS_CACHE_TIMEOUT, 0L); // Disable DNS cache
         curl_easy_setopt(_curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0); // enable HTTP2 Protocol
@@ -227,8 +227,8 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
         // PERFORM the Curl
         theResult = curl_easy_perform(_curl);
         if (theResult == CURLE_OK) {
-            long http_code, http_ver;
-            double total_time, total_size, total_speed, timing_ns, timing_tcp, timing_ssl, timing_fb;
+            long http_code, http_ver, total_size, total_speed;
+            double total_time, timing_ns, timing_tcp, timing_ssl, timing_fb;
             char *redirect_url2 = NULL;
             curl_easy_getinfo(_curl, CURLINFO_RESPONSE_CODE, &http_code);
             curl_easy_getinfo(_curl, CURLINFO_TOTAL_TIME, &total_time);
@@ -256,7 +256,7 @@ int iOSCurlProgressCallback(void *clientp, double dltotal, double dlnow, double 
             }
             
             // timings
-            _resultText.text = [_resultText.text stringByAppendingFormat:@"\n** Timing Details **\n-- \tName Lookup:\t%0.2fs\n-- \tTCP Connect: \t%0.2fs\n-- \tSSL Handshake: \t%0.2fs\n-- \tFirst Byte: \t\t%0.2fs\n-- \tTotal Download: \t%0.2fs\n-- Size: %0.0f bytes\n-- Speed: %0.0f bytes/sec\n-- Using: %@\n** RESULT CODE: %ld**",
+            _resultText.text = [_resultText.text stringByAppendingFormat:@"\n** Timing Details **\n-- \tName Lookup:\t%0.2fs\n-- \tTCP Connect: \t%0.2fs\n-- \tSSL Handshake: \t%0.2fs\n-- \tFirst Byte: \t\t%0.2fs\n-- \tTotal Download: \t%0.2fs\n-- Size: %" CURL_FORMAT_CURL_OFF_T " bytes\n-- Speed: %" CURL_FORMAT_CURL_OFF_T " bytes/sec\n-- Using: %@\n** RESULT CODE: %ld**",
                                 timing_ns,timing_tcp,timing_ssl,timing_fb,
                                 total_time,total_size, total_speed, http_ver_s, http_code];
         
