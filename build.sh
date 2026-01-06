@@ -24,7 +24,7 @@ BUILD_MACHINE=`uname -m`
 BUILD_CMD=$*
 
 # Script Version
-SCRIPT_VERSION="1.0.2"
+SCRIPT_VERSION="1.0.3"
 
 # Compile Cache - Optional
 # export CMAKE_CXX_COMPILER_LAUNCHER="ccache"
@@ -265,6 +265,10 @@ fi
 mkdir -p "$ARCHIVE/bin"
 mkdir -p "$ARCHIVE/framework"
 mkdir -p "$ARCHIVE/xcframework"
+
+# Create a symlink of latest build
+rm -f archive/latest
+ln -s "libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2" archive/latest
 
 # libraries for libcurl, libcrypto and libssl
 if [ "$BUILDFOR" == "ios" ] || [ "$BUILDFOR" == "all" ]; then

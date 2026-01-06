@@ -274,6 +274,15 @@ buildMac()
 	if [ $ARCH == ${BUILD_MACHINE} ]; then
 		echo -e "Testing binary for ${BUILD_MACHINE}:"
 		/tmp/curl -V
+		# if user requested SSLv3, test it
+		if [ ${FORCE_SSLV3} == 'yes' ]; then
+			echo -e "Testing SSLv3 support..."
+			if /tmp/curl --sslv3 -V 2>&1 | grep -q "Ignores instruction to use SSLv3"; then
+				echo -e "${alert}ERROR: SSLv3 support not enabled in binary${normal}"
+			else
+				echo -e "${green}SUCCESS: SSLv3 support is enabled${normal}"
+			fi
+		fi
 	fi
 }
 
@@ -567,6 +576,19 @@ if [ ${FORCE_SSLV3} == 'yes' ]; then
 		# for command line
 		sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
 		sed -i '' -e 's/warnf(global, \"Ignores instruction to use SSLv3\\n\");/config->ssl_version = CURL_SSLVERSION_SSLv3;/g' "${CURL_VERSION}/src/tool_getparam.c"
+		# fix sslv3 argument deprecated flag in tool_getparams.c
+		sed -i '' '/{"sslv3",/ s/ARG_NONE|ARG_DEPR/ARG_NONE/' "${CURL_VERSION}/src/tool_getparam.c"
+		# add C_SSLV3 case handler in opt_none() function - use value 99 as marker for SSLv3
+		sed -i '' '/case C_IPV4:/i\
+  case C_SSLV3: /* --sslv3 */\
+    config->ssl_version = 99; /* special marker for SSLv3 */\
+    break;
+' "${CURL_VERSION}/src/tool_getparam.c"
+		# patch config2setopts.c to handle SSLv3 marker value before calling tlsversion()
+		sed -i '' '/my_setopt_SSLVERSION(curl, CURLOPT_SSLVERSION,/,/);/{
+s/my_setopt_SSLVERSION(curl, CURLOPT_SSLVERSION,$/my_setopt_SSLVERSION(curl, CURLOPT_SSLVERSION,/
+s/tlsversion(config->ssl_version,$/config->ssl_version == 99 ? CURL_SSLVERSION_SSLv3 : tlsversion(config->ssl_version,/
+}' "${CURL_VERSION}/src/config2setopts.c"
 	fi
 fi
 
