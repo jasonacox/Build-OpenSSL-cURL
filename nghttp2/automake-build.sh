@@ -30,14 +30,14 @@ if ! type "brew" > /dev/null; then
 	# AUTOCONF
 	curl -OL http://ftpmirror.gnu.org/autoconf/${AUTOCONF}.tar.gz
 	tar -xzf ${AUTOCONF}.tar.gz 
-	cd ${AUTOCONF}
+	cd ${AUTOCONF} || exit 1
 	echo "building..."
 	#./configure && make && sudo make install
 	cd ..
 	 
 	curl -OLs http://ftpmirror.gnu.org/automake/${AUTOMAKE}.tar.gz
 	tar -xzf ${AUTOMAKE}.tar.gz
-	cd ${AUTOMAKE}
+	cd ${AUTOMAKE} || exit 1
 	echo "building..."
 	#./configure && make && sudo make install
 	cd ..

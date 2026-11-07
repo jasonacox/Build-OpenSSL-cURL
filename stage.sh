@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034 # shared color palette; not every color is used here
 #
 # Sync Builds to S3 for next stage
 #
@@ -8,21 +9,15 @@
 # export AWS_SECRET_ACCESS_KEY=""
 
 # Formatting
-default="\033[39m"
-wihte="\033[97m"
+white="\033[97m"
 green="\033[32m"
 red="\033[91m"
 yellow="\033[33m"
 
 bold="\033[0m${green}\033[1m"
 subbold="\033[0m${green}"
-archbold="\033[0m${yellow}\033[1m"
 normal="${white}\033[0m"
 dim="\033[0m${white}\033[2m"
-alert="\033[0m${red}\033[1m"
-alertdim="\033[0m${red}\033[2m"
-
-OPENSSL_PHASE="1"
 
 EXAMPLE="example/iOS Test App"
 
@@ -44,8 +39,6 @@ usage ()
 	trap - INT TERM EXIT
 	exit 127
 }
-
-engine=0
 
 while getopts "o:ncduth\?" o; do
 	case "${o}" in
