@@ -557,7 +557,11 @@ rm -rf "${CURL_VERSION}"
 
 if [ ! -e ${CURL_VERSION}.tar.gz ]; then
 	echo -e "${dim}Downloading ${CURL_VERSION}.tar.gz"
-	curl -LOs https://curl.haxx.se/download/${CURL_VERSION}.tar.gz
+	if ! curl -fLOs https://curl.haxx.se/download/${CURL_VERSION}.tar.gz; then
+		rm -f "${CURL_VERSION}.tar.gz"
+		echo -e "${alert}** ERROR: Failed to download ${CURL_VERSION}.tar.gz - check that the version exists${normal}"
+		exit 1
+	fi
 else
 	echo -e "${dim}Using ${CURL_VERSION}.tar.gz"
 fi
