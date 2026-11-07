@@ -1,0 +1,6 @@
+[{"tag_name": "openssl-4.1.0", "draft": false, "prerelease": false},
+ {"tag_name": "openssl-3.6.5", "draft": false, "prerelease": false},
+ {"tag_name": "openssl-3.5.9", "draft": false, "prerelease": false},
+ {"tag_name": "openssl-3.5.10-alpha1", "draft": false, "prerelease": true},
+ {"tag_name": "openssl-3.0.22", "draft": false, "prerelease": false},
+ {"tag_name": "openssl-3.5.8", "draft": false, "prerelease": false}]

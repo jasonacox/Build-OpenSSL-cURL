@@ -92,6 +92,12 @@ NGHTTP2="1.64.0"	# https://nghttp2.org/
 ################################################
 ```
 
+To see whether newer upstream releases are available for these defaults (OpenSSL is compared within its major.minor LTS series), run:
+
+```bash
+./check-versions.sh
+```
+
 ## Details
 
 ### Dependencies
