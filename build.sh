@@ -13,9 +13,9 @@ set -e
 # EDIT this section to Select Default Versions #
 ################################################
 
-OPENSSL="3.0.18"	# https://www.openssl.org/source/ - LTS Version
-LIBCURL="8.17.0"	# https://curl.haxx.se/download.html
-NGHTTP2="1.68.0"	# https://nghttp2.org/
+OPENSSL="3.5.9"		# https://www.openssl.org/source/ - LTS Version (3.0 LTS EOL 2026-09-07)
+LIBCURL="8.23.0"	# https://curl.haxx.se/download.html
+NGHTTP2="1.71.0"	# https://nghttp2.org/
 
 ################################################
 
