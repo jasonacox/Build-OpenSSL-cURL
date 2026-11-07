@@ -544,7 +544,11 @@ rm -rf "${NGHTTP2_VERSION}"
 
 if [ ! -e ${NGHTTP2_VERSION}.tar.gz ]; then
 	echo -e "${dim}Downloading ${NGHTTP2_VERSION}.tar.gz"
-	curl -LOs https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERNUM}/${NGHTTP2_VERSION}.tar.gz
+	if ! curl -fLOs https://github.com/nghttp2/nghttp2/releases/download/v${NGHTTP2_VERNUM}/${NGHTTP2_VERSION}.tar.gz; then
+		rm -f "${NGHTTP2_VERSION}.tar.gz"
+		echo -e "${alert}** ERROR: Failed to download ${NGHTTP2_VERSION}.tar.gz - check that the version exists${normal}"
+		exit 1
+	fi
 else
 	echo -e "${dim}Using ${NGHTTP2_VERSION}.tar.gz"
 fi

@@ -299,7 +299,11 @@ rm -rf "${OPENSSL_VERSION}"
 
 if [ ! -e ${OPENSSL_VERSION}.tar.gz ]; then
 	echo -e "${dim}Downloading ${OPENSSL_VERSION}.tar.gz"
-	curl -LOs https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz
+	if ! curl -fLOs https://www.openssl.org/source/${OPENSSL_VERSION}.tar.gz; then
+		rm -f "${OPENSSL_VERSION}.tar.gz"
+		echo -e "${alert}** ERROR: Failed to download ${OPENSSL_VERSION}.tar.gz - check that the version exists${normal}"
+		exit 1
+	fi
 else
 	echo -e "${dim}Using ${OPENSSL_VERSION}.tar.gz"
 fi
