@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2034 # TARGET is set per-arch but only used by the OpenSSL scripts
 # This script downlaods and builds the Mac, iOS and tvOS nghttp2 libraries 
 #
 # Credits:
@@ -16,8 +17,7 @@
 set -e
 
 # Formatting
-default="\033[39m"
-wihte="\033[97m"
+white="\033[97m"
 green="\033[32m"
 red="\033[91m"
 yellow="\033[33m"
@@ -38,7 +38,6 @@ trap 'exit 1' INT
 NGHTTP2_VERNUM="1.41.0"
 
 # Set defaults
-VERSION="1.1.1i"				# OpenSSL version default
 catalyst="0"
 BUILDFOR="all"
 
@@ -225,7 +224,7 @@ buildMac()
 
 	pushd . > /dev/null
 	cd "${NGHTTP2_VERSION}"
-	if [[ $ARCH != ${BUILD_MACHINE} ]]; then
+	if [[ $ARCH != "${BUILD_MACHINE}" ]]; then
 		# cross compile required
 		if [[ "${ARCH}" == "arm64" || "${ARCH}" == "arm64e"  ]]; then
 			./configure --disable-shared --disable-app --disable-threads --enable-lib-only  --prefix="${NGHTTP2}/Mac/${ARCH}" --host="arm-apple-darwin" &> "/tmp/${NGHTTP2_VERSION}-${ARCH}.log"
@@ -338,8 +337,6 @@ buildIOS()
 	else
 			CC_BITCODE_FLAG="-fembed-bitcode"
 	fi
-  
-	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
@@ -376,7 +373,6 @@ buildIOSsim()
 	cd "${NGHTTP2_VERSION}"
   
   	PLATFORM="iPhoneSimulator"
-	export $PLATFORM
 
 	TARGET="darwin-i386-cc"
 	RUNTARGET=""
@@ -392,8 +388,6 @@ buildIOSsim()
 	else
 			CC_BITCODE_FLAG="-fembed-bitcode"
 	fi
-  
-	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
@@ -433,8 +427,6 @@ buildTVOS()
 	else
 		PLATFORM="AppleTVOS"
 	fi
-
-	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${TVOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
@@ -480,11 +472,9 @@ buildTVOSsim()
 
 	PLATFORM="AppleTVSimulator"
 
-	TARGET="darwin64-${ARCH}-cc"
 	RUNTARGET="-target ${ARCH}-apple-tvos${TVOS_MIN_SDK_VERSION}-simulator"
-
-	export $PLATFORM
-	export SYSROOT=$(xcrun --sdk appletvsimulator --show-sdk-path)
+	SYSROOT=$(xcrun --sdk appletvsimulator --show-sdk-path)
+	export SYSROOT
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 	export CFLAGS="-arch ${ARCH} -pipe -Os -gdwarf-2 -isysroot ${SYSROOT} -mtvos-version-min=${TVOS_MIN_SDK_VERSION} -fembed-bitcode ${RUNTARGET}"

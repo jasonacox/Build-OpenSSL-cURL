@@ -64,7 +64,6 @@ sslv3=""
 autobuild=""
 
 # Formatting
-default="\033[39m"
 white="\033[97m"
 green="\033[32m"
 red="\033[91m"

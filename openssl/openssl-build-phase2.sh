@@ -12,8 +12,7 @@ set -e
 CUSTOMCONFIG="enable-ssl-trace"
 
 # Formatting
-default="\033[39m"
-wihte="\033[97m"
+white="\033[97m"
 green="\033[32m"
 red="\033[91m"
 yellow="\033[33m"
@@ -37,6 +36,7 @@ CATALYST_IOS="15.0"				# Min supported is iOS 15.0 for Mac Catalyst
 IOS_MIN_SDK_VERSION="8.0"
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
+# shellcheck disable=SC2034 # kept for parity with phase1
 TVOS_SDK_VERSION=""
 catalyst="0"
 VERSION="3.0.9"					# OpenSSL version default
@@ -99,9 +99,11 @@ while getopts "v:s:t:i:a:u:p:emx3h\?" o; do
 			engine=1
 			;;
 		m)
+			# shellcheck disable=SC2034 # Catalyst is built in phase1
 			catalyst="1"
 			;;
 		u)
+			# shellcheck disable=SC2034
 			catalyst="1"
 			CATALYST_IOS="${OPTARG}"
 			;;
@@ -156,8 +158,6 @@ buildIOS()
 		PLATFORM="iPhoneOS"
 		#sed -ie "s!static volatile sig_atomic_t intr_signal;!static volatile intr_signal;!" "crypto/ui/ui_openssl.c"
 	fi
-
-	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${IOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
@@ -217,7 +217,6 @@ buildIOSsim()
 	cd "${OPENSSL_VERSION}"
 
 	PLATFORM="iPhoneSimulator"
-	export $PLATFORM
 
 	TARGET="darwin-i386-cc"
 	RUNTARGET=""
@@ -252,7 +251,7 @@ buildIOSsim()
 	export CC="${BUILD_TOOLS}/usr/bin/gcc"
 	export CXX="${BUILD_TOOLS}/usr/bin/gcc"
 
-	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${iOS_SDK_VERSION} ${archbold}${ARCH}${dim} (iOS ${MIPHONEOS})"
+	echo -e "${subbold}Building ${OPENSSL_VERSION} for ${PLATFORM} ${IOS_SDK_VERSION} ${archbold}${ARCH}${dim} (iOS ${MIPHONEOS})"
 
 	# configure
 	if [[ "$OPENSSL_VERSION" = "openssl-1.0"* ]]; then
@@ -292,8 +291,8 @@ mkdir -p iOS-simulator/include/openssl/
 mkdir -p iOS-fat/include/openssl/
 mkdir -p tvOS/include/openssl/
 
-rm -rf "/tmp/${OPENSSL_VERSION}-*"
-rm -rf "/tmp/${OPENSSL_VERSION}-*.log"
+rm -rf "/tmp/${OPENSSL_VERSION}-"*
+rm -rf "/tmp/${OPENSSL_VERSION}-"*.log
 
 rm -rf "${OPENSSL_VERSION}"
 
@@ -320,7 +319,7 @@ tar xfz "${OPENSSL_VERSION}.tar.gz"
 
 if [ "$engine" == "1" ]; then
 	echo -e "${dim}+ Activate Static Engine"
-	sed -ie 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
+	sed -i '' 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
 fi
 
 # iOS

@@ -12,8 +12,7 @@ set -e
 CUSTOMCONFIG="enable-ssl-trace"
 
 # Formatting
-default="\033[39m"
-wihte="\033[97m"
+white="\033[97m"
 green="\033[32m"
 red="\033[91m"
 yellow="\033[33m"
@@ -40,6 +39,7 @@ MACOS_X86_64_VERSION=""			# Empty = use host version
 MACOS_ARM64_VERSION=""			# Min supported is MacOS 11.0 Big Sur
 CATALYST_IOS="15.0"				# Min supported is iOS 15.0 for Mac Catalyst
 IOS_MIN_SDK_VERSION="8.0"
+# shellcheck disable=SC2034 # kept for parity with phase2
 IOS_SDK_VERSION=""
 TVOS_MIN_SDK_VERSION="9.0"
 TVOS_SDK_VERSION=""
@@ -306,8 +306,6 @@ buildTVOS()
 		PLATFORM="AppleTVOS"
 		sed -ie "s!static volatile sig_atomic_t intr_signal;!static volatile intr_signal;!" "crypto/ui/ui_openssl.c"
 	fi
-
-	export $PLATFORM
 	export CROSS_TOP="${DEVELOPER}/Platforms/${PLATFORM}.platform/Developer"
 	export CROSS_SDK="${PLATFORM}${TVOS_SDK_VERSION}.sdk"
 	export BUILD_TOOLS="${DEVELOPER}"
@@ -382,9 +380,8 @@ buildTVOSsim()
 	PLATFORM="AppleTVSimulator"
 	TARGET="darwin64-${ARCH}-cc"
 	RUNTARGET="-target ${ARCH}-apple-tvos${TVOS_MIN_SDK_VERSION}-simulator"
-
-	export $PLATFORM
-	export SYSROOT=$(xcrun --sdk appletvsimulator --show-sdk-path)
+	SYSROOT=$(xcrun --sdk appletvsimulator --show-sdk-path)
+	export SYSROOT
 	export BUILD_TOOLS="${DEVELOPER}"
 	export CC="${BUILD_TOOLS}/usr/bin/gcc -fembed-bitcode -arch ${ARCH}"
 	export LC_CTYPE=C
@@ -465,8 +462,8 @@ mkdir -p tvOS-simulator/lib
 mkdir -p tvOS-simulator/include/openssl/
 
 rm -rf "/tmp/openssl"
-rm -rf "/tmp/${OPENSSL_VERSION}-*"
-rm -rf "/tmp/${OPENSSL_VERSION}-*.log"
+rm -rf "/tmp/${OPENSSL_VERSION}-"*
+rm -rf "/tmp/${OPENSSL_VERSION}-"*.log
 
 rm -rf "${OPENSSL_VERSION}"
 
@@ -493,7 +490,7 @@ tar xfz "${OPENSSL_VERSION}.tar.gz"
 
 if [ "$engine" == "1" ]; then
 	echo -e "${dim}+ Activate Static Engine"
-	sed -ie 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
+	sed -i '' 's/\"engine/\"dynamic-engine/' ${OPENSSL_VERSION}/Configurations/15-ios.conf
 fi
 
 ## Mac

@@ -17,4 +17,4 @@ OPENSSL_VERSION="$VERSION" ./openssl-build-phase1.sh "$@"
 OPENSSL_VERSION="$VERSION" ./openssl-build-phase2.sh "$@"
 
 # Done
-echo -e "${normal}Done"
+echo "Done"

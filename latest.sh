@@ -22,7 +22,7 @@ echo ""
 
 # Tar the build
 echo "  Creating archive libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2.tgz ..."
-cd archive
+cd archive || exit 1
 tar -czf libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2.tgz libcurl-$LIBCURL-openssl-$OPENSSL-nghttp2-$NGHTTP2
 
 # Load the README into the clipboard
